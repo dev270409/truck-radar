@@ -1,0 +1,311 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum SubscriptionPlan {
+  BASE
+  PRO
+}
+
+enum UserRole {
+  ADMIN
+  UFFICIO
+  AUTISTA
+  COMMITTENTE
+}
+
+enum KycDocType {
+  PARTITA_IVA
+  LICENZA_CONTO_TERZI
+  ALBO_TRASPORTATORI
+}
+
+enum KycStatus {
+  IN_ATTESA
+  VERIFICATO
+  RIFIUTATO
+}
+
+enum VehicleCategory {
+  FRIGO
+  TELONATO
+  SPONDA_IDRAULICA
+  CISTERNA
+  ADR
+}
+
+enum VehicleStatus {
+  DISPONIBILE
+  IN_VIAGGIO
+  IN_MANUTENZIONE
+  NON_IDONEO
+}
+
+enum VehicleDocType {
+  ASSICURAZIONE
+  REVISIONE
+  TAGLIANDO
+  BOLLO
+}
+
+enum TripStatus {
+  DA_ASSEGNARE
+  ASSEGNATO
+  IN_CORSO
+  COMPLETATO
+  ANNULLATO
+  SUBAPPALTATO
+}
+
+enum TransactionType {
+  SUBSCRIPTION
+  ESCROW
+  COMMISSION
+  PAYOUT
+}
+
+enum EscrowStatus {
+  HELD
+  RELEASED
+  REFUNDED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Company {
+  id                 String             @id @default(cuid())
+  ragioneSociale     String
+  partitaIva         String             @unique
+  indirizzo          String
+  telefono           String
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  subscriptionPlan   SubscriptionPlan   @default(BASE)
+  trialEndsAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  users          User[]
+  kycDocuments   KycDocument[]
+  vehicles       Vehicle[]
+  trips          Trip[]
+  auditLogs      AuditLog[]
+  subscriptions  Subscription[]
+  transactions   Transaction[]
+  escrowPayers   EscrowPayment[]    @relation("EscrowPayer")
+  escrowPayees   EscrowPayment[]    @relation("EscrowPayee")
+  payoutRequests PayoutRequest[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  nome         String
+  cognome      String
+  telefono     String?
+  role         UserRole  @default(ADMIN)
+  isActive     Boolean   @default(true)
+  companyId    String
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vehicleId    String?
+  vehicle      Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  auditLogs AuditLog[]
+
+  @@index([companyId])
+}
+
+model KycDocument {
+  id         String     @id @default(cuid())
+  companyId  String
+  company    Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tipo       KycDocType
+  fileUrl    String
+  fileName   String
+  status     KycStatus  @default(IN_ATTESA)
+  verifiedBy String?
+  verifiedAt DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([companyId])
+}
+
+model Vehicle {
+  id           String          @id @default(cuid())
+  companyId    String
+  company      Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  targa        String
+  categoria    VehicleCategory
+  portataMaxKg Float
+  volumeMaxM3  Float
+  status       VehicleStatus   @default(DISPONIBILE)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  drivers   User[]
+  documents VehicleDocument[]
+  trips     Trip[]
+
+  @@index([companyId])
+}
+
+model VehicleDocument {
+  id          String         @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  tipo        VehicleDocType
+  dataScadenza DateTime
+  fileUrl     String?
+  createdAt   DateTime       @default(now())
+
+  @@index([vehicleId])
+}
+
+model Trip {
+  id           String     @id @default(cuid())
+  companyId    String
+  company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vehicleId    String?
+  vehicle      Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  luogoRitiro  String
+  luogoConsegna String
+  dataRitiro   DateTime
+  dataConsegna DateTime
+  tipoMerce    String
+  pesoKg       Float
+  volumeM3     Float
+  status       TripStatus @default(DA_ASSEGNARE)
+  createdBy    String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  events         TripEvent[]
+  transactions   Transaction[]
+  escrowPayments EscrowPayment[]
+
+  @@index([companyId])
+  @@index([vehicleId])
+}
+
+model TripEvent {
+  id         String     @id @default(cuid())
+  tripId     String
+  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromStatus TripStatus
+  toStatus   TripStatus
+  changedBy  String
+  note       String?
+  createdAt  DateTime   @default(now())
+
+  @@index([tripId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  action    String
+  entity    String
+  entityId  String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  companyId            String
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String
+  stripeSubscriptionId String   @unique
+  plan                 String
+  status               String
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Transaction {
+  id                    String          @id @default(cuid())
+  companyId             String
+  company               Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tripId                String?
+  trip                  Trip?           @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  stripePaymentIntentId String?
+  amount                Float
+  currency              String          @default("eur")
+  type                  TransactionType
+  status                String
+  createdAt             DateTime        @default(now())
+
+  @@index([companyId])
+  @@index([tripId])
+}
+
+model EscrowPayment {
+  id             String       @id @default(cuid())
+  tripId         String
+  trip           Trip         @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  payerCompanyId String
+  payerCompany   Company      @relation("EscrowPayer", fields: [payerCompanyId], references: [id], onDelete: Cascade)
+  payeeCompanyId String
+  payeeCompany   Company      @relation("EscrowPayee", fields: [payeeCompanyId], references: [id], onDelete: Cascade)
+  amount         Float
+  platformFee    Float
+  netAmount      Float
+  status         EscrowStatus @default(HELD)
+  createdAt      DateTime     @default(now())
+  releasedAt     DateTime?
+
+  @@index([tripId])
+  @@index([payerCompanyId])
+  @@index([payeeCompanyId])
+}
+
+model CommissionRate {
+  id          String   @id @default(cuid())
+  planType    String
+  percentage  Float
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model PayoutRequest {
+  id               String       @id @default(cuid())
+  companyId        String
+  company          Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  amount           Float
+  status           PayoutStatus @default(PENDING)
+  stripeTransferId String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([companyId])
+}
