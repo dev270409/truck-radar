@@ -42,13 +42,13 @@ export async function POST(req: Request) {
               stripeSubscriptionId: sub.id,
               plan: sub.items.data[0]?.price.id || "BASE",
               status: sub.status,
-              currentPeriodStart: new Date(sub.current_period_start * 1000),
-              currentPeriodEnd: new Date(sub.current_period_end * 1000),
+              currentPeriodStart: new Date((sub as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((sub as any).current_period_end * 1000),
             },
             update: {
               status: sub.status,
-              currentPeriodStart: new Date(sub.current_period_start * 1000),
-              currentPeriodEnd: new Date(sub.current_period_end * 1000),
+              currentPeriodStart: new Date((sub as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((sub as any).current_period_end * 1000),
             },
           });
 
@@ -73,7 +73,10 @@ export async function POST(req: Request) {
             await db.transaction.create({
               data: {
                 companyId: sub.companyId,
-                stripePaymentIntentId: typeof invoice.payment_intent === "string" ? invoice.payment_intent : null,
+                stripePaymentIntentId:
+                  typeof (invoice as any).payment_intent === "string"
+                    ? (invoice as any).payment_intent
+                    : null,
                 amount: (invoice.amount_paid || 0) / 100,
                 currency: invoice.currency || "eur",
                 type: "SUBSCRIPTION",

@@ -12,15 +12,15 @@ export async function GET() {
   const tenantDb = getTenantDb(session.user.companyId);
   const users = await tenantDb.users.findMany({
     select: {
-      id: string;
-      email: true;
-      nome: true;
-      cognome: true;
-      telefono: true;
-      role: true;
-      isActive: true;
-      vehicleId: true;
-      createdAt: true;
+      id: true,
+      email: true,
+      nome: true,
+      cognome: true,
+      telefono: true,
+      role: true,
+      isActive: true,
+      vehicleId: true,
+      createdAt: true,
     },
     orderBy: { createdAt: "desc" },
   });

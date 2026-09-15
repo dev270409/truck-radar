@@ -1,4 +1,5 @@
 import { db } from "./db";
+import type { Prisma } from "@prisma/client";
 
 /**
  * Creates a tenant-scoped Prisma client proxy that automatically
@@ -28,11 +29,11 @@ export function getTenantDb(companyId: string) {
           ...args,
           where: { ...args?.where, companyId },
         }),
-      create: (args: Parameters<typeof db.user.create>[0]) =>
+      create: (args: { select?: any; include?: any; data: Omit<Prisma.UserUncheckedCreateInput, "companyId"> | Prisma.UserUncheckedCreateInput }) =>
         db.user.create({
           ...args,
           data: { ...args.data, companyId },
-        }),
+        } as any),
       updateMany: (args: Parameters<typeof db.user.updateMany>[0]) =>
         db.user.updateMany({
           ...args,
@@ -52,15 +53,15 @@ export function getTenantDb(companyId: string) {
           ...args,
           where: { ...args?.where, companyId },
         }),
-      create: (args: Parameters<typeof db.vehicle.create>[0]) =>
+      create: (args: { select?: any; include?: any; data: Omit<Prisma.VehicleUncheckedCreateInput, "companyId"> | Prisma.VehicleUncheckedCreateInput }) =>
         db.vehicle.create({
           ...args,
           data: { ...args.data, companyId },
-        }),
-      deleteMany: (args: Parameters<typeof db.vehicle.deleteMany>[0]) =>
+        } as any),
+      deleteMany: (args?: Parameters<typeof db.vehicle.deleteMany>[0]) =>
         db.vehicle.deleteMany({
           ...args,
-          where: { ...args.where, companyId },
+          where: { ...(args?.where ?? {}), companyId },
         }),
     },
 
@@ -76,11 +77,11 @@ export function getTenantDb(companyId: string) {
           ...args,
           where: { ...args?.where, companyId },
         }),
-      create: (args: Parameters<typeof db.trip.create>[0]) =>
+      create: (args: { select?: any; include?: any; data: Omit<Prisma.TripUncheckedCreateInput, "companyId"> | Prisma.TripUncheckedCreateInput }) =>
         db.trip.create({
           ...args,
           data: { ...args.data, companyId },
-        }),
+        } as any),
     },
 
     // KYC Documents
@@ -95,11 +96,11 @@ export function getTenantDb(companyId: string) {
           ...args,
           where: { ...args?.where, companyId },
         }),
-      create: (args: Parameters<typeof db.kycDocument.create>[0]) =>
+      create: (args: { select?: any; include?: any; data: Omit<Prisma.KycDocumentUncheckedCreateInput, "companyId"> | Prisma.KycDocumentUncheckedCreateInput }) =>
         db.kycDocument.create({
           ...args,
           data: { ...args.data, companyId },
-        }),
+        } as any),
     },
 
     // Subscriptions
@@ -118,11 +119,11 @@ export function getTenantDb(companyId: string) {
           ...args,
           where: { ...args?.where, companyId },
         }),
-      create: (args: Parameters<typeof db.auditLog.create>[0]) =>
+      create: (args: { select?: any; include?: any; data: Omit<Prisma.AuditLogUncheckedCreateInput, "companyId"> | Prisma.AuditLogUncheckedCreateInput }) =>
         db.auditLog.create({
           ...args,
           data: { ...args.data, companyId },
-        }),
+        } as any),
     },
   };
 }

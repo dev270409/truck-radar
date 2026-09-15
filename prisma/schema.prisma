@@ -169,34 +169,34 @@ model Vehicle {
 }
 
 model VehicleDocument {
-  id          String         @id @default(cuid())
-  vehicleId   String
-  vehicle     Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  tipo        VehicleDocType
+  id           String         @id @default(cuid())
+  vehicleId    String
+  vehicle      Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  tipo         VehicleDocType
   dataScadenza DateTime
-  fileUrl     String?
-  createdAt   DateTime       @default(now())
+  fileUrl      String?
+  createdAt    DateTime       @default(now())
 
   @@index([vehicleId])
 }
 
 model Trip {
-  id           String     @id @default(cuid())
-  companyId    String
-  company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vehicleId    String?
-  vehicle      Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
-  luogoRitiro  String
+  id            String     @id @default(cuid())
+  companyId     String
+  company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vehicleId     String?
+  vehicle       Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  luogoRitiro   String
   luogoConsegna String
-  dataRitiro   DateTime
-  dataConsegna DateTime
-  tipoMerce    String
-  pesoKg       Float
-  volumeM3     Float
-  status       TripStatus @default(DA_ASSEGNARE)
-  createdBy    String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  dataRitiro    DateTime
+  dataConsegna  DateTime
+  tipoMerce     String
+  pesoKg        Float
+  volumeM3      Float
+  status        TripStatus @default(DA_ASSEGNARE)
+  createdBy     String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   events         TripEvent[]
   transactions   Transaction[]
