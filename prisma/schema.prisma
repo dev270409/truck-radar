@@ -128,7 +128,8 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  auditLogs AuditLog[]
+  auditLogs     AuditLog[]
+  assignedTrips Trip[]    @relation("TripDriver")
 
   @@index([companyId])
 }
@@ -186,6 +187,8 @@ model Trip {
   company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   vehicleId     String?
   vehicle       Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  driverId      String?
+  driver        User?      @relation("TripDriver", fields: [driverId], references: [id], onDelete: SetNull)
   luogoRitiro   String
   luogoConsegna String
   dataRitiro    DateTime
@@ -193,6 +196,10 @@ model Trip {
   tipoMerce     String
   pesoKg        Float
   volumeM3      Float
+  cliente       String?
+  prezzo        Float?
+  costo         Float?
+  note          String?
   status        TripStatus @default(DA_ASSEGNARE)
   createdBy     String
   createdAt     DateTime   @default(now())
@@ -204,6 +211,7 @@ model Trip {
 
   @@index([companyId])
   @@index([vehicleId])
+  @@index([driverId])
 }
 
 model TripEvent {

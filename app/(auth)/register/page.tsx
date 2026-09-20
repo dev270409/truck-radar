@@ -11,12 +11,12 @@ import {
   ArrowRight,
   ArrowLeft,
   Truck,
-  Upload,
   AlertCircle,
   Loader2,
   Clock,
   ShieldAlert,
 } from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -45,21 +45,6 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [registeredCompanyId, setRegisteredCompanyId] = useState("");
 
-  // Simulated file upload helper for KYC documents
-  const handleSimulatedFileUpload = (tipo: string, file: File) => {
-    setKycFiles((prev) =>
-      prev.map((item) =>
-        item.tipo === tipo
-          ? {
-              ...item,
-              fileName: file.name,
-              fileUrl: `https://storage.logiflow.it/kyc/${Date.now()}_${file.name}`,
-            }
-          : item
-      )
-    );
-  };
-
   const handleNextFromA = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -85,6 +70,10 @@ export default function RegisterPage() {
   };
 
   const handleCompleteRegistration = async () => {
+    if (kycFiles.some((file) => !file.fileUrl)) {
+      setError("Carica tutti i documenti richiesti prima di completare la registrazione.");
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -101,11 +90,7 @@ export default function RegisterPage() {
           password,
           nome,
           cognome,
-          kycFiles: kycFiles.map((f) => ({
-            tipo: f.tipo,
-            fileName: f.fileName || `${f.label}.pdf`,
-            fileUrl: f.fileUrl || `https://storage.logiflow.it/kyc/demo-${f.tipo.toLowerCase()}.pdf`,
-          })),
+          kycFiles,
         }),
       });
 
@@ -139,7 +124,7 @@ export default function RegisterPage() {
               <Truck className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">LogiFlow SaaS</h1>
+              <h1 className="text-xl font-bold tracking-tight">Truck Radar</h1>
               <p className="text-xs text-slate-400">Registrazione Piattaforma Trasporti</p>
             </div>
           </div>
@@ -362,7 +347,7 @@ export default function RegisterPage() {
                 <FileCheck className="w-5 h-5 mr-2 text-blue-400" /> Step C: Upload Documentazione KYC (3 File)
               </h2>
               <p className="text-xs text-slate-400 mt-1">
-                Carica o seleziona i file necessari per la verifica aziendale.
+                I documenti vengono caricati in storage protetto e restano privati. L&apos;esito della verifica abilita il Network.
               </p>
             </div>
 
@@ -379,19 +364,16 @@ export default function RegisterPage() {
                     </p>
                   </div>
 
-                  <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-blue-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
-                    <Upload className="w-4 h-4" />
-                    <span>{doc.fileName ? "Sostituisci" : "Carica File"}</span>
-                    <input
-                      type="file"
-                      accept=".pdf,.png,.jpg,.jpeg"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSimulatedFileUpload(doc.tipo, file);
-                      }}
-                    />
-                  </label>
+                  <UploadButton
+                    endpoint="kycDocument"
+                    appearance={{ button: "bg-slate-800 hover:bg-slate-700 text-blue-300 px-3.5 py-2 rounded-lg text-xs font-semibold", allowedContent: "hidden" }}
+                    content={{ button: doc.fileName ? "Sostituisci" : "Carica file" }}
+                    onClientUploadComplete={(files) => {
+                      const file = files[0];
+                      setKycFiles((previous) => previous.map((item) => item.tipo === doc.tipo ? { ...item, fileName: file.name, fileUrl: file.url } : item));
+                    }}
+                    onUploadError={(uploadError) => setError(uploadError.message)}
+                  />
                 </div>
               ))}
             </div>
@@ -438,7 +420,7 @@ export default function RegisterPage() {
             <div>
               <h2 className="text-2xl font-bold text-white">Registrazione Completata con Successo!</h2>
               <p className="text-sm text-slate-400 mt-2 max-w-md mx-auto">
-                La tua azienda <span className="text-blue-300 font-semibold">{ragioneSociale}</span> è ora registrata sulla piattaforma LogiFlow.
+                La tua azienda <span className="text-blue-300 font-semibold">{ragioneSociale}</span> è ora registrata su Truck Radar.
               </p>
             </div>
 

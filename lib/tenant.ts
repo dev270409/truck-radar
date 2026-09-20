@@ -82,6 +82,16 @@ export function getTenantDb(companyId: string) {
           ...args,
           data: { ...args.data, companyId },
         } as any),
+      updateMany: (args: Parameters<typeof db.trip.updateMany>[0]) =>
+        db.trip.updateMany({
+          ...args,
+          where: { ...args.where, companyId },
+        }),
+      deleteMany: (args?: Parameters<typeof db.trip.deleteMany>[0]) =>
+        db.trip.deleteMany({
+          ...args,
+          where: { ...(args?.where ?? {}), companyId },
+        }),
     },
 
     // KYC Documents

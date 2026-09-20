@@ -1,32 +1,42 @@
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { getTenantDb } from "@/lib/tenant";
 import { db } from "@/lib/db";
+import type { Vehicle, VehicleDocument } from "@prisma/client";
 import {
   Car,
   Users,
   Clock,
   ShieldCheck,
-  AlertTriangle,
   CheckCircle2,
   FileCheck,
-  TrendingUp,
+  FileWarning,
+  CalendarClock,
 } from "lucide-react";
+import VerificationCard from "@/components/VerificationCard";
+
+const daysUntil = (iso: Date) =>
+  Math.ceil((iso.getTime() - Date.now()) / 86400000);
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.companyId) return null;
+  if (session.user.role === "AUTISTA") {
+    redirect("/dashboard/autista");
+  }
 
   const tenantDb = getTenantDb(session.user.companyId);
 
   const [company, vehicles, users, kycDocs] = await Promise.all([
     db.company.findUnique({ where: { id: session.user.companyId } }),
-    tenantDb.vehicles.findMany({ include: { documents: true } }),
+    tenantDb.vehicles.findMany({ include: { documents: true } }) as Promise<
+      Array<Vehicle & { documents: VehicleDocument[] }>
+    >,
     tenantDb.users.findMany(),
     tenantDb.kycDocuments.findMany(),
   ]);
 
   const availableVehicles = vehicles.filter((v) => v.status === "DISPONIBILE").length;
-  const maintenanceVehicles = vehicles.filter((v) => v.status === "IN_MANUTENZIONE").length;
 
   return (
     <div className="space-y-8">
@@ -94,15 +104,108 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stato Verifica KYC</p>
-              <h3 className="text-xl font-bold text-blue-300 mt-1">IN ATTESA</h3>
-              <p className="text-xs text-slate-400 mt-1">{kycDocs.length} Documenti Inviati</p>
+              {(() => {
+                const pending = kycDocs.filter((d) => d.status === "IN_ATTESA").length;
+                const rejected = kycDocs.filter((d) => d.status === "RIFIUTATO").length;
+                const done = kycDocs.length - pending - rejected;
+                if (kycDocs.length > 0 && pending === 0 && rejected === 0) {
+                  return (
+                    <>
+                      <h3 className="text-xl font-bold text-emerald-300 mt-1">VERIFICATA</h3>
+                      <p className="text-xs text-slate-400 mt-1">{done} Documenti Approvati</p>
+                    </>
+                  );
+                }
+                return (
+                  <>
+                    <h3
+                      className={`text-xl font-bold mt-1 ${rejected > 0 ? "text-red-300" : "text-amber-300"}`}
+                    >
+                      {pending > 0 ? "IN ATTESA" : "RIFIUTATA"}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {pending} in attesa · {done} verificati{pending > 0 ? " · Vai alla verifica" : ""}
+                    </p>
+                  </>
+                );
+              })()}
             </div>
-            <div className="w-12 h-12 bg-blue-950/80 border border-blue-800/60 rounded-xl flex items-center justify-center text-blue-400">
+            <a
+              href="/dashboard/kyc"
+              className="w-12 h-12 bg-blue-950/80 border border-blue-800/60 rounded-xl flex items-center justify-center text-blue-400 hover:bg-blue-900 transition"
+              title="Gestisci KYC"
+            >
               <FileCheck className="w-6 h-6" />
-            </div>
+            </a>
           </div>
         </div>
       </div>
+
+      {/* Vehicle Documents Expiry Section */}
+      <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+        <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <FileWarning className="w-5 h-5 mr-2 text-amber-400" /> Scadenze Documenti Veicoli
+        </h3>
+
+        {(() => {
+          const expiring = vehicles
+            .flatMap((v) => (v.documents ?? []).map((d) => ({ ...d, targa: v.targa })))
+            .filter((d) => daysUntil(new Date(d.dataScadenza)) <= 30)
+            .sort((a, b) => new Date(a.dataScadenza).getTime() - new Date(b.dataScadenza).getTime());
+
+          if (expiring.length === 0) {
+            return (
+              <div className="flex items-center space-x-2 text-sm text-emerald-300 bg-emerald-950/50 border border-emerald-800/60 rounded-xl p-4">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Nessun documento in scadenza nei prossimi 30 giorni.</span>
+              </div>
+            );
+          }
+
+          const hasExpired = expiring.some((d) => daysUntil(new Date(d.dataScadenza)) < 0);
+
+          return (
+            <div
+              className={`rounded-xl border p-4 space-y-2.5 ${
+                hasExpired ? "border-red-800/60 bg-red-950/40" : "border-amber-800/60 bg-amber-950/40"
+              }`}
+            >
+              <p className={`text-sm font-bold ${hasExpired ? "text-red-200" : "text-amber-200"}`}>
+                {expiring.length} documento{expiring.length > 1 ? "i" : ""}{" "}
+                {hasExpired ? "scaduto/i o in scadenza" : "in scadenza entro 30 giorni"}
+              </p>
+              <div className="space-y-1.5">
+                {expiring.map((d) => {
+                  const days = daysUntil(new Date(d.dataScadenza));
+                  const badge =
+                    days < 0
+                      ? "bg-red-950 text-red-300 border border-red-800/60"
+                      : "bg-amber-950 text-amber-300 border border-amber-800/60";
+                  return (
+                    <div
+                      key={d.id}
+                      className="flex items-center justify-between text-sm bg-slate-950/80 border border-slate-800/80 rounded-lg px-3 py-2"
+                    >
+                      <span className="font-mono font-bold text-slate-100">{d.targa}</span>
+                      <span className="text-slate-300">{d.tipo}</span>
+                      <span className="text-xs text-slate-400 flex items-center space-x-1">
+                        <CalendarClock className="w-3 h-3" />
+                        <span>{new Date(d.dataScadenza).toLocaleDateString("it-IT")}</span>
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge}`}>
+                        {days < 0 ? "SCADUTO" : `ENTRO ${days} G`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* Verified Account */}
+      <VerificationCard />
 
       {/* Main Sections Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

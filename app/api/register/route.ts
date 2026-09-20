@@ -32,6 +32,10 @@ export async function POST(req: Request) {
 
     const cleanEmail = String(email).toLowerCase().trim();
     const cleanPiva = String(partitaIva).trim();
+    const requiredKycTypes = ["PARTITA_IVA", "LICENZA_CONTO_TERZI", "ALBO_TRASPORTATORI"];
+    if (!Array.isArray(kycFiles) || requiredKycTypes.some((tipo) => !kycFiles.some((file: { tipo?: string; fileUrl?: string }) => file.tipo === tipo && file.fileUrl))) {
+      return NextResponse.json({ error: "Carica tutti i documenti KYC richiesti tramite il flusso protetto." }, { status: 400 });
+    }
 
     // Check if email or partitaIva already exists
     const existingCompany = await db.company.findUnique({
@@ -103,8 +107,8 @@ export async function POST(req: Request) {
         return {
           companyId: company.id,
           tipo: docDef.tipo,
-          fileUrl: provided?.fileUrl || `https://storage.logiflow.it/kyc/demo-${docDef.tipo.toLowerCase()}.pdf`,
-          fileName: provided?.fileName || `${docDef.name}.pdf`,
+          fileUrl: provided.fileUrl,
+          fileName: provided.fileName || `${docDef.name}.pdf`,
           status: "IN_ATTESA" as const,
         };
       });

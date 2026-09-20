@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Truck, ShieldCheck, ArrowRight, Lock, Mail, AlertCircle, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -34,7 +34,7 @@ export default function LoginPage() {
         router.push(callbackUrl);
         router.refresh();
       }
-    } catch (err: any) {
+    } catch {
       setError("Si è verificato un errore durante l'accesso.");
     } finally {
       setLoading(false);
@@ -55,9 +55,9 @@ export default function LoginPage() {
             <Truck className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            LogiFlow SaaS
+            Truck Radar
           </h1>
-          <p className="text-sm text-slate-400 mt-1">Piattaforma di Gestione Trasporti & Flotte</p>
+          <p className="text-sm text-slate-400 mt-1">Transport Operating System</p>
         </div>
 
         {/* Error Alert */}
@@ -145,5 +145,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Plus, ShieldCheck, UserCheck, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3 } from "lucide-react";
 
 interface UserItem {
   id: string;
@@ -100,23 +101,28 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center">
             <Users className="w-6 h-6 mr-2.5 text-indigo-400" /> Gestione Team & Autisti
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Aggiungi e gestisci gli utenti aziendali (Autisti e Committenti).
+            Crea le credenziali degli autisti, assegna il mezzo e gestisci il team.
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Aggiungi Utente</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/analytics?scope=autista" className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
+            <BarChart3 className="w-4 h-4" /><span>Analisi autisti</span>
+          </Link>
+          <button
+            onClick={() => { setRole("AUTISTA"); setShowAddModal(true); }}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Aggiungi autista</span>
+          </button>
+        </div>
       </div>
 
       {/* Users Table */}
@@ -128,7 +134,7 @@ export default function UsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="p-12 text-center text-slate-500">
-            Nessun utente trovato. Clicca su "Aggiungi Utente" per creare un nuovo account.
+            Nessun membro del team trovato. Clicca su "Aggiungi autista" per creare credenziali e accesso PWA.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -181,7 +187,7 @@ export default function UsersPage() {
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
             <h3 className="text-lg font-bold text-slate-100 flex items-center">
-              <UserCheck className="w-5 h-5 mr-2 text-indigo-400" /> Crea Nuovo Utente
+              <UserCheck className="w-5 h-5 mr-2 text-indigo-400" /> Crea account del team
             </h3>
 
             {error && (

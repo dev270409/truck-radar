@@ -3,15 +3,15 @@ import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
   const tenantDb = getTenantDb(session.user.companyId);
 
   // STRICT MULTI-TENANCY FILTER: where clause incorporates both vehicle id AND companyId
