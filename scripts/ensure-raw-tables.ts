@@ -352,6 +352,24 @@ const statements = [
   ALTER TABLE "SmartReturn" ADD COLUMN IF NOT EXISTS "source" TEXT NOT NULL DEFAULT 'INTERNO';
   ALTER TABLE "SmartReturn" ADD COLUMN IF NOT EXISTS "externalLoadId" TEXT;
   `,
+
+  // Entità §53 — VISTA COMMITTENTE: link condivisi (token) della pagina pubblica di tracking
+  // spedizione per il committente (posizione, stato consegna, DDT, info operative).
+  // Solo l'admin genera lo share; la pagina pubblica espone SOLO i dati autorizzati.
+  `
+  CREATE TABLE IF NOT EXISTS "TripShare" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "tripId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    enabled BOOLEAN NOT NULL DEFAULT true,
+    note TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "TripShare_tripId_idx" ON "TripShare"("tripId");
+  CREATE INDEX IF NOT EXISTS "TripShare_companyId_idx" ON "TripShare"("companyId");
+  `,
 ];
 
 async function main() {

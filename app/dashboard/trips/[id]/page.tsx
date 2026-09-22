@@ -20,6 +20,10 @@ import {
   FileText,
   Handshake,
   Star,
+  Share2,
+  Copy,
+  Check,
+  Link2,
 } from "lucide-react";
 
 interface SubSuggestion {
@@ -101,6 +105,17 @@ interface TrackEvent {
   createdAt: string;
 }
 
+interface TripShare {
+  id: string;
+  tripId: string;
+  token: string;
+  enabled: boolean;
+  note: string | null;
+  createdAt: string;
+  url: string;
+  trip: string;
+}
+
 const statusStyles: Record<string, string> = {
   DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
@@ -143,6 +158,70 @@ export default function TripDetailPage() {
   const [subProposals, setSubProposals] = useState<SubProposal[]>([]);
   const [subPrices, setSubPrices] = useState<Record<string, string>>({});
   const [subMsg, setSubMsg] = useState("");
+  const [shares, setShares] = useState<TripShare[]>([]);
+  const [shareMsg, setShareMsg] = useState("");
+  const [shareNote, setShareNote] = useState("");
+  const [creatingShare, setCreatingShare] = useState(false);
+  const [copiedShare, setCopiedShare] = useState<string | null>(null);
+
+  const loadShares = async () => {
+    try {
+      const res = await fetch(`/api/trip-shares?tripId=${id}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setShares(data.shares ?? []);
+    } catch {
+      /* silenzioso */
+    }
+  };
+
+  const createShare = async () => {
+    setCreatingShare(true);
+    setShareMsg("");
+    try {
+      const res = await fetch("/api/trip-shares", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tripId: id, note: shareNote }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setShareMsg(data.error ?? "Errore.");
+        return;
+      }
+      setShareMsg("Link di tracking creato. Invialo al committente.");
+      setShareNote("");
+      await loadShares();
+    } finally {
+      setCreatingShare(false);
+    }
+  };
+
+  const toggleShare = async (s: TripShare) => {
+    setShareMsg("");
+    const res = await fetch("/api/trip-shares", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: s.id, enabled: !s.enabled }),
+    });
+    if (res.ok) await loadShares();
+  };
+
+  const deleteShare = async (s: TripShare) => {
+    setShareMsg("");
+    const res = await fetch(`/api/trip-shares?id=${s.id}`, { method: "DELETE" });
+    if (res.ok) await loadShares();
+  };
+
+  const copyShare = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedShare(url);
+      setTimeout(() => setCopiedShare(null), 1500);
+    } catch {
+      /* silenzioso */
+    }
+  };
 
   const loadSubcontracts = async () => {
     try {
@@ -238,6 +317,7 @@ export default function TripDetailPage() {
   useEffect(() => {
     load();
     loadSubcontracts();
+    loadShares();
   }, [id]);
 
   const handleAssign = async (e: React.FormEvent) => {
@@ -616,6 +696,96 @@ Apri
                   ))}
                 </ol>
 </>
+          )}
+        </div>
+
+        {/* Vista Committente (§53) */}
+        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+          <h3 className="text-base font-bold text-slate-100 mb-1 flex items-center">
+            <Share2 className="w-5 h-5 mr-2 text-sky-400" /> Vista Committente
+          </h3>
+          <p className="text-xs text-slate-400 mb-4">
+            Condividi con il committente una pagina di tracking (posizione, stato consegna, DDT) senza dargli accesso al pannello.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <input
+              type="text"
+              value={shareNote}
+              onChange={(e) => setShareNote(e.target.value)}
+              placeholder="Nota per il committente (opzionale)"
+              className="flex-1 min-w-52 bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-sm"
+            />
+            <button
+              onClick={createShare}
+              disabled={creatingShare}
+              className="text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl disabled:opacity-50 flex items-center space-x-1.5"
+            >
+              {creatingShare ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2 className="w-3.5 h-3.5" />}
+              <span>Genera link</span>
+            </button>
+          </div>
+
+          {shareMsg && (
+            <p className="mb-3 text-xs text-sky-300 bg-sky-950/40 border border-sky-800/60 rounded-xl px-3 py-2">
+              {shareMsg}
+            </p>
+          )}
+
+          {shares.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              Nessun link condiviso per questo viaggio.
+            </p>
+          ) : (
+            <ul className="space-y-2.5">
+              {shares.map((s) => (
+                <li key={s.id} className="flex items-center justify-between flex-wrap gap-2 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-mono text-slate-300 break-all">{s.url}</p>
+                    {s.note && <p className="text-[11px] text-slate-400 mt-0.5">{s.note}</p>}
+                    <p className="text-[10px] font-mono text-slate-500 mt-0.5">
+                      creato il {new Date(s.createdAt).toLocaleString("it-IT")} ·{" "}
+                      <span className={s.enabled ? "text-emerald-400" : "text-red-400"}>
+                        {s.enabled ? "attivo" : "disattivato"}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => copyShare(s.url)}
+                      className="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg"
+                      title="Copia link"
+                    >
+                      {copiedShare === s.url ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-semibold text-sky-300 hover:underline px-2 py-1.5"
+                    >
+                      Apri anteprima
+                    </a>
+                    <button
+                      onClick={() => toggleShare(s)}
+                      className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border ${
+                        s.enabled
+                          ? "bg-amber-950 text-amber-300 border-amber-800/60 hover:bg-amber-900"
+                          : "bg-emerald-950 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900"
+                      }`}
+                    >
+                      {s.enabled ? "Disattiva" : "Riattiva"}
+                    </button>
+                    <button
+                      onClick={() => deleteShare(s)}
+                      className="text-xs font-semibold bg-red-950 text-red-300 border border-red-800/60 hover:bg-red-900 px-2.5 py-1.5 rounded-lg"
+                    >
+                      Elimina
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
