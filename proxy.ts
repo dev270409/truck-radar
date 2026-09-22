@@ -1,29 +1,24 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
 
-export async function proxy(req: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
 
-  const isProtectedPath = pathname.startsWith("/dashboard");
-
-  if (!isProtectedPath) {
+  if (!pathname.startsWith("/dashboard")) {
     return NextResponse.next();
   }
 
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
-  });
-
-  if (!token) {
-    const loginUrl = new URL("/login", req.url);
+  if (!req.auth) {
+    const loginUrl = new URL("/login", req.nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/dashboard/:path*"],

@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import type { UserRole } from "@prisma/client";
 
 export const authConfig = {
   pages: {
@@ -20,13 +21,13 @@ export const authConfig = {
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.userId;
-        session.user.email = token.email;
-        session.user.nome = token.nome;
-        session.user.cognome = token.cognome;
-        session.user.role = token.role;
-        session.user.companyId = token.companyId;
-        session.user.vehicleId = token.vehicleId;
+        session.user.id = token.userId as string;
+        session.user.email = token.email as string;
+        session.user.nome = token.nome as string;
+        session.user.cognome = token.cognome as string;
+        session.user.role = token.role as UserRole;
+        session.user.companyId = token.companyId as string;
+        session.user.vehicleId = token.vehicleId as string | null | undefined;
       }
       return session;
     },
