@@ -1,5 +1,10 @@
 import { db } from "./db";
-import { findReturnMatches, type LoadWithCompany } from "./marketplace";
+import {
+  findReturnMatches,
+  findExternalReturnMatches,
+  type LoadWithCompany,
+  type ExternalMatch,
+} from "./marketplace";
 
 /**
  * Smart Return V1 deterministico (§32/§33/§34/§35/§55):
@@ -52,6 +57,8 @@ export interface SmartReturnRow {
   tripId: string;
   companyId: string;
   matchLoadId: string | null;
+  source: "INTERNO" | "ESTERNO";
+  externalLoadId: string | null;
   kmOneWay: number;
   kmVuotiPrima: number;
   kmVuotiDopo: number;
@@ -78,6 +85,8 @@ export async function saveSmartReturn(data: {
   companyId: string;
   tripId: string;
   matchLoadId: string | null;
+  source?: "INTERNO" | "ESTERNO";
+  externalLoadId?: string | null;
   kmOneWay: number;
   kmVuotiPrima: number;
   kmVuotiDopo: number;
@@ -86,12 +95,14 @@ export async function saveSmartReturn(data: {
 }): Promise<SmartReturnRow> {
   const rows = (await db.$queryRawUnsafe(
     `INSERT INTO "SmartReturn"
-     ("tripId", "companyId", "matchLoadId", "kmOneWay", "kmVuotiPrima", "kmVuotiDopo", "ricavoAggiuntivo", "candidato")
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     RETURNING *`,
+     ("tripId", "companyId", "matchLoadId", "source", "externalLoadId", "kmOneWay", "kmVuotiPrima", "kmVuotiDopo", "ricavoAggiuntivo", "candidato")
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+     RETURNING id, "tripId", "companyId", "matchLoadId", "source", "externalLoadId", "kmOneWay", "kmVuotiPrima", "kmVuotiDopo", "ricavoAggiuntivo", "candidato", "createdAt"`,
     data.tripId,
     data.companyId,
     data.matchLoadId,
+    data.source ?? "INTERNO",
+    data.externalLoadId ?? null,
     data.kmOneWay,
     data.kmVuotiPrima,
     data.kmVuotiDopo,
@@ -113,6 +124,7 @@ export interface SmartReturnAnalysis {
   ricavoPrima: number;
   ricavoAggiuntivo: number;
   matches: LoadWithCompany[];
+  externalMatches: ExternalMatch[];
   applicati: SmartReturnRow[];
 }
 
@@ -138,7 +150,20 @@ export async function analyzeSmartReturn(opts: {
     pesoKg: trip.pesoKg,
   });
 
-  const best = matches[0] ?? null;
+  // SMART RETURN IBRIDO — Priorità 2 (§34): se la rete interna non ha match,
+  // interrogare le piattaforme esterne collegate dal cliente (ApiConnection BORSA).
+  const externalMatches =
+    matches.length === 0
+      ? await findExternalReturnMatches(opts.companyId, {
+          luogoRitiro: trip.luogoRitiro,
+          luogoConsegna: trip.luogoConsegna,
+          dataRitiro: trip.dataRitiro,
+          vehicleCategory: trip.vehicle?.categoria ?? null,
+          pesoKg: trip.pesoKg,
+        })
+      : [];
+
+  const best = matches[0] ?? externalMatches[0] ?? null;
   const ricavoAggiuntivo = best?.prezzo ?? 0;
   const kmVuotiDopo = best ? 0 : kmOneWay;
 
@@ -156,8 +181,26 @@ export async function analyzeSmartReturn(opts: {
     ricavoPrima: 0,
     ricavoAggiuntivo,
     matches,
+    externalMatches,
     applicati,
   };
+}
+
+/** Prezzo di un carico di ritorno, interno o esterno (SMART RETURN IBRIDO). */
+export async function smartReturnLoadPrice(matchLoadId: string | null, externalLoadId?: string | null): Promise<number> {
+  if (externalLoadId) {
+    const rows = (await db.$queryRawUnsafe(
+      `SELECT "prezzo" FROM "ExternalLoad" WHERE "id" = $1`,
+      externalLoadId
+    )) as Array<{ prezzo: number | null }>;
+    return rows[0]?.prezzo ?? 0;
+  }
+  if (!matchLoadId) return 0;
+  const rows = (await db.$queryRawUnsafe(
+    `SELECT "prezzo" FROM "MarketplaceLoad" WHERE "id" = $1`,
+    matchLoadId
+  )) as Array<{ prezzo: number | null }>;
+  return rows[0]?.prezzo ?? 0;
 }
 
 /** Stima km a vuoto "PRIMA": somma km dei viaggi (ritorno stimato vuoto) senza smart return. */

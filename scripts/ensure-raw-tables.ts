@@ -324,6 +324,34 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "FuelLog_vehicleId_idx" ON "FuelLog"("vehicleId");
   CREATE INDEX IF NOT EXISTS "FuelLog_companyId_idx" ON "FuelLog"("companyId");
   `,
+
+  // Entità §34 — SMART RETURN IBRIDO, Priorità 2 (API esterne TIMOCOM/TELEROUTE/altre):
+  // carichi CERCO pubblicati su piattaforme esterne interrogabili via le connessioni
+  // API della company (ApiConnection di tipo BORSA). Consolidati localmente per il match.
+  `
+  CREATE TABLE IF NOT EXISTS "ExternalLoad" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "provider" TEXT NOT NULL,
+    "luogoRitiro" TEXT NOT NULL,
+    "luogoConsegna" TEXT NOT NULL,
+    "dataRitiro" TIMESTAMPTZ NOT NULL,
+    "dataConsegna" TIMESTAMPTZ NOT NULL,
+    "tipoMerce" TEXT,
+    "pesoKg" DOUBLE PRECISION,
+    "volumeM3" DOUBLE PRECISION,
+    "vehicleCategory" TEXT,
+    "prezzo" DOUBLE PRECISION,
+    "note" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ATTIVO',
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "ExternalLoad_status_idx" ON "ExternalLoad"("status");
+  CREATE INDEX IF NOT EXISTS "ExternalLoad_provider_idx" ON "ExternalLoad"("provider");
+  CREATE INDEX IF NOT EXISTS "ExternalLoad_route_idx" ON "ExternalLoad"("luogoRitiro", "luogoConsegna");
+  ALTER TABLE "SmartReturn" ADD COLUMN IF NOT EXISTS "source" TEXT NOT NULL DEFAULT 'INTERNO';
+  ALTER TABLE "SmartReturn" ADD COLUMN IF NOT EXISTS "externalLoadId" TEXT;
+  `,
 ];
 
 async function main() {
@@ -434,6 +462,44 @@ async function main() {
     console.log("ensure-raw-tables: seed network Vettore Demo SRL ok");
   } catch (err) {
     console.error("ensure-raw-tables: seed network fallito", err);
+    process.exitCode = 1;
+  }
+
+  // SMART RETURN IBRIDO — Priorità 2 (API esterne, §34): connessioni BORSA-CARICHI per
+  // le aziende demo (Abbonata Demo + Vettore Demo) e consolidamento locale di carichi
+  // CERCO da piattaforme esterne (TimoCom/Teleroute/altre) su rotte inverse dei viaggi demo.
+  try {
+    const loadsSeed: Array<[string, string, string, string, string, number | null, number | null, string, number | null]> = [
+      // provider | luogoRitiro | luogoConsegna | tipoMerce | vehicleCategory | pesoKg | volumeM3 | note | prezzo
+      ["TimoCom", "Roma", "Milano", "Semilavorati", "TELONATO", 18000, 68, "Carico esterno TimoCom", 820],
+      ["TimoCom", "Torino", "Roma", "General cargo", "TELONATO", 16000, 70, "Carico esterno TimoCom", 900],
+      ["Teleroute", "Verona", "Milano", "Pallet", "TELONATO", 12000, 32, "Carico esterno Teleroute", 480],
+      ["Teleroute", "Bologna", "Firenze", "Food", "FRIGO", 8000, 20, "Carico esterno Teleroute", 350],
+    ];
+    await db.$queryRawUnsafe(
+      `INSERT INTO "ApiConnection" ("id", "companyId", "integrationId", "name", "baseUrl", "credentialsCipher", "status")
+       SELECT gen_random_uuid(), c.id, i."id", i.name || ' Demo', 'https://api.borsa-demo.example.com', 'network-demo', 'SYNCED'
+       FROM "ExternalIntegration" i
+       CROSS JOIN "Company" c
+       WHERE i."provider" = 'BORSA-CARICHI' AND i.enabled = true
+         AND c."ragioneSociale" IN ('Trasporti Demo Srl', 'Vettore Demo SRL')
+         AND NOT EXISTS (
+           SELECT 1 FROM "ApiConnection" a WHERE a."companyId" = c.id AND a."integrationId" = i."id"
+         )`
+    );
+    for (const [provider, from, to, merce, cat, peso, vol, note, prezzo] of loadsSeed) {
+      await db.$queryRawUnsafe(
+        `INSERT INTO "ExternalLoad" ("id", "provider", "luogoRitiro", "luogoConsegna", "dataRitiro", "dataConsegna", "tipoMerce", "pesoKg", "volumeM3", "vehicleCategory", "prezzo", "note", "status")
+         SELECT 'ext-' || gen_random_uuid()::text, $1, $2, $3, now() + interval '2 days', now() + interval '3 days', $4, $5, $6, $7, $8, $9, 'ATTIVO'
+         WHERE NOT EXISTS (
+           SELECT 1 FROM "ExternalLoad" e WHERE e."provider" = $1 AND e."luogoRitiro" = $2 AND e."luogoConsegna" = $3 AND e."status" = 'ATTIVO'
+         )`,
+        provider, from, to, merce, peso, vol, cat, prezzo, note
+      );
+    }
+    console.log("ensure-raw-tables: seed smart return ibrido (API esterne) ok");
+  } catch (err) {
+    console.error("ensure-raw-tables: seed smart return ibrido fallito", err);
     process.exitCode = 1;
   }
 

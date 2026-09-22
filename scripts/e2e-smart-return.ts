@@ -67,7 +67,46 @@ async function main() {
     assert(a2.body.analysis.applicati.length >= 1, "applicato registrato");
     assert(a2.body.analysis.applicati.some((r: any) => r.matchLoadId === best.id && !r.candidato), "record abbinato coerente");
 
-    console.log("7) Pagina UI...");
+    console.log("7) SMART RETURN IBRIDO — fallback piattaforma esterna (Priorità 2)...");
+    const t2 = await admin.req("/api/trips", {
+      method: "POST",
+      body: JSON.stringify({
+        luogoRitiro: "Roma",
+        luogoConsegna: "Torino",
+        dataRitiro: new Date(Date.now() + 86_400_000).toISOString().slice(0, 10),
+        dataConsegna: new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10),
+        tipoMerce: "General cargo",
+        pesoKg: 16000,
+        volumeM3: 70,
+        prezzo: 1500,
+      }),
+    });
+    assert(t2.status === 201, `POST /api/trips esterno 201 (${t2.status})`);
+    const trip2 = t2.body.trip.id;
+
+    const a3 = await admin.req(`/api/smart-return?tripId=${trip2}`);
+    assert(a3.status === 200, `GET analisi esterna 200 (${a3.status})`);
+    const an3 = a3.body.analysis;
+    assert(an3.matches.length === 0, "nessun match interno (atteso per trip esterno)");
+    assert(an3.externalMatches.length >= 1, `fallback esterno con match (${an3.externalMatches.length})`);
+    const ext = an3.externalMatches[0];
+    assert(ext.source === "ESTERNO", "source ESTERNO");
+    assert(ext.providerName === "TimoCom" || ext.provider === "TimoCom", "provider TimoCom");
+    assert(ext.luogoRitiro.toLowerCase().includes("torino") && ext.luogoConsegna.toLowerCase().includes("roma"), "match esterno inverso Torino→Roma");
+    assert(an3.kmVuotiDopo === 0, "DOPO = 0 grazie al fallback esterno");
+
+    console.log("8) Applico match esterno...");
+    const applyExt = await admin.req("/api/smart-return", {
+      method: "POST",
+      body: JSON.stringify({ tripId: trip2, externalLoadId: ext.id }),
+    });
+    assert(applyExt.status === 201, `POST applica esterno 201 (${applyExt.status})`);
+    assert(applyExt.body.smart.source === "ESTERNO", "record smart return source ESTERNO");
+    assert(applyExt.body.smart.externalLoadId === ext.id, "externalLoadId registrato");
+    assert(applyExt.body.smart.candidato === false, "non candidato (abbinato esterno)");
+    assert(applyExt.body.smart.ricavoAggiuntivo === ext.prezzo, "ricavo da piattaforma esterna");
+
+    console.log("9) Pagina UI...");
     const page = await admin.req("/dashboard/smart-return");
     assert(page.status === 200, `smart-return page 200 (${page.status})`);
 

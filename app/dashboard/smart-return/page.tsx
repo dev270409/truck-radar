@@ -33,6 +33,30 @@ interface Match {
   score: number;
 }
 
+interface ExternalMatch {
+  id: string;
+  provider: string;
+  providerName: string;
+  luogoRitiro: string;
+  luogoConsegna: string;
+  dataRitiro: string;
+  tipoMerce: string | null;
+  pesoKg: number | null;
+  prezzo: number | null;
+  score: number;
+  source: "ESTERNO";
+}
+
+interface AppliedRow {
+  id: string;
+  matchLoadId: string | null;
+  externalLoadId: string | null;
+  source: "INTERNO" | "ESTERNO";
+  kmVuotiDopo: number;
+  ricavoAggiuntivo: number;
+  candidato: boolean;
+}
+
 interface Analysis {
   tripId: string;
   luogoRitiro: string;
@@ -45,7 +69,8 @@ interface Analysis {
   ricavoPrima: number;
   ricavoAggiuntivo: number;
   matches: Match[];
-  applicati: Array<{ id: string; matchLoadId: string | null; kmVuotiDopo: number; ricavoAggiuntivo: number; candidato: boolean }>;
+  externalMatches: ExternalMatch[];
+  applicati: AppliedRow[];
 }
 
 export default function SmartReturnPage() {
@@ -84,21 +109,21 @@ export default function SmartReturnPage() {
     }
   };
 
-  const apply = async (matchLoadId: string | null) => {
+  const apply = async (matchLoadId: string | null, externalLoadId?: string | null) => {
     setApplying(true);
     setMsg("");
     try {
       const res = await fetch("/api/smart-return", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tripId, matchLoadId }),
+        body: JSON.stringify({ tripId, matchLoadId, externalLoadId }),
       });
       const d = await res.json();
       if (!res.ok) {
         setMsg(d.error ?? "Errore.");
         return;
       }
-      setMsg(matchLoadId ? "Carico di ritorno abbinato e applicato." : "Registrato come viaggio a vuoto (candidato).");
+      setMsg(matchLoadId || externalLoadId ? "Carico di ritorno abbinato e applicato." : "Registrato come viaggio a vuoto (candidato).");
       await analyze(tripId);
     } finally {
       setApplying(false);
@@ -176,7 +201,7 @@ export default function SmartReturnPage() {
               <p className="text-xs font-semibold text-slate-400 uppercase">KM A VUOTO · DOPO</p>
               <h3 className="text-3xl font-bold text-emerald-300 mt-1">{analysis.kmVuotiDopo} km</h3>
               <p className="text-[11px] text-slate-500 mt-1">
-                {analysis.matches.length > 0
+                {analysis.matches.length + analysis.externalMatches.length > 0
                   ? `${savedPct}% di km a vuoto eliminati con lo smart return`
                   : "Nessun abbinamento disponibile al momento"}
               </p>
@@ -223,7 +248,7 @@ export default function SmartReturnPage() {
           {/* Match + applicati */}
           <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
             <h3 className="text-sm font-bold text-slate-100 mb-4 flex items-center">
-              <Route className="w-4 h-4 mr-2 text-blue-400" /> Carichi di ritorno ({analysis.matches.length})
+              <Route className="w-4 h-4 mr-2 text-blue-400" /> Carichi di ritorno ({analysis.matches.length + analysis.externalMatches.length})
             </h3>
 
             {analysis.applicati.length > 0 && (
@@ -231,7 +256,7 @@ export default function SmartReturnPage() {
                 {analysis.applicati.map((a) => (
                   <div key={a.id} className="flex items-center justify-between bg-slate-950 border border-emerald-900/60 rounded-xl px-4 py-2.5 text-sm">
                     <span className={a.candidato ? "text-slate-400" : "text-emerald-300 font-semibold"}>
-                      {a.candidato ? "Registrato a vuoto (candidato)" : "Smart return applicato"}
+                      {a.candidato ? "Registrato a vuoto (candidato)" : a.source === "ESTERNO" ? "Smart return applicato (piattaforma esterna)" : "Smart return applicato"}
                     </span>
                     <span className="text-xs text-slate-400">
                       km vuoti {a.kmVuotiDopo} · € {a.ricavoAggiuntivo.toLocaleString("it-IT")}
@@ -241,7 +266,7 @@ export default function SmartReturnPage() {
               </div>
             )}
 
-            {analysis.matches.length === 0 ? (
+            {analysis.matches.length === 0 && analysis.externalMatches.length === 0 ? (
               <div className="flex items-start space-x-3 p-4 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-400">
                 <Fuel className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
@@ -283,6 +308,34 @@ export default function SmartReturnPage() {
                         className="text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg disabled:opacity-50"
                       >
                         {applying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Riempi il ritorno"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {analysis.externalMatches.map((e) => (
+                  <div key={e.id} className="flex items-center justify-between flex-wrap gap-2 bg-slate-950 border border-amber-900/40 rounded-xl px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-100">
+                        {e.luogoRitiro} <ArrowRightLeft className="w-3.5 h-3.5 inline text-slate-500" /> {e.luogoConsegna}
+                      </p>
+                      <p className="text-[11px] text-slate-400">
+                        <span className="text-amber-400">{e.providerName ?? e.provider}</span> · piattaforma esterna · {new Date(e.dataRitiro).toLocaleDateString("it-IT")}
+                        {e.pesoKg ? ` · ${e.pesoKg.toLocaleString("it-IT")} kg` : ""}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      {e.prezzo != null && (
+                        <span className="flex items-center text-sm font-bold text-emerald-300">
+                          <Euro className="w-3.5 h-3.5 mr-0.5" /> {e.prezzo.toLocaleString("it-IT")}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => apply(null, e.id)}
+                        disabled={applying}
+                        className="text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg disabled:opacity-50"
+                      >
+                        {applying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Riempi via esterna"}
                       </button>
                     </div>
                   </div>

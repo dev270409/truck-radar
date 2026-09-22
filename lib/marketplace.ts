@@ -232,3 +232,98 @@ export async function findReturnMatches(
   results.sort((a, b) => b.score - a.score);
   return results;
 }
+
+/**
+ * SMART RETURN IBRIDO — Priorità 2 (§34): se la rete interna non ha match, interrogare
+ * le piattaforme esterne alle quali il cliente è già abbonato (ApiConnection BORSA-CARICHI).
+ * I carichi esterni (ExternalLoad) vengono consolidati localmente e fatti girare con lo
+ * stesso matching deterministico inverso.
+ */
+export interface ExternalLoadRow {
+  id: string;
+  provider: string;
+  luogoRitiro: string;
+  luogoConsegna: string;
+  dataRitiro: Date;
+  dataConsegna: Date;
+  tipoMerce: string | null;
+  pesoKg: number | null;
+  volumeM3: number | null;
+  vehicleCategory: string | null;
+  prezzo: number | null;
+  note: string | null;
+  status: string;
+  createdAt: Date;
+}
+
+export interface ExternalMatch extends ExternalLoadRow {
+  companyName: string;
+  companyVerified: boolean;
+  score: number;
+  source: "ESTERNO";
+  providerName: string;
+}
+
+export async function getConnectedBorsaProviders(companyId: string): Promise<Set<string>> {
+  const rows = (await db.$queryRawUnsafe(
+    `SELECT i."provider" AS "providerKey"
+     FROM "ApiConnection" a
+     JOIN "ExternalIntegration" i ON i.id = a."integrationId"
+     WHERE a."companyId" = $1 AND a."status" = 'SYNCED' AND i."type" = 'BORSA'`,
+    companyId
+  )) as Array<{ providerKey: string }>;
+  return new Set(rows.map((r) => r.providerKey));
+}
+
+/**
+ * SMART RETURN IBRIDO — Priorità 2 (§34): le piattaforme esterne interrogabili sono quelle
+ * del catalogo BORSA collegate (SYNCED). Gli ExternalLoad sono consolidati per provider
+ * di piattaforma (TimoCom/Teleroute/…): se il cliente ha UNA connessione Borsa attiva
+ * tratta tutti i carichi consolidati come interrogabili (autorizzazione BORSA presente).
+ */
+export async function hasBorsaConnections(companyId: string): Promise<boolean> {
+  const providers = await getConnectedBorsaProviders(companyId);
+  return providers.size > 0;
+}
+
+/** Matching inverso sui carichi esterni: il carico CERCO va nella direzione opposta al viaggio. */
+export async function findExternalReturnMatches(
+  currentCompanyId: string,
+  input: MatchInput
+): Promise<ExternalMatch[]> {
+  // Priorità 2: solo se il cliente è abbonato/collegato a una borsa carichi esterna.
+  if (!(await hasBorsaConnections(currentCompanyId))) return [];
+
+  const loads = (await db.$queryRawUnsafe(
+    `SELECT * FROM "ExternalLoad" WHERE "status" = 'ATTIVO'`,
+  )) as ExternalLoadRow[];
+  if (loads.length === 0) return [];
+
+  const results: ExternalMatch[] = [];
+  for (const load of loads) {
+    const reverseStart = cityCompat(load.luogoRitiro, input.luogoConsegna);
+    const reverseEnd = cityCompat(load.luogoConsegna, input.luogoRitiro);
+    if (!reverseStart || !reverseEnd) continue;
+
+    let score = 0;
+    if (reverseStart) score += 1;
+    if (reverseEnd) score += 1;
+    if (dateWithinDays(load.dataRitiro, input.dataRitiro, 7)) score += 1;
+    if (load.vehicleCategory && input.vehicleCategory && load.vehicleCategory === input.vehicleCategory) {
+      score += 1;
+    }
+    if (load.pesoKg && input.pesoKg && load.pesoKg <= input.pesoKg) score += 1;
+
+    results.push({
+      ...load,
+      companyName: load.provider,
+      companyVerified: true,
+      score,
+      source: "ESTERNO",
+      providerName: load.provider,
+    });
+  }
+
+  results.sort((a, b) => b.score - a.score);
+  return results;
+}

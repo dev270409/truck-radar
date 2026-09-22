@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { analyzeSmartReturn, saveSmartReturn, cityKm } from "@/lib/smart-return";
+import { analyzeSmartReturn, saveSmartReturn, cityKm, smartReturnLoadPrice } from "@/lib/smart-return";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Area riservata a ufficio/admin." }, { status: 403 });
   }
 
-  let body: { tripId?: unknown; matchLoadId?: unknown };
+  let body: { tripId?: unknown; matchLoadId?: unknown; externalLoadId?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -60,6 +60,7 @@ export async function POST(req: Request) {
 
   const tripId = String(body.tripId ?? "").trim();
   const matchLoadId = body.matchLoadId ? String(body.matchLoadId) : null;
+  const externalLoadId = body.externalLoadId ? String(body.externalLoadId) : null;
   if (!tripId) {
     return NextResponse.json({ error: "tripId obbligatorio." }, { status: 400 });
   }
@@ -72,38 +73,41 @@ export async function POST(req: Request) {
   }
 
   const kmOneWay = cityKm(trip.luogoRitiro, trip.luogoConsegna);
-  const ricavoAggiuntivo = matchLoadId ? await loadPrice(matchLoadId) : 0;
-  const kmVuotiDopo = matchLoadId ? 0 : kmOneWay;
+  const ricavoAggiuntivo = await smartReturnLoadPrice(matchLoadId, externalLoadId);
+  const kmVuotiDopo = matchLoadId || externalLoadId ? 0 : kmOneWay;
+  const source: "INTERNO" | "ESTERNO" = externalLoadId ? "ESTERNO" : "INTERNO";
 
   const row = await saveSmartReturn({
     companyId: session.user.companyId,
     tripId,
-    matchLoadId,
+    matchLoadId: externalLoadId ? null : matchLoadId,
+    source,
+    externalLoadId,
     kmOneWay,
     kmVuotiPrima: kmOneWay,
     kmVuotiDopo,
     ricavoAggiuntivo,
-    candidato: !matchLoadId,
+    candidato: !matchLoadId && !externalLoadId,
   });
 
   await db.auditLog.create({
     data: {
       userId: session.user.id,
       companyId: session.user.companyId,
-      action: matchLoadId ? "SMART_RETURN_APPLICATO" : "SMART_RETURN_CANDIDATO",
+      action: matchLoadId || externalLoadId ? "SMART_RETURN_APPLICATO" : "SMART_RETURN_CANDIDATO",
       entity: "SmartReturn",
       entityId: row.id,
-      payload: { tripId, matchLoadId, kmVuotiPrima: kmOneWay, kmVuotiDopo, ricavoAggiuntivo },
+      payload: {
+        tripId,
+        matchLoadId,
+        externalLoadId,
+        source,
+        kmVuotiPrima: kmOneWay,
+        kmVuotiDopo,
+        ricavoAggiuntivo,
+      },
     },
   });
 
   return NextResponse.json({ smart: row }, { status: 201 });
-}
-
-async function loadPrice(loadId: string): Promise<number> {
-  const rows = (await db.$queryRawUnsafe(
-    `SELECT "prezzo" FROM "MarketplaceLoad" WHERE "id" = $1`,
-    loadId
-  )) as Array<{ prezzo: number | null }>;
-  return rows[0]?.prezzo ?? 0;
 }
