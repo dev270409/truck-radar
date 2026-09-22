@@ -56,3 +56,57 @@ export async function getFleetMap(companyId: string): Promise<FleetVehicleRow[]>
     lastEventAt: r.lastEventAt ? new Date(r.lastEventAt) : null,
   }));
 }
+
+export interface FleetTrackPoint {
+  tripId: string;
+  lat: number;
+  lng: number;
+  posizione: string | null;
+  eventType: string | null;
+  createdAt: Date;
+}
+
+/**
+ * Storico del movimento di un veicolo: ultimi eventi di tracking ordinati
+ * cronologicamente (replay del percorso). Ripiega sul viaggio più recente
+ * se un tripId esplicito non viene fornito.
+ */
+export async function getVehicleTrack(
+  companyId: string,
+  vehicleId: string,
+  tripId?: string
+): Promise<{ vehicleId: string; tripId: string | null; points: FleetTrackPoint[] }> {
+  const effectiveTrip = tripId
+    ? tripId
+    : (
+        (await db.$queryRawUnsafe(
+          `SELECT t.id FROM "Trip" t
+           WHERE t."vehicleId" = $1 AND t."companyId" = $2
+           ORDER BY CASE t.status WHEN 'IN_CORSO' THEN 0 WHEN 'ASSEGNATO' THEN 1 ELSE 2 END, t."updatedAt" DESC
+           LIMIT 1`,
+          vehicleId,
+          companyId
+        )) as Array<{ id: string }>
+      )[0]?.id ?? null;
+
+  if (!effectiveTrip) {
+    return { vehicleId, tripId: null, points: [] };
+  }
+
+  const rows = (await db.$queryRawUnsafe(
+    `SELECT te."tripId", te.lat, te.lng, te.posizione, te."eventType", te."createdAt"
+     FROM "TrackingEvent" te
+     JOIN "Trip" t ON t.id = te."tripId"
+     WHERE te."tripId" = $1 AND t."companyId" = $2 AND te.lat IS NOT NULL AND te.lng IS NOT NULL
+     ORDER BY te."createdAt" ASC
+     LIMIT 500`,
+    effectiveTrip,
+    companyId
+  )) as Array<Omit<FleetTrackPoint, "createdAt"> & { createdAt: Date }>;
+
+  return {
+    vehicleId,
+    tripId: effectiveTrip,
+    points: rows.map((p) => ({ ...p, createdAt: new Date(p.createdAt) })),
+  };
+}

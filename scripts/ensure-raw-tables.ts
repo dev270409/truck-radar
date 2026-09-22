@@ -302,6 +302,28 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "VehicleInspection_companyId_idx" ON "VehicleInspection"("companyId");
   CREATE INDEX IF NOT EXISTS "VehicleInspection_tripId_idx" ON "VehicleInspection"("tripId");
   `,
+
+  // Entità F11.1 — Rifornimenti carburante (fuel log con odometer, da fleetops/aakvatech):
+  // kpi efficienza km/l e €/km per veicolo.
+  `
+  CREATE TABLE IF NOT EXISTS "FuelLog" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "vehicleId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "tripId" TEXT,
+    "litri" DOUBLE PRECISION NOT NULL,
+    "costo" DOUBLE PRECISION NOT NULL,
+    "odometerKm" DOUBLE PRECISION NOT NULL,
+    "pieno" BOOLEAN NOT NULL DEFAULT true,
+    "luogo" TEXT,
+    "fornitore" TEXT,
+    "note" TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "FuelLog_vehicleId_idx" ON "FuelLog"("vehicleId");
+  CREATE INDEX IF NOT EXISTS "FuelLog_companyId_idx" ON "FuelLog"("companyId");
+  `,
 ];
 
 async function main() {
@@ -432,6 +454,67 @@ async function main() {
     console.log("ensure-raw-tables: seed aree di sosta ok");
   } catch (err) {
     console.error("ensure-raw-tables: seed aree di sosta fallito", err);
+    process.exitCode = 1;
+  }
+
+  // Seed track replay demo (F11.2): punti di tracking per il primo veicolo del tenant admin
+  // così il pulsante "▶ Riproduci percorso" sulla Flotta Live ha dati da mostrare.
+  try {
+    const demoVehicles = (await db.$queryRawUnsafe(
+      `SELECT v."id", v."companyId" FROM "Vehicle" v
+       JOIN "User" u ON u."companyId" = v."companyId"
+       WHERE u.email = 'admin@demo.com'
+       ORDER BY v."createdAt" ASC
+       LIMIT 1`
+    )) as Array<{ id: string; companyId: string }>;
+    const demoV = demoVehicles[0];
+    if (demoV) {
+      const existing = (await db.$queryRawUnsafe(
+        `SELECT COUNT(*)::int AS n FROM "TrackingEvent" te
+         JOIN "Trip" t ON t.id = te."tripId"
+         WHERE t."vehicleId" = $1`,
+        demoV.id
+      )) as Array<{ n: number }>;
+      const havePoints = existing[0]?.n ?? 0;
+      if (havePoints < 3) {
+        const demoTrip = (await db.$queryRawUnsafe(
+          `SELECT t.id FROM "Trip" t WHERE t."vehicleId" = $1 ORDER BY t."createdAt" DESC LIMIT 1`,
+          demoV.id
+        )) as Array<{ id: string }>;
+        const tripId = demoTrip[0]?.id ?? "demo-track-trip";
+        if (!demoTrip[0]) {
+          await db.$queryRawUnsafe(
+            `INSERT INTO "Trip" ("id", "companyId", "vehicleId", "luogoRitiro", "luogoConsegna", "dataPartenza", "dataArrivo", "tipoMerce", "pesoKg", "prezzo", "costo", "status", "updatedAt", "createdAt")
+             VALUES ('demo-track-trip', $1, $2, 'Roma', 'Milano', now() - interval '1 day', now() + interval '1 day', 'Semilavorati', 15000, 1200, 850, 'IN_CORSO'::"TripStatus", now(), now())
+             ON CONFLICT ("id") DO NOTHING`,
+            demoV.companyId,
+            demoV.id
+          );
+        }
+        const route: Array<[number, number, string]> = [
+          [41.9028, 12.4964, "Roma — partenza"],
+          [42.4298, 12.1076, "Viterbo — registro"],
+          [43.7167, 10.4, "Pisa — sosta"],
+          [45.4642, 9.19, "Milano — arrivo"],
+        ];
+        for (const [lat, lng, pos] of route) {
+          await db.$queryRawUnsafe(
+            `INSERT INTO "TrackingEvent" ("id", "tripId", "companyId", "eventType", "lat", "lng", "posizione", "createdBy", "createdAt")
+             VALUES (gen_random_uuid(), $1, $2, 'TRACK', $3, $4, $5, $6, now())
+             ON CONFLICT DO NOTHING`,
+            tripId,
+            demoV.companyId,
+            lat,
+            lng,
+            pos,
+            "seed-demo-track"
+          );
+        }
+        console.log("ensure-raw-tables: seed track replay demo ok");
+      }
+    }
+  } catch (err) {
+    console.error("ensure-raw-tables: seed track replay fallito", err);
     process.exitCode = 1;
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Wrench, Plus, Trash2, CheckCircle2, XCircle, CalendarClock, Gauge, Coins } from "lucide-react";
+import { Loader2, Wrench, Plus, Trash2, CheckCircle2, XCircle, CalendarClock, Gauge, Coins, AlertTriangle } from "lucide-react";
 
 interface VehicleLite {
   id: string;
@@ -143,6 +143,14 @@ export default function ManutenzionePage() {
   const scheduled = items.filter((i) => i.status === "PROGRAMMATO" || i.status === "IN_CORSO");
   const completed = items.filter((i) => i.status === "ESEGUITO");
 
+  const daysUntil = (d: string) => Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
+  const proactive = scheduled.filter(
+    (i) =>
+      (i.dataProssima && daysUntil(i.dataProssima) <= 30) || (i.kmProssimo != null && i.kmProssimo > 0)
+  );
+  const scadeEntroSoglia = (i: (typeof items)[number]) =>
+    (i.dataProssima != null && daysUntil(i.dataProssima) <= 30) || (i.kmProssimo != null && i.kmProssimo > 0);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -186,6 +194,36 @@ export default function ManutenzionePage() {
           <p className="text-xs text-slate-400 mt-1">Interventi registrati</p>
         </div>
       </div>
+
+      {proactive.length > 0 && (
+        <div className="bg-slate-900 border border-amber-800/60 rounded-2xl p-4">
+          <h3 className="text-sm font-bold text-amber-300 flex items-center mb-3">
+            <AlertTriangle className="w-4 h-4 mr-2" /> Prossime scadenze (30 giorni)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {scheduled.filter(scadeEntroSoglia).map((i) => (
+              <div key={i.id} className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm">
+                <div className="flex items-center space-x-3">
+                  <span className="font-mono font-bold text-slate-100">{targaOf(i.vehicleId)}</span>
+                  <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold">{i.tipo}</span>
+                </div>
+                <div className="text-right text-xs text-slate-400 space-y-0.5">
+                  {i.kmProssimo != null && (
+                    <div className="flex items-center justify-end">
+                      <Gauge className="w-3 h-3 mr-1" /> {i.kmProssimo.toLocaleString("it-IT")} km
+                    </div>
+                  )}
+                  {i.dataProssima != null && (
+                    <div className="flex items-center justify-end">
+                      <CalendarClock className="w-3 h-3 mr-1" /> {new Date(i.dataProssima).toLocaleDateString("it-IT")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         {loading ? (

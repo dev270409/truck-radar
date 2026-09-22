@@ -19,6 +19,7 @@ import {
   Wrench,
   ClipboardCheck,
   Radar,
+  Fuel,
 } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
@@ -165,6 +166,14 @@ export default async function DashboardLayout({
                 </Link>
 
                 <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Network</p>
+                <Link
+                  href="/dashboard/carburante"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <Fuel className="w-4 h-4 text-emerald-400" />
+                  <span>Carburante</span>
+                </Link>
+
                 <Link
                   href="/dashboard/marketplace"
                   className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"

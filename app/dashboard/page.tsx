@@ -166,13 +166,6 @@ export default async function DashboardPage() {
       />
 
       <ComingSoonCard
-        title="Carte carburante e IFTA"
-        description="Gestione carburante, card controllo e calcolo tasse (IFTA) nei viaggi internazionali."
-        icon="fuel"
-        color="amber"
-      />
-
-      <ComingSoonCard
         title="Fleet Radar AI"
         description="Alert intelligenti: velocità, deviazioni di rotta e anomalie di guida basate su regole configurabili."
         icon="network"
