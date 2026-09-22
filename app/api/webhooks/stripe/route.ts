@@ -61,7 +61,25 @@ export async function POST(req: Request) {
 
           await db.company.update({
             where: { id: companyId },
-            data: { subscriptionStatus: "ACTIVE" },
+            data: { subscriptionStatus: sub.status === "active" ? "ACTIVE" : "TRIAL" },
+          });
+        }
+        break;
+      }
+
+      case "customer.subscription.deleted": {
+        const sub = event.data.object as Stripe.Subscription;
+        const companyId = sub.metadata?.companyId;
+
+        if (companyId) {
+          await db.subscription.updateMany({
+            where: { stripeSubscriptionId: sub.id },
+            data: { status: "canceled" },
+          });
+
+          await db.company.update({
+            where: { id: companyId },
+            data: { subscriptionStatus: "TRIAL" },
           });
         }
         break;
