@@ -20,6 +20,7 @@ import {
   ClipboardCheck,
   Radar,
   Fuel,
+  CreditCard,
 } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
@@ -230,6 +231,16 @@ export default async function DashboardLayout({
                 >
                   <Radar className="w-4 h-4 text-violet-400" />
                   <span>Aree e Geofence</span>
+                </Link>
+
+                <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Fatturazione</p>
+
+                <Link
+                  href="/dashboard/abbonamenti"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <CreditCard className="w-4 h-4 text-sky-400" />
+                  <span>Abbonamento</span>
                 </Link>
 
                 <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Configurazione</p>
