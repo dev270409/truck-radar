@@ -1,21 +1,121 @@
 import Link from "next/link";
+import {
+  Building2,
+  Scale,
+  RefreshCw,
+  ShieldAlert,
+  Lock,
+  BadgeCheck,
+  FileX,
+} from "lucide-react";
+
+const sections = [
+  {
+    icon: Building2,
+    title: "1. Oggetto e Accesso al Servizio",
+    items: [
+      {
+        h: "Esclusività B2B",
+        p: "Il servizio è riservato esclusivamente ad aziende e liberi professionisti (B2B). È esclusa la vendita a consumatori privati (B2C).",
+      },
+      {
+        h: "Licenza d'uso",
+        p: "Viene concessa una licenza temporanea, non esclusiva e non trasferibile. Il software è fornito \"così com'è\" (\"as is\") e \"secondo disponibilità\".",
+      },
+    ],
+  },
+  {
+    icon: Scale,
+    title: "2. Responsabilità del Cliente sui Dati e sui Driver (Blindatura Finale)",
+    items: [
+      {
+        h: "Conformità Giuridica",
+        p: "Il Cliente è l'unico responsabile del rispetto delle leggi sul lavoro (incluso l'Art. 4 Statuto dei Lavoratori in Italia per il controllo a distanza) e della normativa Privacy/GDPR.",
+      },
+      {
+        h: "Manleva Totale",
+        p: "Il Cliente si impegna a manlevare e tenere indenne il Fornitore da qualsiasi sanzione, multa, causa di lavoro o richiesta di risarcimento avanzata da dipendenti, driver, autorità giudiziarie o Garanti Privacy a causa dell'uso del software.",
+      },
+    ],
+  },
+  {
+    icon: RefreshCw,
+    title: "3. Piani, Pagamenti e Rimborsi",
+    items: [
+      {
+        h: "Rinnovo Automatico",
+        p: "Tutti gli abbonamenti si rinnovano automaticamente alla scadenza per la medesima durata (es. mese per mese o anno per anno), a meno che il Cliente non invii disdetta formale entro i termini indicati (es. 15 giorni prima).",
+      },
+      {
+        h: "Politica \"Nessun Rimborso\"",
+        p: "I pagamenti non sono in alcun caso rimborsabili. Il mancato utilizzo del software da parte del Cliente non dà diritto ad alcun rimborso o credito.",
+      },
+      {
+        h: "Mancato o Ritardato Pagamento",
+        p: "In caso di ritardo nel pagamento anche di una sola rata o fattura, il Fornitore ha il diritto di sospendere immediatamente l'accesso al servizio senza preavviso e senza responsabilità per eventuali danni subiti dal Cliente.",
+      },
+    ],
+  },
+  {
+    icon: ShieldAlert,
+    title: "4. Limitazione di Responsabilità (SLA & Danni)",
+    items: [
+      {
+        h: "Hardware e Connettività di Terzi",
+        p: "Il Fornitore non risponde di disservizi dovuti a malfunzionamenti di localizzatori GPS, SIM dati di terzi, assenza di segnale satellitare/di rete o problemi d'interruzione internet del Cliente.",
+      },
+      {
+        h: "Soffitto di Responsabilità (Cap on Liability)",
+        p: "L'eventuale risarcimento massimo a carico del Fornitore per qualsiasi controversia non potrà mai superare l'importo effettivamente pagato dal Cliente negli ultimi 12 mesi (o nei primi 3 mesi se la durata è inferiore). Il Fornitore non risponde mai di danni indiretti, perdita di profitto o fermo macchina.",
+      },
+    ],
+  },
+  {
+    icon: Lock,
+    title: "5. Proprietà Intellettuale e Sospensione",
+    items: [
+      {
+        h: "Proprietà",
+        p: "Il codice, la piattaforma e le tecnologie restano di esclusiva proprietà del Fornitore.",
+      },
+      {
+        h: "Abuso",
+        p: "Tentativi di reverse engineering, rivendita non autorizzata dell'account o abuso dei sistemi comporteranno la risoluzione immediata del contratto e il blocco dell'account, fatto salvo il risarcimento del danno.",
+      },
+    ],
+  },
+];
 
 export default function TerminiPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-3xl px-6 py-16">
         <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">&larr; Torna alla home</Link>
-        <h1 className="mt-6 text-3xl font-bold">Termini di Servizio</h1>
-        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: bozza in preparazione.</p>
-        <div className="mt-8 space-y-6 text-sm leading-7 text-slate-300">
-          <p>
-            Questa pagina è un <b>placeholder</b>. Il testo definitivo deve coprire, su validazione
-            legale: uso del gestione, regole di marketplace e subappalto, commissioni, limitazioni di
-            responsabilità in relazione ai vettori del Network, risoluzione delle controversie e legge applicabile.
-          </p>
-          <p>
-            Truck Radar orchestra i servizi tramite fornitori specializzati; i termini devono riflettere
-            il ruolo di piattaforma di collegamento tra aziende committenti e vettori verificati.
+        <h1 className="mt-6 text-3xl font-bold">Termini e Condizioni di Servizio (T&amp;C)</h1>
+        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: 22 settembre 2026.</p>
+
+        <div className="prose-invert mt-8 space-y-6 text-sm leading-7 text-slate-300">
+          {sections.map(({ icon: Icon, title, items }) => (
+            <section key={title} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+              <h2 className="font-bold text-slate-100 mb-3 flex items-center">
+                <Icon className="w-5 h-5 mr-2 text-blue-400 shrink-0" /> {title}
+              </h2>
+              <div className="space-y-4">
+                {items.map((it) => (
+                  <div key={it.h}>
+                    <h3 className="font-semibold text-slate-200 text-sm mb-1 flex items-center">
+                      <BadgeCheck className="w-4 h-4 mr-1.5 text-emerald-400 shrink-0" /> {it.h}
+                    </h3>
+                    <p className="text-slate-400">{it.p}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+
+          <p className="text-xs text-slate-500 flex items-center">
+            <FileX className="w-3.5 h-3.5 mr-1.5" />
+            I Termini vanno validati dal tuo consulente legale prima del lancio produttivo (v. §63 del paper).
           </p>
         </div>
       </div>
