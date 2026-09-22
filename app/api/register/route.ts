@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/hash";
+import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
+import { safeLog } from "@/lib/safe-log";
 
 export async function POST(req: Request) {
   try {
+    const rl = rateLimit(rateLimitKeyFromRequest(req, "register"), 10, 60_000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Troppe registrazioni. Riprova tra qualche minuto." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+      );
+    }
+
     const body = await req.json();
     const {
       // Step A: Company
@@ -139,7 +149,7 @@ export async function POST(req: Request) {
       email: result.adminUser.email,
     });
   } catch (error: any) {
-    console.error("Registration error:", error);
+    safeLog("error", "Registration failed", { message: error?.message });
     return NextResponse.json(
       { error: "Errore durante la registrazione: " + (error.message || "Errore del server") },
       { status: 500 }

@@ -11,6 +11,7 @@ import {
   XCircle,
   Truck,
 } from "lucide-react";
+import IncassoRapidoSoon from "@/components/IncassoRapidoSoon";
 
 interface Tx {
   id: string;
@@ -190,7 +191,7 @@ export default function EconomiaPage() {
             <span>{data ? eur(data.commissioni) : "—"}</span>
             {data && <span className="text-xs bg-indigo-950/60 border border-indigo-800/60 px-2 py-0.5 rounded">{data.rate}%</span>}
           </h3>
-          <p className="text-xs text-slate-500 mt-1">Fee versata a LogiFlow</p>
+          <p className="text-xs text-slate-500 mt-1">Fee versata a Truck Radar</p>
         </div>
         <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prelievi In Elaborazione</p>
@@ -200,6 +201,8 @@ export default function EconomiaPage() {
           </p>
         </div>
       </div>
+
+      <IncassoRapidoSoon />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Transactions */}

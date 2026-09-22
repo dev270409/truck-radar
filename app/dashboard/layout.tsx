@@ -16,6 +16,9 @@ import {
   Globe,
   MapPin,
   Settings,
+  Wrench,
+  ClipboardCheck,
+  Radar,
 } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
@@ -68,7 +71,7 @@ export default async function DashboardLayout({
             </div>
             <div className="overflow-hidden">
               <h2 className="font-bold text-sm text-slate-100 truncate">
-                {company?.ragioneSociale || "LogiFlow SaaS"}
+                {company?.ragioneSociale || "Truck Radar"}
               </h2>
               <p className="text-[11px] text-slate-400 font-mono truncate">
                 P.IVA: {company?.partitaIva || "N/A"}
@@ -138,6 +141,14 @@ export default async function DashboardLayout({
                 </Link>
 
                 <Link
+                  href="/dashboard/flotta"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <MapPin className="w-4 h-4 text-blue-400" />
+                  <span>Flotta Live (Mappa)</span>
+                </Link>
+
+                <Link
                   href="/dashboard/users"
                   className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
                 >
@@ -184,6 +195,32 @@ export default async function DashboardLayout({
                 >
                   <MapPin className="w-4 h-4 text-emerald-400" />
                   <span>Aree di Sosta</span>
+                </Link>
+
+                <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Flotta e sicurezza</p>
+
+                <Link
+                  href="/dashboard/manutenzione"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <Wrench className="w-4 h-4 text-amber-400" />
+                  <span>Manutenzione</span>
+                </Link>
+
+                <Link
+                  href="/dashboard/ispezioni"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <ClipboardCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Check-list Ispezioni</span>
+                </Link>
+
+                <Link
+                  href="/dashboard/geofence"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
+                >
+                  <Radar className="w-4 h-4 text-violet-400" />
+                  <span>Aree e Geofence</span>
                 </Link>
 
                 <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Configurazione</p>

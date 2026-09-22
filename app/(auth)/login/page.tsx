@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Truck, ShieldCheck, ArrowRight, Lock, Mail, AlertCircle, Loader2 } from "lucide-react";
 
+const SHOW_DEMO_CREDS = process.env.NEXT_PUBLIC_SHOW_DEMO_CREDS === "true";
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -68,16 +70,18 @@ function LoginForm() {
           </div>
         )}
 
-        {/* Demo Credentials Quick-Fill Hint */}
-        <div className="mb-6 p-3.5 bg-blue-950/40 border border-blue-900/60 rounded-xl text-xs text-blue-300">
-          <p className="font-semibold text-blue-200 mb-1 flex items-center">
-            <ShieldCheck className="w-4 h-4 mr-1 text-blue-400" /> Credenziali Demo disponibili (dopo seed):
-          </p>
-          <div className="font-mono text-slate-300 space-y-0.5">
-            <p>Admin: admin@demo.com / Demo123!</p>
-            <p>Autista: autista@demo.com / Demo123!</p>
+        {/* Demo Credentials Quick-Fill Hint — solo se NEXT_PUBLIC_SHOW_DEMO_CREDS=true */}
+        {SHOW_DEMO_CREDS && (
+          <div className="mb-6 p-3.5 bg-blue-950/40 border border-blue-900/60 rounded-xl text-xs text-blue-300">
+            <p className="font-semibold text-blue-200 mb-1 flex items-center">
+              <ShieldCheck className="w-4 h-4 mr-1 text-blue-400" /> Credenziali Demo disponibili (dopo seed):
+            </p>
+            <div className="font-mono text-slate-300 space-y-0.5">
+              <p>Admin: admin@demo.com / Demo123!</p>
+              <p>Autista: autista@demo.com / Demo123!</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">

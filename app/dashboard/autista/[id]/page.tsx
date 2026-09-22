@@ -18,6 +18,8 @@ import {
   StickyNote,
   FileText,
   Upload,
+  ClipboardCheck,
+  Send,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
@@ -93,6 +95,14 @@ export default function AutistaTripDetailPage() {
   const [trackNote, setTrackNote] = useState("");
   const [trackSaving, setTrackSaving] = useState(false);
 
+  // Inspection checklist state
+  const [inspectTemplate, setInspectTemplate] = useState<{ id: string; name: string; items: { label: string }[] } | null>(null);
+  const [inspectChecks, setInspectChecks] = useState<Record<string, boolean>>({});
+  const [inspectNote, setInspectNote] = useState("");
+  const [inspectSaving, setInspectSaving] = useState(false);
+  const [inspectSent, setInspectSent] = useState(false);
+  const [inspectError, setInspectError] = useState("");
+
   const load = async () => {
     try {
       const res = await fetch(`/api/autista/trips/${id}`);
@@ -104,6 +114,16 @@ export default function AutistaTripDetailPage() {
       const resTrack = await fetch(`/api/trips/${id}/tracking`);
       const dataTrack = await resTrack.json();
       if (dataTrack.events) setTrackEvents(dataTrack.events);
+      const resInsp = await fetch("/api/inspections?action=template");
+      const dataInsp = await resInsp.json();
+      if (dataInsp.template) {
+        setInspectTemplate(dataInsp.template);
+        const checks: Record<string, boolean> = {};
+        dataInsp.template.items.forEach((i: { label: string }) => {
+          checks[i.label] = true;
+        });
+        setInspectChecks(checks);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -197,6 +217,40 @@ export default function AutistaTripDetailPage() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setTrackSaving(false);
+    }
+  };
+
+  const handleInspectionSend = async () => {
+    setInspectError("");
+    if (!inspectTemplate || !trip?.vehicle) {
+      setInspectError("Template o veicolo non disponibile.");
+      return;
+    }
+    const items = inspectTemplate.items.map((i) => ({
+      label: i.label,
+      ok: inspectChecks[i.label] !== false,
+    }));
+    setInspectSaving(true);
+    try {
+      const res = await fetch("/api/inspections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          vehicleId: trip.vehicle.id,
+          tripId: trip.id,
+          templateId: inspectTemplate.id,
+          items,
+          note: inspectNote || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nell'invio della check-list");
+      setInspectSent(true);
+      setSuccess("Check-list pre-partenza inviata alla sede.");
+    } catch (err) {
+      setInspectError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setInspectSaving(false);
     }
   };
 
@@ -506,6 +560,60 @@ export default function AutistaTripDetailPage() {
             >
               {trackSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
               <span>Aggiorna posizione / stato</span>
+            </button>
+          </div>
+        )}
+
+        {(isAssigned || isInCorso) && inspectTemplate && (
+          <div className="border-t border-slate-800 pt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-emerald-300 flex items-center">
+                <ClipboardCheck className="w-4 h-4 mr-2" /> {inspectTemplate.name}
+              </h4>
+              {inspectSent && (
+                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
+                  INVIATA
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400">
+              Conferma ogni voce prima della partenza. Almeno una voce non ok genera un esito critico.
+            </p>
+            <div className="space-y-2">
+              {inspectTemplate.items.map((item) => (
+                <label
+                  key={item.label}
+                  className="flex items-start justify-between gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer"
+                >
+                  <span className="text-sm text-slate-200">{item.label}</span>
+                  <input
+                    type="checkbox"
+                    checked={inspectChecks[item.label] !== false}
+                    onChange={(e) =>
+                      setInspectChecks((prev) => ({ ...prev, [item.label]: e.target.checked }))
+                    }
+                    className="w-4 h-4 mt-0.5 accent-emerald-500"
+                  />
+                </label>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={inspectNote}
+              onChange={(e) => setInspectNote(e.target.value)}
+              placeholder="Note o criticità (opzionale)"
+              className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+            />
+            {inspectError && (
+              <div className="p-3 bg-red-950/60 border border-red-800 text-red-200 text-xs rounded-xl">{inspectError}</div>
+            )}
+            <button
+              onClick={handleInspectionSend}
+              disabled={inspectSaving || inspectSent}
+              className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-3 rounded-xl transition disabled:opacity-60"
+            >
+              {inspectSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              <span>{inspectSent ? "Check-list inviata" : "Invia check-list pre-partenza"}</span>
             </button>
           </div>
         )}

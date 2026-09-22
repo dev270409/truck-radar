@@ -12,8 +12,11 @@ import {
   FileCheck,
   FileWarning,
   CalendarClock,
+  AlertTriangle,
 } from "lucide-react";
 import VerificationCard from "@/components/VerificationCard";
+import StripeCheckoutCard from "@/components/StripeCheckoutCard";
+import ComingSoonCard from "@/components/ComingSoonCard";
 
 const daysUntil = (iso: Date) =>
   Math.ceil((iso.getTime() - Date.now()) / 86400000);
@@ -140,6 +143,41 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <StripeCheckoutCard />
+
+      <ComingSoonCard
+        title="Telemetria e diagnostica motore"
+        description="Dati motore, consumi e guasti in tempo reale via GPS/OBU (come il modulo Engine/Fault di MyGeotab)."
+        icon="radar"
+        color="blue"
+        details={
+          <>
+            <p>Collegando un telemetra GPS/OBU otterrai in tempo reale: consumi carburante e chilometri reali, fault/guasti di motore con codice DTC. Richiede integrazione provider GPS/telemetria (FASE 3, §9 del paper).</p>
+          </>
+        }
+      />
+
+      <ComingSoonCard
+        title="Videosorveglianza a bordo (Dashcam AI)"
+        description="Clip video e telecamere per la flotta per sicurezza e gestione sinistri (come il modulo video di MyGeotab)."
+        icon="video"
+        color="violet"
+      />
+
+      <ComingSoonCard
+        title="Carte carburante e IFTA"
+        description="Gestione carburante, card controllo e calcolo tasse (IFTA) nei viaggi internazionali."
+        icon="fuel"
+        color="amber"
+      />
+
+      <ComingSoonCard
+        title="Fleet Radar AI"
+        description="Alert intelligenti: velocità, deviazioni di rotta e anomalie di guida basate su regole configurabili."
+        icon="network"
+        color="red"
+      />
 
       {/* Vehicle Documents Expiry Section */}
       <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">

@@ -205,6 +205,103 @@ const statements = [
     UNIQUE ("parkingAreaId", "companyId")
   );
   `,
+
+  // Entità feedback committente — Incasso rapido Stripe Connect (in arrivo)
+  // Campi previsti secondo docs/STRIPE_CONNECT_ROADMAP.md: account Express/Custom,
+  // aspettiamo l'attivazione del provider prima di esporli.
+  `
+  CREATE TABLE IF NOT EXISTS "StripeConnectProfile" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL UNIQUE,
+    "stripeAccountId" TEXT,
+    "onboardingComplete" BOOLEAN NOT NULL DEFAULT false,
+    "payoutsEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "featureActive" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS "StripeConnectLead" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'INTERESSATA',
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("companyId")
+  );
+  CREATE INDEX IF NOT EXISTS "StripeConnectLead_status_idx" ON "StripeConnectLead"("status");
+  `,
+
+  // Entità T10.3 — Manutenzione programmata veicoli (tagliandi/interventi, km/date)
+  `
+  CREATE TABLE IF NOT EXISTS "VehicleMaintenance" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "vehicleId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "descrizione" TEXT,
+    "kmProssimo" DOUBLE PRECISION,
+    "dataProssima" TIMESTAMPTZ,
+    "kmEseguito" DOUBLE PRECISION,
+    "dataEseguito" TIMESTAMPTZ,
+    "costo" DOUBLE PRECISION,
+    "fornitore" TEXT,
+    "note" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PROGRAMMATO',
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "VehicleMaintenance_vehicleId_idx" ON "VehicleMaintenance"("vehicleId");
+  CREATE INDEX IF NOT EXISTS "VehicleMaintenance_companyId_idx" ON "VehicleMaintenance"("companyId");
+  CREATE INDEX IF NOT EXISTS "VehicleMaintenance_status_idx" ON "VehicleMaintenance"("status");
+  `,
+
+  // Entità T10.5 — Geofence / aree personalizzate per tenant
+  `
+  CREATE TABLE IF NOT EXISTS "GeofenceArea" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    name TEXT NOT NULL,
+    "latCenter" DOUBLE PRECISION,
+    "lngCenter" DOUBLE PRECISION,
+    "raggioM" DOUBLE PRECISION NOT NULL DEFAULT 1000,
+    color TEXT NOT NULL DEFAULT '#3b82f6',
+    note TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "GeofenceArea_companyId_idx" ON "GeofenceArea"("companyId");
+  `,
+
+  // Entità T10.4 — Checklist ispezione veicolo + esiti compilati (PWA autista)
+  `
+  CREATE TABLE IF NOT EXISTS "InspectionTemplate" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    name TEXT NOT NULL,
+    "items" JSONB NOT NULL DEFAULT '[]',
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "InspectionTemplate_companyId_idx" ON "InspectionTemplate"("companyId");
+  CREATE TABLE IF NOT EXISTS "VehicleInspection" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "vehicleId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "tripId" TEXT,
+    "templateId" TEXT,
+    "templateName" TEXT,
+    "esito" TEXT NOT NULL DEFAULT 'OK',
+    "items" JSONB NOT NULL DEFAULT '[]',
+    "note" TEXT,
+    "lat" DOUBLE PRECISION,
+    "lng" DOUBLE PRECISION,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "VehicleInspection_vehicleId_idx" ON "VehicleInspection"("vehicleId");
+  CREATE INDEX IF NOT EXISTS "VehicleInspection_companyId_idx" ON "VehicleInspection"("companyId");
+  CREATE INDEX IF NOT EXISTS "VehicleInspection_tripId_idx" ON "VehicleInspection"("tripId");
+  `,
 ];
 
 async function main() {
@@ -328,7 +425,7 @@ async function main() {
     );
     await db.$queryRawUnsafe(
       `INSERT INTO "ParkingArea" ("id", "companyId", name, address, city, security, illuminated, restaurant, showers, wifi)
-       SELECT 'seed-parking-02', c.id, 'LogiFlow Logistic Park', 'Via degli Spedizionieri 3', 'Milano', true, true, false, false, true
+       SELECT 'seed-parking-02', c.id, 'Truck Radar Logistic Park', 'Via degli Spedizionieri 3', 'Milano', true, true, false, false, true
        FROM "Company" c WHERE c."ragioneSociale" = 'Vettore Demo SRL'
          AND NOT EXISTS (SELECT 1 FROM "ParkingArea" WHERE id = 'seed-parking-02')`
     );

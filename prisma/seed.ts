@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const db = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Starting Database Seed for LogiFlow SaaS...");
+  console.log("🌱 Starting Database Seed for Truck Radar...");
 
   // Clean existing seed data if any
   await db.auditLog.deleteMany({});

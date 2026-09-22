@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { db } from "@/lib/db";
 import { comparePassword } from "@/lib/hash";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -21,6 +22,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
+
+        const rl = rateLimit(`login:${email}`, 30, 60_000);
+        if (!rl.ok) {
+          return null;
+        }
 
         const user = await db.user.findUnique({
           where: { email },

@@ -112,7 +112,7 @@ async function main() {
     console.log("  (cleanup viaggio di test)");
 
     console.log("9) GET admin vede anche il DDT dell'autista...");
-    const finalList = await admin.req(base);
+    const finalList = await admin.req(`/api/trips/${activeTrip.id}/documents`);
     assert(finalList.body.documents.some((d: any) => d.fileUrl.includes("demo-foto")), "admin vede il DDT dell'autista");
 
     console.log("DDT e2e: TUTTI I CHECK PASSATI");

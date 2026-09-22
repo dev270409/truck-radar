@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { safeLog } from "@/lib/safe-log";
+import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
 import Stripe from "stripe";
 
 export async function POST(req: Request) {
+  const rl = rateLimit(rateLimitKeyFromRequest(req, "stripe-webhook"), 100, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json({ error: "Troppe richieste." }, { status: 429 });
+  }
+
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 
@@ -21,7 +28,7 @@ export async function POST(req: Request) {
       event = JSON.parse(body) as Stripe.Event;
     }
   } catch (err: any) {
-    console.error(`Webhook Signature Error: ${err.message}`);
+    safeLog("error", "Stripe webhook signature error", { message: err.message });
     return NextResponse.json({ error: `Webhook error: ${err.message}` }, { status: 400 });
   }
 
@@ -89,12 +96,12 @@ export async function POST(req: Request) {
       }
 
       default:
-        console.log(`Unhandled Stripe event type: ${event.type}`);
+        safeLog("info", "Unhandled Stripe event type", { type: event.type });
     }
 
     return NextResponse.json({ received: true });
   } catch (error: any) {
-    console.error("Stripe Webhook Processing Error:", error);
+    safeLog("error", "Stripe webhook processing error", { message: error.message });
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
 }

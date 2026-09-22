@@ -2,7 +2,7 @@
 
 ## Paper di lancio, distribuzione web e onboarding verificato
 
-**Stato:** piano successivo al completamento del Mega Paper Master
+**Stato:** piano successivo al completamento del Mega Paper Master — aggiornato con verifica del codice (2026-09-21)
 
 Truck Radar è il Transport Operating System per aziende di trasporto: gestione di mezzi, autisti e viaggi; documenti e DDT; dati, network, marketplace e Smart Return.
 
@@ -11,6 +11,18 @@ Truck Radar è il Transport Operating System per aziende di trasporto: gestione 
 La checklist funzionale attuale è completa: non risultano task `[ ]` o `[FAILED]`.
 
 Sono già disponibili account aziendale e ruoli, multi-tenancy, mezzi, autisti con credenziali, viaggi, PWA autista, DDT, documenti, tracking, integrazioni, abbonamenti, verifica account, marketplace, subappalto, Smart Return, analytics, reputazione, community ed ESG.
+
+### 1.1 Stato implementazione verificato a oggi (codice + repo)
+
+| Voce | Stato |
+| --- | --- |
+| Landing pubblica Truck Radar (obiettivo, valore, network verificato, CTA) | ✔ `app/page.tsx` |
+| Rinominazione LogiFlow → Truck Radar (metadata, manifest, login, landing) | ✔ con residui in 5 file (riepilogo in §8.1) |
+| Registrazione aziendale multi-step + KYC con upload reale (UploadThing) | ✔ wizard 4 step; `app/api/register/route.ts` rifiuta KYC incomplete |
+| Blocco fallback mock in produzione (Stripe e cifratura) | ✔ `lib/stripe.ts`, `lib/crypto.ts` lanciano senza chiavi valide in produzione |
+| Repository GitHub privato e remote | ✔ `github.com/dev270409/truck-radar` (commit `cb28637`, push eseguito) |
+| Suite e2e di regressione + build production | ✔ `npx tsc --noEmit` e `npm run build` puliti; regressione e2e 14/14 verde |
+| Incasso rapido "In arrivo" (embedded finance Stripe Connect) | ✔ UI + lead gen + DB predisposto, attivazione al §9 (§8.4) |
 
 Prima di rendere il servizio pubblico restano comunque i seguenti **gate di produzione**:
 
@@ -185,6 +197,63 @@ Il lancio è autorizzato solo se:
 - attivazioni Network, match e subappalti;
 - errori tecnici, ticket e tempo di risposta supporto.
 
+## 8.1 Lavori che NON richiedono account esterni (pronti da fare)
+
+Attività preparatorie che si possono implementare subito, senza dipendere da credenziali:
+
+1. Rimuovere il riquadro "Credenziali Demo" dalla pagina login (`app/(auth)/login/page.tsx`) e gestire l'accesso demo solo via flag di ambiente. ✔ fatto: riquadro condizionato da `NEXT_PUBLIC_SHOW_DEMO_CREDS=true`, nascosto in produzione.
+2. Ripulire i residui del vecchio brand. ✔ fatto: nessun riferimento "LogiFlow" residuo nel codice (layout, economia, seed, ensure-raw-tables, README).
+3. Creare le pagine legali placeholder in `truckradar.it` (`privacy`, `termini`, `cookie`) collegate dal footer della landing, da completare con i consulenti. ✔ fatto: `app/privacy`, `app/termini`, `app/cookie` + link nei footer; testi da validare legalmente.
+4. Definire il flusso dati KYC interno (schema) per collegare poi gli esiti dei provider: stato, riferimento verifica, motivazione rifiuto, scadenza/riesame, audit — senza mai salvare documenti identitari non necessari. ✔ fatto: `docs/KYC_PROVIDER_SCHEMA.md` definisce modello dati (`KycVerification`), flusso, mapping eventi e vincoli.
+5. Apporre `rate limit` e logging strutturato con redazione dei dati sensibili sui route handler critici (auth, register, KYC, webhook). ✔ fatto: `lib/rate-limit.ts` (in-memory, chiave IP+scope) su register (10/min) e login (30/min per email); `lib/safe-log.ts` con `redact()` e `safeLog()` sostituisce i log grezzi nel route register e nei webhook Stripe.
+6. Preparare il webhook KYC centralizzato per gli esiti dei provider (Stripe Identity e visure). ✔ fatto: `app/api/webhooks/kyc/route.ts` (boilerplate: rate limit 60/min, validazione tipo/stato, firma richiesta in produzione se chiave configurata, mapping su `KycVerification` da attivare in §9); smoke test verde su dev.
+
+## 8.2 Check manuale del codice (punto della situazione)
+
+- Gestione core e funzioni operative: **complete** (checklist `.opencode_tasks.md` tutta `[x]`).
+- Regressione e2e modulo 2: **14/14 script verdi** (13 esistenti + `e2e-stripe-lead` per l'incasso rapido "In arrivo") dopo la correzione di un test DDT fragile legato all'accumulo di dati demo (verifica su viaggio dell'autista, non più sul primo viaggio in lista).
+- Landings, brand e onboard: **fatte**; pulizia residui fatta (§8.1 completato).
+- Integrazione esterne: **nessuna attiva** (GPS/TMS simulate, Stripe in modalità test/mock, nessun provider identity, email o monitoring).
+- Sicurezza produzione: **pronta nei punti chiave** (hardening in `lib/stripe.ts` e `lib/crypto.ts`, rate limit + log redatti su register/login/webhook, webhook KYC boilerplate pronto), ma mancano legali validati giuridicamente, CMP e backoffice KYC reale: i 6 punti §8.1 risultano completati.
+- Deploy: **repository pronto, nessun progetto Vercel/dominio/Supabase production ancora configurato**.
+
+## 8.3 Punto della situazione verso il committente — aggiornamenti attesi
+
+Il committente ha confermato: nessun account esterno attivato al momento. Tutti i lavori che non richiedono account esterni (§8.1) sono completati e verificati (landing pubblica, cerca-un-vettore, pagine legali, demo creds sotto flag, KYC schema, webhook KYC boilerplate, rate limit + log redatti). Il prossimo giro di feedback riguarderà cosa cambiare, migliorare o togliere nel prodotto; a quello segue l'attivazione progressiva dei provider in ordine di dipendenza (vedi §2.1 e roadmap §5), che richiede le credenziali del committente e non può essere completata dall'agente in autonomia.
+
+## 8.4 Feedback del committente — incasso rapido (Stripe Connect) e logo sui camion
+
+### Incasso rapido / anticipo fatture (borsa carichi)
+
+Il problema dei pagamenti a 60/90 giorni sulla borsa carichi viene risolto con **embedded finance**: fattoring/anticipo fatture tramite partner autorizzati, senza che Truck Radar tocchi mai i fondi. Decisione del committente: **Stripe Connect** con commissione fissa **1%** per transazione, split automatico (99% vettore / 1% piattaforma). Non implementato come funzionalità erogante credito: è solo UI + preparazione dati finché il provider non è attivo.
+
+Implementato subito (senza account esterno):
+- ✔ Pulsante "Incasso rapido · In arrivo" disabilitato con badge, su **Economia** e **Borsa Carichi** (`components/IncassoRapidoSoon.tsx`), per testare interesse e preparare l'onboarding.
+- ✔ Lead gen idempotente "Avvisami quando disponibile" → `StripeConnectLead` + `POST /api/finance/stripe-lead` (auth, rate limit 5/min, log redatti).
+- ✔ DB predisposto per il futuro Stripe: `StripeConnectProfile` (stripeAccountId, onboardingComplete, payoutsEnabled, featureActive) — descrizione in `docs/STRIPE_CONNECT_ROADMAP.md`.
+- ✔ e2e `scripts/e2e-stripe-lead.ts` verde (401 senza login, registrazione, idempotenza, pagine UI 200); tsc + build puliti.
+- ⏳ Da attivare con Stripe (vedi §9 punto 5 e roadmap): onboarding Connect embedded, webhook `account.updated`/`payment_intent.succeeded`, ripartizione 99/1 alla conferma della tratta, scrittura Economia "INCASSO RAPIDO".
+
+### Logo Truck Radar sui camion (marketing)
+
+Iniziativa di marketing/offline ("Powered by Truck Radar" sui mezzi dei clienti) valutata come canale di acquisizione B2B: social proof presso il target (hub logistici, interporti) e fidelizzazione. Studio costi/format disponibile in `C:\Users\Asus\Downloads\Loghi su camion per gestionali.md`: sticker in vinile CAST laminato per automezzi, formato jolly consigliato 60x30 cm o 45x45 cm sagomato; prezzi indicativi 18–25 €/pezzo (1–5), 10–15 €/pezzo (10–25), 5–8 €/pezzo (50+). Non è una funzionalità software: viene catalogata come leva di acquisizione fuori dall'app (off-label) da attivare quando esisteranno i primi clienti pilota/Design Partner.
+
+## 9. Checklist operativa provider (da attivare, in ordine)
+
+Nessun provider è ancora stato attivato. Questa checklist è l'ordine consigliato; ogni attivazione sblocca un'apposita implementazione nel codice. Quando viene creato un account, non incollare mai chiavi nella chat: verranno inserite nelle Environment Variables di Vercel.
+
+1. **GitHub** — ❌ da fare: repository (`dev270409/truck-radar`) già pronto e pushato, impostare MFA e regole di protezione su `master`.
+2. **Vercel** — ❌: importare `dev270409/truck-radar`, creare progetto `truck-radar`, collezionare domini `truckradar.it` e `app.truckradar.it`, variabili separate per Production/Preview/Development.
+3. **Supabase** — ❌ (è già il DB attuale, ma serve un progetto production separato): regione UE, SSL, backup automatico e restore testato, restrizioni di rete, MFA.
+4. **UploadThing** — ❌: progetto production, domini consentiti, limiti sui file.
+5. **Stripe** — ❌ (modalità test nel codice; da passare a live): Billing + Connect + Identity. Implementazioni: checkout abbonamento, webhook firmati, payout e commissioni Connect, verifica KYC persona via Identity. Predisposte solo le basi dell'incasso rapido (§8.4): UI "In arrivo", lead gen e tabelle raw `StripeConnectProfile`/`StripeConnectLead` — l'attivazione Connect (onboarding embedded, split 99/1, webhook) avviene solo quando il committente attiva l'account.
+6. **Provider identity (Clerk o equivalente)** — ❌: login, verifica email, reset password, MFA, inviti autista.
+7. **Provider camerale / business verification (visura aziendale)** — ❌: verifica visura e dati societari, webhook/esito firmato.
+8. **Resend/Postmark** — ❌: dominio `truckradar.it`, email transazionali (`noreply@truckradar.it`).
+9. **Sentry** — ❌: error tracking, alert, DSN in variabili d'ambiente.
+
+Ogni punto di questa lista, quando attivato, verrà convertito dal placeholder attuale in un'integrazione reale coerente con §2.1 (orchestriamo, non sostituiamo il provider) e con i criteri di go-live di §7.
+
 ## Decisione
 
-Il prossimo prodotto da realizzare non è un'altra funzione di gestione: è la presenza pubblica e il percorso affidabile con cui un'azienda scopre Truck Radar, si registra, dimostra la propria identità aziendale e accede gradualmente al Network verificato.
+Il prossimo prodotto da realizzare non è un'altra funzione di gestione: è la presenza pubblica e il percorso affidabile con cui un'azienda scopre Truck Radar, si registra, dimostra la propria identità aziendale e accede gradualmente al Network verificato. Stato: roadmap scritta, pubblica già esercitabile su `localhost`, regressione e2e 14/14 verde, webhook KYC e sicurezza di base pronti, incasso rapido annunciato "In arrivo" con DB Stripe predisposto; nessun provider esterno attivo; si attendono il feedback del committente e l'attivazione dei provider di §9 (blocco: attivazione degli account provider richiede l'utente).

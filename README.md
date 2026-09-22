@@ -1,6 +1,6 @@
-# 🚚 LogiFlow SaaS — Piattaforma SaaS di Gestione Trasporti & Flotte
+# 🚚 Truck Radar — Transport Operating System
 
-Una piattaforma SaaS multi-tenant enterprise per la gestione completa di trasporti merci, flotte aziendali, documenti KYC, autisti e contratti, sviluppata con la seguente stack tecnologica:
+Una piattaforma SaaS multi-tenant per la gestione completa di trasporti merci, flotte aziendali, documenti KYC, autisti, DDT e Network di vettori verificati, sviluppata con la seguente stack tecnologica:
 
 - **Frontend / Backend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
 - **ORM & Database**: Prisma ORM, PostgreSQL (Supabase)
