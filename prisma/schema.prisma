@@ -26,9 +26,17 @@ enum UserRole {
 }
 
 enum KycDocType {
+  // Livello 1 - SaaS Interno (Gestionale flotta)
   PARTITA_IVA
+  DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE
+
+  // Livello 2 - Borsa Carichi (Marketplace)
   LICENZA_CONTO_TERZI
   ALBO_TRASPORTATORI
+  LICENZA_REN
+  POLIZZA_ASSICURATIVA_CMR
+  DURC
+  DELEGA_POTERI_FIRMA
 }
 
 enum KycStatus {

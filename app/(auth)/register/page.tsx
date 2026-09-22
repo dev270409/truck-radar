@@ -31,14 +31,14 @@ export default function RegisterPage() {
   // Step B Data: Admin User
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [nome, setNome] = useState("");
   const [cognome, setCognome] = useState("");
 
-  // Step C Data: KYC Files
+  // Step C Data: KYC Files (Livello 1 - SaaS Interno)
   const [kycFiles, setKycFiles] = useState([
     { tipo: "PARTITA_IVA", label: "Certificato Partita IVA", fileName: "", fileUrl: "" },
-    { tipo: "LICENZA_CONTO_TERZI", label: "Licenza Conto Terzi", fileName: "", fileUrl: "" },
-    { tipo: "ALBO_TRASPORTATORI", label: "Iscrizione Albo Autotrasportatori", fileName: "", fileUrl: "" },
+    { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE", label: "Documento Identità Legale Rappresentante", fileName: "", fileUrl: "" },
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -58,12 +58,16 @@ export default function RegisterPage() {
   const handleNextFromB = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!email || !password || !nome || !cognome) {
+    if (!email || !password || !passwordConfirm || !nome || !cognome) {
       setError("Compila tutti i campi dell'amministratore per proseguire.");
       return;
     }
     if (password.length < 6) {
       setError("La password deve contenere almeno 6 caratteri.");
+      return;
+    }
+    if (password !== passwordConfirm) {
+      setError("Le password non coincidono.");
       return;
     }
     setStep("C");
@@ -316,6 +320,20 @@ export default function RegisterPage() {
                   className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none"
                 />
               </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  Conferma Password *
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  placeholder="Ripeti la password"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none"
+                />
+              </div>
             </div>
 
             <div className="flex justify-between pt-4 border-t border-slate-800">
@@ -344,10 +362,10 @@ export default function RegisterPage() {
           <div className="space-y-5">
             <div>
               <h2 className="text-lg font-semibold text-slate-200 flex items-center">
-                <FileCheck className="w-5 h-5 mr-2 text-blue-400" /> Step C: Upload Documentazione KYC (3 File)
+                <FileCheck className="w-5 h-5 mr-2 text-blue-400" /> Step C: Upload Documentazione KYC - Livello 1 (SaaS Interno)
               </h2>
               <p className="text-xs text-slate-400 mt-1">
-                I documenti vengono caricati in storage protetto e restano privati. L&apos;esito della verifica abilita il Network.
+                Documenti obbligatori per attivare il gestionale flotta (SaaS Interno). La verifica Livello 2 (Borsa Carichi) sarà richiesta separatamente.
               </p>
             </div>
 
@@ -438,9 +456,9 @@ export default function RegisterPage() {
               <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-start space-x-3">
                 <ShieldAlert className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-400 uppercase">Stato Documenti KYC</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase">Stato Documenti KYC (Livello 1)</p>
                   <p className="text-sm font-bold text-blue-300">IN_ATTESA</p>
-                  <p className="text-[11px] text-slate-500">3 Documenti inviati</p>
+                  <p className="text-[11px] text-slate-500">2 Documenti inviati (Livello 1)</p>
                 </div>
               </div>
             </div>

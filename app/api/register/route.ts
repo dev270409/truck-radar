@@ -42,9 +42,11 @@ export async function POST(req: Request) {
 
     const cleanEmail = String(email).toLowerCase().trim();
     const cleanPiva = String(partitaIva).trim();
-    const requiredKycTypes = ["PARTITA_IVA", "LICENZA_CONTO_TERZI", "ALBO_TRASPORTATORI"];
-    if (!Array.isArray(kycFiles) || requiredKycTypes.some((tipo) => !kycFiles.some((file: { tipo?: string; fileUrl?: string }) => file.tipo === tipo && file.fileUrl))) {
-      return NextResponse.json({ error: "Carica tutti i documenti KYC richiesti tramite il flusso protetto." }, { status: 400 });
+    // Livello 1 (SaaS Interno): PARTITA_IVA + DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE
+    // Livello 2 (Borsa Carichi): LICENZA_CONTO_TERZI + ALBO_TRASPORTATORI + LICENZA_REN + POLIZZA_ASSICURATIVA_CMR + DURC + DELEGA_POTERI_FIRMA
+    const requiredKycTypesLevel1 = ["PARTITA_IVA", "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE"];
+    if (!Array.isArray(kycFiles) || requiredKycTypesLevel1.some((tipo) => !kycFiles.some((file: { tipo?: string; fileUrl?: string }) => file.tipo === tipo && file.fileUrl))) {
+      return NextResponse.json({ error: "Carica i documenti KYC di Livello 1 (Partita IVA + Documento identità legale rappresentante) tramite il flusso protetto." }, { status: 400 });
     }
 
     // Check if email or partitaIva already exists
@@ -105,14 +107,13 @@ export async function POST(req: Request) {
         },
       });
 
-      // 3. Create initial 3 KYC Documents
-      const defaultDocs = [
+      // 3. Create initial KYC Documents (Livello 1 - SaaS Interno)
+      const level1Docs = [
         { tipo: "PARTITA_IVA" as const, name: "Certificato Partita IVA" },
-        { tipo: "LICENZA_CONTO_TERZI" as const, name: "Licenza Trasporto Conto Terzi" },
-        { tipo: "ALBO_TRASPORTATORI" as const, name: "Iscrizione Albo Autotrasportatori" },
+        { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE" as const, name: "Documento Identità Legale Rappresentante" },
       ];
 
-      const kycRecordsToCreate = defaultDocs.map((docDef) => {
+      const kycRecordsToCreate = level1Docs.map((docDef) => {
         const provided = (kycFiles || []).find((f: any) => f.tipo === docDef.tipo);
         return {
           companyId: company.id,

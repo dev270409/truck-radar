@@ -111,6 +111,16 @@ export function getTenantDb(companyId: string) {
           ...args,
           data: { ...args.data, companyId },
         } as any),
+      update: (args: Parameters<typeof db.kycDocument.update>[0]) =>
+        db.kycDocument.update({
+          ...args,
+          where: { ...args.where, companyId },
+        }),
+      updateMany: (args: Parameters<typeof db.kycDocument.updateMany>[0]) =>
+        db.kycDocument.updateMany({
+          ...args,
+          where: { ...args.where, companyId },
+        }),
     },
 
     // Subscriptions
