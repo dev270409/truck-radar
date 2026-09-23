@@ -370,6 +370,16 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "TripShare_tripId_idx" ON "TripShare"("tripId");
   CREATE INDEX IF NOT EXISTS "TripShare_companyId_idx" ON "TripShare"("companyId");
   `,
+
+  // Estensione enum KycDocType (Livello 1 + Livello 2, §KYC tiered)
+  // Prisma CLI migrate non disponibile: ALTER TYPE idempotente.
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'LICENZA_CONTO_TERZI'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'ALBO_TRASPORTATORI'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'LICENZA_REN'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'POLIZZA_ASSICURATIVA_CMR'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'DURC'`,
+  `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'DELEGA_POTERI_FIRMA'`,
 ];
 
 async function main() {
