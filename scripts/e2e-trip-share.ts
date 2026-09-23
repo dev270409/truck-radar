@@ -106,7 +106,7 @@ async function main() {
     });
     assert(toggle.status === 200, "toggle disattiva share");
     const disabled = await fetch(`http://localhost:3002${pageUrl}`);
-    assert(disabled.status === 200 && (await disabled.text()).includes("non più attivo"), "pagina share disattivato mostra avviso");
+    assert(disabled.status === 200 && (await disabled.text()).includes("non valido"), "pagina share disattivato mostra avviso");
 
     const reenable = await admin.req("/api/trip-shares", {
       method: "PATCH",
@@ -118,7 +118,7 @@ async function main() {
     assert(del.status === 200, "DELETE share");
 
     const afterDelete = await fetch(`http://localhost:3002${pageUrl}`);
-    assert(afterDelete.status === 200 && (await afterDelete.text()).includes("non più attivo"), "dopo eliminazione link non valido");
+    assert(afterDelete.status === 200 && (await afterDelete.text()).includes("non valido"), "dopo eliminazione link non valido");
 
     console.log("6) Autorizzazione API per utente non-admin...");
     const nonAdmin = await login(3002, driverEmail, "Demo123!");

@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Truck, Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen } from "lucide-react";
+import { Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen } from "lucide-react";
 
 export default function CercaUnVettorePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-2 font-bold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500">
-            <Truck className="h-5 w-5" />
-          </span>
+          <img src="/logo.jpg" alt="Truck Radar" className="h-9 w-9 rounded-xl object-cover" />
           Truck Radar
         </Link>
         <div className="flex items-center gap-4 text-sm">

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { getPlanLimits, hasFullSectionAccess } from "@/lib/plans";
 import {
-  Truck,
   LayoutDashboard,
   Users,
   Clock,
@@ -120,9 +119,11 @@ export default async function DashboardLayout({
         <div>
           {/* Brand & Tenant Info */}
           <div className="flex items-center space-x-3 pb-5 mb-6 border-b border-slate-800">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
-              <Truck className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="/logo.jpg"
+              alt="Truck Radar"
+              className="w-10 h-10 rounded-xl object-cover shadow-lg flex-shrink-0"
+            />
             <div className="overflow-hidden">
               <h2 className="font-bold text-sm text-slate-100 truncate">
                 {company?.ragioneSociale || "Truck Radar"}

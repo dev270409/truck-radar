@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Truck,
   AlertCircle,
   Loader2,
   Clock,
@@ -124,9 +123,11 @@ export default function RegisterForm() {
         {/* Brand Header */}
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-800">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Truck className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="/logo.jpg"
+              alt="Truck Radar"
+              className="w-10 h-10 rounded-xl object-cover shadow-lg"
+            />
             <div>
               <h1 className="text-xl font-bold tracking-tight">Truck Radar</h1>
               <p className="text-xs text-slate-400">Registrazione Piattaforma Trasporti</p>
