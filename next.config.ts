@@ -39,7 +39,7 @@ const securityHeaders = [
   },
 ];
 
-const BUILD_ID = "20260923.6";
+const BUILD_ID = "20260923.7";
 
 const nextConfig: NextConfig = {
   async headers() {
