@@ -34,3 +34,31 @@ export function isStripeConfigured(): boolean {
 export function isStripeReady(): boolean {
   return isStripeConfigured();
 }
+
+/** Limiti operativi per piano (fonte: requisito prodotto). */
+export interface PlanLimits {
+  /** Massimo numero di mezzi gestibili. */
+  vehicleLimit: number;
+  /** Massimo numero di autisti gestibili. */
+  driverLimit: number;
+}
+
+export const PLAN_DEFAULT_LIMITS: PlanLimits = { vehicleLimit: 15, driverLimit: 15 };
+
+export function getPlanLimits(planKey?: string | null): PlanLimits {
+  const key = (planKey || "BASE").toUpperCase();
+  if (key === "PRO") {
+    return { vehicleLimit: 50, driverLimit: 50 };
+  }
+  return PLAN_DEFAULT_LIMITS;
+}
+
+/**
+ * Un'azienda ha accesso completo a tutte le sezioni solo con
+ * un abbonamento attivo (BASE/PRO). Chi è in TRIAL/SOSPESO o con solo
+ * KYC Livello 1 ha le funzioni base di gestione flotta e può solo
+ * *vedere* le sezioni premium.
+ */
+export function hasFullSectionAccess(subscriptionStatus?: string | null): boolean {
+  return subscriptionStatus === "ACTIVE";
+}

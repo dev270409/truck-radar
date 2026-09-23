@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { getPlanLimits, hasFullSectionAccess } from "@/lib/plans";
 import {
   Truck,
   LayoutDashboard,
@@ -21,10 +22,51 @@ import {
   Radar,
   Fuel,
   CreditCard,
+  Lock,
 } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
 import { listApiConnections } from "@/lib/raw-tables";
+
+function SidebarLink({
+  href,
+  label,
+  icon,
+  fullAccess,
+  premium = false,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  fullAccess: boolean;
+  premium?: boolean;
+}) {
+  const blocked = premium && !fullAccess;
+  return (
+    <Link
+      href={blocked ? "/dashboard/abbonamenti" : href}
+      className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl transition ${
+        blocked
+          ? "text-slate-500 hover:bg-slate-800/50 cursor-pointer"
+          : "hover:bg-slate-800 text-slate-300 hover:text-white"
+      }`}
+    >
+      <span className={blocked ? "opacity-40" : ""}>{icon}</span>
+      <span>{label}</span>
+      {premium && (
+        <span
+          className={`ml-auto text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+            blocked
+              ? "bg-amber-900/40 text-amber-500"
+              : "bg-blue-950/70 text-blue-300"
+          }`}
+        >
+          {blocked ? "PRO" : "PRO"}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export default async function DashboardLayout({
   children,
@@ -39,18 +81,28 @@ export default async function DashboardLayout({
 
   const company = await db.company.findUnique({
     where: { id: session.user.companyId },
-    select: { ragioneSociale: true, subscriptionStatus: true, partitaIva: true },
+    select: { ragioneSociale: true, subscriptionStatus: true, partitaIva: true, subscriptionPlan: true },
   });
 
+  const planLimits = getPlanLimits(company?.subscriptionPlan || session.user.subscriptionPlan);
+  const fullSectionAccess = hasFullSectionAccess(company?.subscriptionStatus);
+  const autoRole = session.user.role === "AUTISTA";
+
   let accountVerificato = false;
+  let vehicleCount = 0;
+  let driverCount = 0;
   try {
-    const [kycAll, apiConns] = await Promise.all([
+    const [kycAll, apiConns, vCount, uCount] = await Promise.all([
       db.kycDocument.findMany({
         where: { companyId: session.user.companyId },
         select: { status: true },
       }),
       listApiConnections(session.user.companyId),
+      db.vehicle.count({ where: { companyId: session.user.companyId } }),
+      db.user.count({ where: { companyId: session.user.companyId, role: "AUTISTA" } }),
     ]);
+    vehicleCount = vCount;
+    driverCount = uCount;
     const kycPending = kycAll.filter(
       (k) => k.status === "IN_ATTESA" || k.status === "RIFIUTATO"
     ).length;
@@ -88,24 +140,51 @@ export default async function DashboardLayout({
                 <Clock className="w-3.5 h-3.5 mr-1.5 text-amber-400" /> Piano Azienda
               </span>
               <span className="font-bold uppercase text-[10px] bg-amber-500/20 px-2 py-0.5 rounded text-amber-200">
-                {company?.subscriptionStatus || "TRIAL"}
+                {company?.subscriptionPlan || session.user.subscriptionPlan}
               </span>
             </div>
-            {session.user.role !== "AUTISTA" && (
-              <div className="flex items-center justify-between mt-2 pt-2 border-t border-amber-800/40">
-                <span className="flex items-center">
-                  <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-blue-400" /> Account
-                </span>
-                <span
-                  className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded ${
-                    accountVerificato
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : "bg-slate-700/40 text-slate-400"
-                  }`}
-                >
-                  {accountVerificato ? "Verificato" : "Basic"}
-                </span>
+            {!autoRole && (
+              <div className="mt-2 pt-2 border-t border-amber-800/40 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Car className="w-3.5 h-3.5 mr-1.5 text-emerald-400" /> Mezzi
+                  </span>
+                  <span className="font-mono text-[11px] text-amber-200">
+                    {vehicleCount}/{planLimits.vehicleLimit}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Users className="w-3.5 h-3.5 mr-1.5 text-indigo-400" /> Autisti
+                  </span>
+                  <span className="font-mono text-[11px] text-amber-200">
+                    {driverCount}/{planLimits.driverLimit}
+                  </span>
+                </div>
               </div>
+            )}
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-amber-800/40">
+              <span className="flex items-center">
+                <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-blue-400" /> Account
+              </span>
+              <span
+                className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded ${
+                  accountVerificato
+                    ? "bg-emerald-500/20 text-emerald-300"
+                    : "bg-slate-700/40 text-slate-400"
+                }`}
+              >
+                {accountVerificato ? "Verificato" : "Basic"}
+              </span>
+            </div>
+            {!fullSectionAccess && !autoRole && (
+              <Link
+                href="/dashboard/abbonamenti"
+                className="flex items-center justify-center mt-2 pt-2 border-t border-amber-800/40 text-[11px] font-semibold text-amber-200 hover:text-amber-100"
+              >
+                <Lock className="w-3 h-3 mr-1.5 text-amber-400" />
+                Attiva le sezioni premium
+              </Link>
             )}
           </div>
 
@@ -175,37 +254,37 @@ export default async function DashboardLayout({
                   <span>Carburante</span>
                 </Link>
 
-                <Link
+                <SidebarLink
                   href="/dashboard/marketplace"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <Boxes className="w-4 h-4 text-violet-400" />
-                  <span>Borsa Carichi</span>
-                </Link>
+                  label="Borsa Carichi"
+                  icon={<Boxes className="w-4 h-4 text-violet-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
-                <Link
+                <SidebarLink
                   href="/dashboard/smart-return"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <Handshake className="w-4 h-4 text-emerald-400" />
-                  <span>Smart Return</span>
-                </Link>
+                  label="Smart Return"
+                  icon={<Handshake className="w-4 h-4 text-emerald-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
-                <Link
+                <SidebarLink
                   href="/dashboard/network"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <Globe className="w-4 h-4 text-blue-400" />
-                  <span>Network</span>
-                </Link>
+                  label="Network"
+                  icon={<Globe className="w-4 h-4 text-blue-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
-                <Link
+                <SidebarLink
                   href="/dashboard/parking"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <MapPin className="w-4 h-4 text-emerald-400" />
-                  <span>Aree di Sosta</span>
-                </Link>
+                  label="Aree di Sosta"
+                  icon={<MapPin className="w-4 h-4 text-emerald-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
                 <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Flotta e sicurezza</p>
 
@@ -217,21 +296,21 @@ export default async function DashboardLayout({
                   <span>Manutenzione</span>
                 </Link>
 
-                <Link
+                <SidebarLink
                   href="/dashboard/ispezioni"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <ClipboardCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Check-list Ispezioni</span>
-                </Link>
+                  label="Check-list Ispezioni"
+                  icon={<ClipboardCheck className="w-4 h-4 text-emerald-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
-                <Link
+                <SidebarLink
                   href="/dashboard/geofence"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <Radar className="w-4 h-4 text-violet-400" />
-                  <span>Aree e Geofence</span>
-                </Link>
+                  label="Aree e Geofence"
+                  icon={<Radar className="w-4 h-4 text-violet-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
 
                 <p className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Fatturazione</p>
 
@@ -254,13 +333,13 @@ export default async function DashboardLayout({
                   </Link>
                 )}
 
-                <Link
+                <SidebarLink
                   href="/dashboard/reporti"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition"
-                >
-                  <Settings className="w-4 h-4 text-indigo-400" />
-                  <span>Report e impostazioni</span>
-                </Link>
+                  label="Report e impostazioni"
+                  icon={<Settings className="w-4 h-4 text-indigo-400" />}
+                  fullAccess={fullSectionAccess}
+                  premium
+                />
               </>
             )}
           </nav>

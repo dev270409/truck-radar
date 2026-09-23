@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
+import { getPlanLimits } from "@/lib/plans";
 
 export async function GET() {
   const session = await auth();
@@ -38,6 +39,19 @@ export async function POST(req: Request) {
     }
 
     const tenantDb = getTenantDb(session.user.companyId);
+
+    const company = await tenantDb.getCompany();
+    const limit = getPlanLimits(company?.subscriptionPlan).vehicleLimit;
+    const currentCount = await tenantDb.vehicles.findMany({ select: { id: true } });
+    if (currentCount.length >= limit) {
+      return NextResponse.json(
+        {
+          error: `Limite piano raggiunto: il tuo piano consente massimo ${limit} mezzi. Abbonati a un piano superiore per gestire flotte più grandi.`,
+        },
+        { status: 403 }
+      );
+    }
+
     const vehicle = await tenantDb.vehicles.create({
       data: {
         targa: targa.toUpperCase().trim(),

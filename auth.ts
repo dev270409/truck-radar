@@ -4,6 +4,7 @@ import { authConfig } from "./auth.config";
 import { db } from "@/lib/db";
 import { comparePassword } from "@/lib/hash";
 import { rateLimit } from "@/lib/rate-limit";
+import { getPlanLimits } from "@/lib/plans";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -42,6 +43,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        const planLimits = getPlanLimits(user.company?.subscriptionPlan);
+
         return {
           id: user.id,
           email: user.email,
@@ -50,6 +53,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           companyId: user.companyId,
           vehicleId: user.vehicleId,
+          subscriptionPlan: user.company?.subscriptionPlan || "BASE",
+          vehicleLimit: planLimits.vehicleLimit,
+          driverLimit: planLimits.driverLimit,
         };
       },
     }),

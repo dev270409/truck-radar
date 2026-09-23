@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
 import { hashPassword } from "@/lib/hash";
+import { getPlanLimits } from "@/lib/plans";
 
 export async function GET() {
   const session = await auth();
@@ -62,6 +63,23 @@ export async function POST(req: Request) {
 
     const cleanEmail = String(email).toLowerCase().trim();
     const tenantDb = getTenantDb(session.user.companyId);
+
+    if (role === "AUTISTA") {
+      const company = await tenantDb.getCompany();
+      const limit = getPlanLimits(company?.subscriptionPlan).driverLimit;
+      const autistiCount = await tenantDb.users.findMany({
+        where: { role: "AUTISTA" },
+        select: { id: true },
+      });
+      if (autistiCount.length >= limit) {
+        return NextResponse.json(
+          {
+            error: `Limite piano raggiunto: il tuo piano consente massimo ${limit} autisti. Abbonati a un piano superiore per gestire squadre più grandi.`,
+          },
+          { status: 403 }
+        );
+      }
+    }
 
     // Check existing email
     const existing = await tenantDb.users.findFirst({
