@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { headers } from "next/headers";
 import {
   Building2,
   User,
@@ -18,7 +19,7 @@ import {
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
-export const dynamic = "force-dynamic";
+headers(); // Force dynamic rendering (SSR)
 
 export default function RegisterPage() {
   const router = useRouter();
