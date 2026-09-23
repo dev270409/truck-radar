@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
+export const dynamic = "force-dynamic";
+
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<"A" | "B" | "C" | "D">("A");
