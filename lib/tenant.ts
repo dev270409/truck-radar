@@ -145,6 +145,10 @@ export function getTenantDb(companyId: string) {
           data: { ...args.data, companyId },
         } as any),
     },
+
+    // Raw (le query raw devono SEMPRE filtrare esplicitamente companyId)
+    $queryRawUnsafe: (query: string, ...values: any[]) => db.$queryRawUnsafe(query, ...values),
+    $executeRawUnsafe: (query: string, ...values: any[]) => db.$executeRawUnsafe(query, ...values),
   };
 }
 

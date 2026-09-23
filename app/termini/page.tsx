@@ -7,6 +7,8 @@ import {
   Lock,
   BadgeCheck,
   FileX,
+  ShieldCheck,
+  ScanText,
 } from "lucide-react";
 
 const sections = [
@@ -84,6 +86,28 @@ const sections = [
       },
     ],
   },
+  {
+    icon: ScanText,
+    title: "6. Verifica di Identità, Idoneità Professionale e Regolarità (KYC/KYB)",
+    items: [
+      {
+        h: "Finalità del Controllo",
+        p: "Per garantire la sicurezza dei servizi, prevenire frodi e adempiere agli obblighi legali in materia di trasporto di merci per conto terzi e responsabilità solidale, l'Utente accetta di sottoporsi alla procedura di verifica aziendale e d'identità (KYC/KYB) fornendo la documentazione richiesta (a titolo esemplificativo: Visura Camerale, Documento d'Identità del Legale Rappresentante, Iscrizione all'Albo degli Autotrasportatori, Licenza REN, Polizza Assicurativa).",
+      },
+      {
+        h: "Compilazione Automatica (Zero-Form)",
+        p: "Per facilitare l'onboarding, la Piattaforma può avvalersi di strumenti di estrazione automatizzata dei documenti (intelligenza artificiale/OCR) al solo scopo di pre-compilare i campi del profilo aziendale e dell'amministratore. Sistemi AI agiscono quali Responsabili del Trattamento (Art. 28 GDPR) e non acquisiscono la titolarità dei dati né li utilizzano per l'addestramento dei propri modelli. L'Utente resta in ogni caso tenuto a verificare e confermare la correttezza dei dati precompilati.",
+      },
+      {
+        h: "Esclusività e Vincolo di Destinazione",
+        p: "Tutti i documenti forniti e le informazioni da essi estratte saranno utilizzati esclusivamente ed unicamente per: (i) verifica dell'identità del Legale Rappresentante/Operatore; (ii) validazione dei requisiti di idoneità professionale ed esercizio della professione di autotrasportatore; (iii) abilitazione dell'account aziendale all'interno della Piattaforma gestionale e della Borsa Carichi.",
+      },
+      {
+        h: "Divieto di Cessione a Terzi",
+        p: "Il Gestore della Piattaforma si impegna formalmente a non cedere, vendere, concedere in licenza o comunque condividere con soggetti terzi i documenti e i dati personali o aziendali raccolti durante la fase di onboarding, fatte salve le comunicazioni obbligatorie per legge verso Autorità Giudiziarie o di Pubblica Sicurezza, o per l'espletamento automatizzato della verifica mediante fornitori di servizi tecnici esterni (Data Processor) debitamente nominati.",
+      },
+    ],
+  },
 ];
 
 export default function TerminiPage() {
@@ -92,7 +116,7 @@ export default function TerminiPage() {
       <div className="mx-auto max-w-3xl px-6 py-16">
         <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">&larr; Torna alla home</Link>
         <h1 className="mt-6 text-3xl font-bold">Termini e Condizioni di Servizio (T&amp;C)</h1>
-        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: 22 settembre 2026.</p>
+        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: 23 settembre 2026.</p>
 
         <div className="prose-invert mt-8 space-y-6 text-sm leading-7 text-slate-300">
           {sections.map(({ icon: Icon, title, items }) => (

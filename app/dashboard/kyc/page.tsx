@@ -11,6 +11,8 @@ import {
   RefreshCcw,
   PartyPopper,
   ShieldAlert,
+  Sparkles,
+  ScanText,
 } from "lucide-react";
 
 interface KycDocument {
@@ -51,8 +53,18 @@ const TIPO_LABELS: Record<string, string> = {
   DELEGA_POTERI_FIRMA: "Delega Poteri di Firma",
 };
 
+interface KybInfo {
+  id: string;
+  provider: string;
+  mode: string;
+  extraction: any;
+  verification: any;
+  createdAt: string;
+}
+
 export default function KycReviewPage() {
   const [documents, setDocuments] = useState<KycDocument[]>([]);
+  const [kyb, setKyb] = useState<KybInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -63,6 +75,7 @@ export default function KycReviewPage() {
       const res = await fetch("/api/kyc");
       const data = await res.json();
       if (data.documents) setDocuments(data.documents);
+      if (data.kyb) setKyb(data.kyb);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -193,6 +206,76 @@ export default function KycReviewPage() {
 
       {error && (
         <div className="p-3 bg-red-950/60 border border-red-800 text-red-200 text-xs rounded-xl">{error}</div>
+      )}
+
+      {/* KYB Zero-Form: estrazione automatica */}
+      {kyb && (
+        <div className="rounded-2xl border border-indigo-800/60 bg-indigo-950/30 p-5">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-800/80 flex items-center justify-center text-indigo-300 flex-shrink-0">
+                <ScanText className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                  <Sparkles className="w-4 h-4 text-indigo-400" />
+                  <span>Compilazione automatica KYB (Zero-Form)</span>
+                </p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Estrazione del {new Date(kyb.createdAt).toLocaleDateString("it-IT")} · provider{" "}
+                  <span className="font-mono text-indigo-300">{kyb.provider}</span> · modalità{" "}
+                  <span className="font-mono text-indigo-300">{kyb.mode}</span>
+                </p>
+              </div>
+            </div>
+            {kyb.verification?.status && (
+              <span className={`text-xs font-bold rounded-full px-3 py-1 border ${
+                kyb.verification.status === "ATTIVA"
+                  ? "bg-emerald-950 text-emerald-300 border-emerald-800/60"
+                  : kyb.verification.status === "NON_CONFIGURATO"
+                  ? "bg-slate-800 text-slate-300 border-slate-700"
+                  : "bg-amber-950 text-amber-300 border-amber-800/60"
+              }`}>
+                {kyb.verification.status === "ATTIVA" ? "✓ Azienda ATTIVA" : kyb.verification.status === "NON_CONFIGURATO" ? "Verifica demo" : "Da confermare"}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Ragione Sociale</p>
+              <p className="font-semibold text-slate-100 mt-1 truncate">{kyb.extraction?.ragione_sociale ?? "—"}</p>
+            </div>
+            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Partita IVA</p>
+              <p className="font-mono font-semibold text-slate-100 mt-1 truncate">{kyb.extraction?.partita_iva ?? "—"}</p>
+            </div>
+            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Legale Rappresentante</p>
+              <p className="font-semibold text-slate-100 mt-1 truncate">
+                {kyb.extraction?.legale_rappresentante?.nome || kyb.extraction?.legale_rappresentante?.cognome
+                  ? `${kyb.extraction.legale_rappresentante.nome ?? ""} ${kyb.extraction.legale_rappresentante.cognome ?? ""}`.trim()
+                  : "—"}
+              </p>
+            </div>
+            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Documenti rilevati</p>
+              <p className="font-semibold text-slate-100 mt-1 truncate">
+                {(kyb.extraction?.documenti_rilevati ?? []).map(String).join(", ") || "—"}
+              </p>
+            </div>
+          </div>
+
+          {kyb.verification?.status === "ATTIVA" && (
+            <p className="mt-3 text-[11px] text-emerald-300 flex items-center space-x-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>
+                Ragione sociale ufficiale: {kyb.verification.ragioneSocialeUfficiale ?? "n/d"}
+                {kyb.verification.ragioneSocialeMatch != null && (kyb.verification.ragioneSocialeMatch ? " · corrispondenza OK" : " · ATTENZIONE: discrepanza")}
+              </span>
+            </p>
+          )}
+        </div>
       )}
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">

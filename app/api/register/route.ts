@@ -30,6 +30,9 @@ export async function POST(req: Request) {
 
       // Step C: KYC Files
       kycFiles, // Array of { tipo: 'PARTITA_IVA'|'LICENZA_CONTO_TERZI'|'ALBO_TRASPORTATORI', fileUrl: string, fileName: string }
+
+      // Step KYB Zero-Form (opzionale): estrazione AI + verifica ufficiale
+      kybExtraction, // { provider, mode, extraction, verification } | null
     } = body;
 
     // Validation
@@ -127,6 +130,20 @@ export async function POST(req: Request) {
       await tx.kycDocument.createMany({
         data: kycRecordsToCreate,
       });
+
+      // KYB Zero-Form: salva l'estrazione AI + verifica ufficiale se disponibile
+      if (kybExtraction && kybExtraction.extraction && kybExtraction.verification) {
+        await tx.$executeRawUnsafe(
+          `INSERT INTO "KybExtraction" ("companyId", "provider", "mode", "extraction", "verification", "documenti", "createdAt")
+           VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, now())`,
+          company.id,
+          String(kybExtraction.provider ?? "manual"),
+          String(kybExtraction.mode ?? "manual"),
+          JSON.stringify(kybExtraction.extraction),
+          JSON.stringify(kybExtraction.verification),
+          JSON.stringify(kybExtraction.documenti ?? [])
+        );
+      }
 
       // Audit Log
       await tx.auditLog.create({

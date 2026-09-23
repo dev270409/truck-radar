@@ -14,6 +14,9 @@ import {
   Loader2,
   Clock,
   ShieldAlert,
+  Sparkles,
+  ScanText,
+  ShieldCheck,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
@@ -39,6 +42,16 @@ export default function RegisterForm() {
     { tipo: "PARTITA_IVA", label: "Certificato Partita IVA", fileName: "", fileUrl: "" },
     { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE", label: "Documento Identità Legale Rappresentante", fileName: "", fileUrl: "" },
   ]);
+
+  // KYB Zero-Form: upload documenti per compilazione automatica
+  const [kybDocs, setKybDocs] = useState<{ tipo: string; label: string; fileName: string; fileUrl: string }[]>([
+    { tipo: "VISURA", label: "Visura Camerale", fileName: "", fileUrl: "" },
+    { tipo: "DOCUMENTO_IDENTITA", label: "Documento d'Identità (Legale Rappresentante)", fileName: "", fileUrl: "" },
+  ]);
+  const [kybAnalyzing, setKybAnalyzing] = useState(false);
+  const [kybInfo, setKybInfo] = useState("");
+  const [kybApplied, setKybApplied] = useState(false);
+  const [kybExtraction, setKybExtraction] = useState<any>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -94,6 +107,7 @@ export default function RegisterForm() {
           nome,
           cognome,
           kycFiles,
+          kybExtraction,
         }),
       });
 
@@ -109,6 +123,72 @@ export default function RegisterForm() {
       setError(err.message || "Errore di connessione durante la registrazione.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleKybAnalyze = async () => {
+    setError("");
+    setKybInfo("");
+    const ready = kybDocs.filter((d) => d.fileUrl);
+    if (ready.length === 0) {
+      setError("Carica almeno una Visura Camerale o un Documento d'Identità per l'estrazione automatica.");
+      return;
+    }
+    setKybAnalyzing(true);
+    try {
+      const res = await fetch("/api/kyb/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: ready.map((d) => ({ tipo: d.tipo, fileUrl: d.fileUrl, fileName: d.fileName })),
+          hints: { ragioneSociale, partitaIva, nome, cognome },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nell'estrazione automatica");
+      const ex = data.extraction;
+      setKybExtraction(data);
+
+      // Pre-compilazione automatica dei campi (Zero-Form) solo se l'AI estrae dati reali
+      let prefilled = 0;
+      if (ex?.ragione_sociale) { setRagioneSociale(ex.ragione_sociale); prefilled++; }
+      if (ex?.partita_iva) { setPartitaIva(ex.partita_iva); prefilled++; }
+      if (ex?.indirizzo) { setIndirizzo(ex.indirizzo); prefilled++; }
+      if (ex?.legale_rappresentante?.nome) { setNome(ex.legale_rappresentante.nome); prefilled++; }
+      if (ex?.legale_rappresentante?.cognome) { setCognome(ex.legale_rappresentante.cognome); prefilled++; }
+
+      // Link automatico dei documenti KYB → upload KYC dello Step C
+      setKycFiles((prev) =>
+        prev.map((item) => {
+          if (item.tipo === "PARTITA_IVA") {
+            const visura = ready.find((d) => d.tipo === "VISURA");
+            return visura ? { ...item, fileName: visura.fileName, fileUrl: visura.fileUrl } : item;
+          }
+          if (item.tipo === "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE") {
+            const ident = ready.find((d) => d.tipo === "DOCUMENTO_IDENTITA");
+            return ident ? { ...item, fileName: ident.fileName, fileUrl: ident.fileUrl } : item;
+          }
+          return item;
+        })
+      );
+
+      setKybApplied(prefilled > 0);
+      const verification = data.verification;
+      const verifyMsg =
+        verification?.status === "ATTIVA"
+          ? `Azienda ATTIVA confermata${verification.ragioneSocialeMatch ? " · corrispondenza ragione sociale OK" : ""}.`
+          : verification?.status === "NON_CONFIGURATO"
+          ? "Verifica sistemi ufficiali non configurata in questa sessione (demo)."
+          : "Attenzione: verifica ufficiale non confermata.";
+      setKybInfo(
+        (data.mode === "ai" ? `Estrazione AI (${data.provider}) completata · ` : "Estrazione manuale (campi inseriti) · ") +
+          (prefilled > 0 ? `${prefilled} campi precompilati automaticamente. ` : "") +
+          verifyMsg
+      );
+    } catch (err: any) {
+      setError(err.message || "Errore durante l'estrazione automatica.");
+    } finally {
+      setKybAnalyzing(false);
     }
   };
 
@@ -189,6 +269,83 @@ export default function RegisterForm() {
             <h2 className="text-lg font-semibold text-slate-200 flex items-center">
               <Building2 className="w-5 h-5 mr-2 text-blue-400" /> Step A: Dati Aziendali
             </h2>
+
+            {/* KYB Zero-Form: compilazione automatica */}
+            <div className={`rounded-2xl border p-4 transition ${kybApplied ? "border-emerald-800/60 bg-emerald-950/40" : "border-indigo-800/60 bg-indigo-950/30"}`}>
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-800/80 flex items-center justify-center text-indigo-300 flex-shrink-0">
+                    <ScanText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-indigo-400" />
+                      <span>Compilazione automatica KYB (Zero-Form)</span>
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Carica Visura Camerale e Documento d'Identità: l'AI estrae i dati e compila il form al posto tuo.
+                    </p>
+                  </div>
+                </div>
+                {kybApplied && (
+                  <span className="flex items-center space-x-1 text-xs font-bold text-emerald-300 bg-emerald-950 border border-emerald-800/60 rounded-full px-3 py-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Dati estratti
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-4 space-y-2.5">
+                {kybDocs.map((doc) => (
+                  <div key={doc.tipo} className="bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-200 truncate">{doc.label}</p>
+                      <p className="text-[11px] text-slate-500 font-mono truncate">
+                        {doc.fileName ? `Selezionato: ${doc.fileName}` : "PDF, JPG, PNG (Max 8MB)"}
+                      </p>
+                    </div>
+                    <UploadButton
+                      endpoint="kycDocument"
+                      appearance={{ button: "bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap", allowedContent: "hidden" }}
+                      content={{ button: doc.fileName ? "Sostituisci" : "Carica file" }}
+                      onClientUploadComplete={(files) => {
+                        const file = files[0];
+                        setKybDocs((prev) => prev.map((item) => item.tipo === doc.tipo ? { ...item, fileName: file.name, fileUrl: file.url } : item));
+                        setError("");
+                      }}
+                      onUploadError={(uploadError) => setError(uploadError.message)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-3.5 flex items-center justify-between gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleKybAnalyze}
+                  disabled={kybAnalyzing}
+                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition disabled:opacity-50"
+                >
+                  {kybAnalyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Analisi documenti in corso...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ScanText className="w-4 h-4" />
+                      <span>Estrai i dati dai documenti</span>
+                    </>
+                  )}
+                </button>
+                {kybInfo && (
+                  <p className={`text-[11px] flex items-start space-x-1.5 max-w-md ${kybApplied ? "text-emerald-300" : "text-indigo-300"}`}>
+                    <ShieldCheck className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>{kybInfo}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">

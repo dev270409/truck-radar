@@ -380,6 +380,21 @@ const statements = [
   `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'POLIZZA_ASSICURATIVA_CMR'`,
   `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'DURC'`,
   `ALTER TYPE "KycDocType" ADD VALUE IF NOT EXISTS 'DELEGA_POTERI_FIRMA'`,
+
+  // Entità KYB Zero-Form (§ KYC/KYB): estrazione AI + verifica ufficiale (Openapi.it/Sumsub in futuro)
+  `
+  CREATE TABLE IF NOT EXISTS "KybExtraction" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    mode TEXT NOT NULL,
+    extraction JSONB NOT NULL,
+    verification JSONB NOT NULL,
+    documenti JSONB NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "KybExtraction_companyId_idx" ON "KybExtraction"("companyId");
+  `,
 ];
 
 async function main() {

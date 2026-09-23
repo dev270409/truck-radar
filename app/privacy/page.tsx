@@ -6,6 +6,8 @@ import {
   Trash2,
   BadgeCheck,
   FileWarning,
+  ScanText,
+  ShieldCheck,
 } from "lucide-react";
 
 const sections = [
@@ -51,6 +53,42 @@ const sections = [
       },
     ],
   },
+  {
+    icon: ScanText,
+    title: "4. Informativa sul Trattamento dei Dati per la Verifica Aziendale (KYB/KYC)",
+    items: [
+      {
+        h: "Base Giuridica e Finalità del Trattamento",
+        p: "Il trattamento dei dati contenuti nei documenti identificativi e aziendali (inclusi dati di Visura Camerale, documenti di riconoscimento, posizioni Albo/REN) è necessario per: (i) l'esecuzione del contratto di servizio SaaS ed erogazione delle funzionalità della Borsa Carichi (Art. 6.1.b GDPR); (ii) l'adempimento di obblighi legali applicabili al settore dei trasporti e alla prevenzione del lavoro abusivo (Art. 6.1.c GDPR); (iii) il legittimo interesse del Titolare a prevenire truffe, furti d'identità e carichi fantasma all'interno del marketplace (Art. 6.1.f GDPR).",
+      },
+      {
+        h: "Elaborazione Automatizzata tramite Intelligenza Artificiale",
+        p: "Per facilitare l'esperienza d'uso dell'Utente ed evitare la digitazione manuale dei dati, la Piattaforma si avvale di strumenti automatizzati di estrazione ed elaborazione dei documenti (Intelligenza Artificiale / OCR). Tali strumenti analizzano i file caricati al solo fine di compilare automaticamente i campi del profilo aziendale. I fornitori di tecnologia AI agiscono quali Responsabili del Trattamento (Art. 28 GDPR) e non acquisiscono la titolarità dei dati né utilizzano i documenti dell'Utente per l'addestramento di modelli di intelligenza artificiale di loro proprietà.",
+      },
+      {
+        h: "Conservazione e Sicurezza dei Dati",
+        p: "I documenti caricati per il KYC/KYB vengono conservati in archivi digitali crittografati e protetti con standard di sicurezza adeguati (encryption at rest e in transit). I dati non saranno riutilizzati per finalità di marketing né profilati per scopi commerciali verso terzi.",
+      },
+      {
+        h: "Divieto di Cessione a Terzi",
+        p: "I dati e i documenti raccolti durante l'onboarding vengono trattati esclusivamente per le finalità di verifica sopra indicate e non vengono ceduti, venduti o condivisi con soggetti terzi, fatte salve le comunicazioni obbligatorie per legge o l'espletamento della verifica mediante fornitori tecnici nominati Responsabili del Trattamento.",
+      },
+    ],
+  },
+  {
+    icon: ShieldCheck,
+    title: "5. Diritti dell'Interessato e Recapito",
+    items: [
+      {
+        h: "Diritti GDPR",
+        p: "Il Cliente e i suoi referenti possono esercitare in qualsiasi momento i diritti previsti dagli artt. 15-22 GDPR (accesso, rettifica, cancellazione, limitazione, portabilità, opposizione) contattando il Data Controller all'indirizzo indicato nella homepage.",
+      },
+      {
+        h: "Recapito",
+        p: "Per qualsiasi richiesta relativa al trattamento dei dati KYC/KYB e di verifica aziendale, contattare: privacy@truck-radar.it (dpcm da definire), con riscontro entro 30 giorni.",
+      },
+    ],
+  },
 ];
 
 export default function PrivacyPage() {
@@ -60,7 +98,7 @@ export default function PrivacyPage() {
         <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">&larr; Torna alla home</Link>
         <Link href="/informativa-autisti" className="ml-3 text-sm text-blue-400 hover:text-blue-300">Informativa Autisti</Link>
         <h1 className="mt-6 text-3xl font-bold">Privacy Policy e Gestione Dati (GDPR)</h1>
-        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: 22 settembre 2026.</p>
+        <p className="mt-2 text-sm text-slate-500">Ultimo aggiornamento: 23 settembre 2026.</p>
 
         <div className="prose-invert mt-8 space-y-6 text-sm leading-7 text-slate-300">
           {sections.map(({ icon: Icon, title, items }) => (
