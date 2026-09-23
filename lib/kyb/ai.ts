@@ -2,11 +2,17 @@ import { buildKybUserPrompt, KYB_SYSTEM_PROMPT } from "./prompt";
 import type { KybExtraction, KybInputFile } from "./types";
 
 /**
- * Provider AI (OpenAI GPT-4o / Gemini) per l'estrazione KYB "Zero-Form".
+ * Provider AI per l'estrazione KYB "Zero-Form".
+ * - Google Gemini (GRATIS, free tier generoso: vision/doc + 1500 richieste/giorno
+ *   su 2.5 Flash-Lite / 2.0 Flash, senza scadenza) — preferito di default se
+ *   GOOGLE_GENERATIVE_AI_API_KEY è presente.
+ * - OpenAI GPT-4o-mini (opzionale, a pagamento) usato SOLO se GOOGLE è assente.
  * Le immagini vengono scaricate da UploadThing e inviate in modalità vision.
  * Se nessuna chiave è configurata le funzioni restituiscono null: l'orchestratore
  * usa allora il fallback mock/manuale (demo).
  */
+
+const KYB_AI_MODEL = process.env.KYB_AI_MODEL || "gemini-2.5-flash-lite";
 
 function emptyExtraction(): KybExtraction {
   return {
@@ -28,8 +34,8 @@ function emptyExtraction(): KybExtraction {
 }
 
 export function aiProviderConfigured(): "openai" | "google" | null {
-  if (process.env.OPENAI_API_KEY?.startsWith("sk-")) return "openai";
   if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) return "google";
+  if (process.env.OPENAI_API_KEY?.startsWith("sk-")) return "openai";
   return null;
 }
 
@@ -120,7 +126,7 @@ async function extractWithOpenAI(files: KybInputFile[], userPrompt: string): Pro
   return sanitizeExtraction(raw, files);
 }
 
-/** Chiamata Google Gemini (generateContent, vision inline). */
+/** Chiamata Google Gemini (generateContent, vision inline) — free tier. */
 async function extractWithGemini(files: KybInputFile[], userPrompt: string): Promise<KybExtraction> {
   const inlineParts: Array<any> = [];
   for (const f of files) {
@@ -130,7 +136,7 @@ async function extractWithGemini(files: KybInputFile[], userPrompt: string): Pro
     inlineParts.push({ inline_data: { mime_type: mime, data: b64 } });
   }
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_GENERATIVE_AI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${KYB_AI_MODEL}:generateContent?key=${process.env.GOOGLE_GENERATIVE_AI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
