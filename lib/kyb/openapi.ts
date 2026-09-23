@@ -1,8 +1,8 @@
 import type { KybVerification } from "./types";
 
 /**
- * Verifica ufficiale della Partita IVA/Visura camerale via Openapi.it
- * (endpoint: https://visure.openapi.it/v2/company/it/{partita_iva}).
+ * Verifica ufficiale della Partita IVA via Openapi.it — prodotto "Company".
+ * (endpoint: https://company.openapi.com/IT-start/{partita_iva}).
  * Con OPENAPI_API_KEY configurata esegue la chiamata reale; altrimenti
  * restituisce un esito NON_CONFIGURATO (il frontend mostra il flusso
  * "verifica non disponibile" come da roadmap - demo).
@@ -34,7 +34,7 @@ export async function verifyPivaWithOpenapi(piva: string | null): Promise<KybVer
   }
 
   try {
-    const res = await fetch(`https://visure.openapi.it/v2/company/it/${clean}`, {
+    const res = await fetch(`https://company.openapi.com/IT-start/${clean}`, {
       headers: {
         accept: "application/json",
         "x-api-key": process.env.OPENAPI_API_KEY ?? "",
@@ -45,14 +45,21 @@ export async function verifyPivaWithOpenapi(piva: string | null): Promise<KybVer
       return { ...base, status: "NON_TROVATA" };
     }
     const data = (await res.json()) as any;
-    const company = data?.data ?? data?.company ?? data;
-    const stato = String(company?.state ?? company?.status ?? "ATTIVA").toUpperCase();
-    const ragione = company?.nome ?? company?.name ?? company?.ragione_sociale ?? null;
+    const company = Array.isArray(data?.data) ? data.data[0] : data?.data ?? data?.company ?? data;
+    const stato = String(company?.activityStatus ?? company?.state ?? company?.status ?? "ATTIVA").toUpperCase();
+    const ragione = company?.companyName ?? company?.nome ?? company?.name ?? company?.ragione_sociale ?? null;
+    const addressNode = company?.address?.registeredOffice ?? company?.address ?? company?.indirizzo ?? null;
+    const address =
+      typeof addressNode === "string"
+        ? addressNode
+        : [addressNode?.streetName, addressNode?.town ?? addressNode?.comune, addressNode?.zipCode ?? addressNode?.cap]
+            .filter(Boolean)
+            .join(", ") || null;
     return {
       ...base,
-      status: stato.includes("ATTIV") ? "ATTIVA" : stato.includes("INATTIV") ? "INATTIVA" : "NON_TROVATA",
+      status: stato.includes("ATTIV") ? "ATTIVA" : stato.includes("INATTIV") || stato.includes("CESSAT") ? "INATTIVA" : "NON_TROVATA",
       ragioneSocialeUfficiale: typeof ragione === "string" ? ragione : null,
-      address: company?.address ?? company?.indirizzo ?? null,
+      address,
     };
   } catch {
     return { ...base, status: "NON_TROVATA" };
