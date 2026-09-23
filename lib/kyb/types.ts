@@ -49,6 +49,10 @@ export interface KybAnalysis {
   mode: "ai" | "mock" | "manual";
   extraction: KybExtraction;
   verification: KybVerification;
+  /** chiave AI configurata? (diag) */
+  aiKeyPresent?: boolean;
+  /** messaggio d'errore del provider AI se il fallback manual è scattato (diag) */
+  aiError?: string | null;
 }
 
 /** Conversione tipi KYB generici in valori enum KycDocType usati dal DB */

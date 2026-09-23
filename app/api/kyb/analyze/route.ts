@@ -49,6 +49,8 @@ export async function POST(req: Request) {
       mode: analysis.mode,
       extraction: analysis.extraction,
       verification: analysis.verification,
+      aiKeyPresent: analysis.aiKeyPresent,
+      aiError: analysis.aiError ?? null,
     });
   } catch (error: any) {
     return NextResponse.json(

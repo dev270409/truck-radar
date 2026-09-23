@@ -45,10 +45,15 @@ export async function analyzeKyb(
 ): Promise<KybAnalysis> {
   // 1. Provider AI (con fallback automatico su errore/503/download non disponibile)
   let ai: { provider: string; extraction: KybExtraction } | null = null;
+  let aiError: string | null = null;
+  let aiKeyPresent = false;
   try {
     ai = await extractWithAI(files);
-  } catch {
+    aiKeyPresent = ai !== null;
+  } catch (e: any) {
     ai = null;
+    aiKeyPresent = true;
+    aiError = typeof e?.message === "string" ? e.message.slice(0, 200) : "errore generico";
   }
   let extraction: KybExtraction;
   let provider: string;
@@ -75,7 +80,7 @@ export async function analyzeKyb(
       normalizeRagione(extraction.ragione_sociale) === normalizeRagione(verification.ragioneSocialeUfficiale);
   }
 
-  return { provider, mode, extraction, verification };
+  return { provider, mode, extraction, verification, aiKeyPresent, aiError };
 }
 
 /** Normalizzazione per confronto ragione sociale (minuscole, spazi, caratteri speciali). */
