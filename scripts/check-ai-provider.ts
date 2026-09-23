@@ -20,6 +20,6 @@ delete process.env.OPENAI_API_KEY;
 process.env.GOOGLE_GENERATIVE_AI_API_KEY = "AIza-test";
 check("solo Google → google", aiProviderConfigured() === "google");
 
-check("KYB_AI_MODEL default = gemini-2.5-flash-lite", (process.env.KYB_AI_MODEL || "gemini-2.5-flash-lite") === "gemini-2.5-flash-lite");
+check("KYB_AI_MODEL default = gemini-flash-latest", (process.env.KYB_AI_MODEL || "gemini-flash-latest") === "gemini-flash-latest");
 
 console.log("\ndone");

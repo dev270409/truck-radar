@@ -43,8 +43,13 @@ export async function analyzeKyb(
   files: KybInputFile[],
   hints: KybHints = {}
 ): Promise<KybAnalysis> {
-  // 1. Provider AI
-  const ai = await extractWithAI(files);
+  // 1. Provider AI (con fallback automatico su errore/503/download non disponibile)
+  let ai: { provider: string; extraction: KybExtraction } | null = null;
+  try {
+    ai = await extractWithAI(files);
+  } catch {
+    ai = null;
+  }
   let extraction: KybExtraction;
   let provider: string;
   let mode: KybAnalysis["mode"];
