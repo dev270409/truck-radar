@@ -2,8 +2,10 @@ import type { KybVerification } from "./types";
 
 /**
  * Verifica ufficiale della Partita IVA via Openapi.it — prodotto "Company".
- * (endpoint: https://company.openapi.com/IT-start/{partita_iva}).
- * Con OPENAPI_API_KEY configurata esegue la chiamata reale; altrimenti
+ * (endpoint: https://company.openapi.com/IT-start/{partita_iva},
+ * auth: Authorization: Bearer <OAuth token>).
+ * Con OPENAPI_API_KEY configurata (il token generato dalla console Openapi,
+ * sezione Authentication → OAuth) esegue la chiamata reale; altrimenti
  * restituisce un esito NON_CONFIGURATO (il frontend mostra il flusso
  * "verifica non disponibile" come da roadmap - demo).
  */
@@ -37,7 +39,7 @@ export async function verifyPivaWithOpenapi(piva: string | null): Promise<KybVer
     const res = await fetch(`https://company.openapi.com/IT-start/${clean}`, {
       headers: {
         accept: "application/json",
-        "x-api-key": process.env.OPENAPI_API_KEY ?? "",
+        Authorization: `Bearer ${process.env.OPENAPI_API_KEY ?? ""}`,
       },
       signal: AbortSignal.timeout(15_000),
     });

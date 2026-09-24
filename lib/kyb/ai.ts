@@ -12,7 +12,7 @@ import type { KybExtraction, KybInputFile } from "./types";
  * usa allora il fallback mock/manuale (demo).
  */
 
-const KYB_AI_MODEL = process.env.KYB_AI_MODEL || "gemini-flash-latest";
+const KYB_AI_MODEL = process.env.KYB_AI_MODEL || "gemini-3.1-flash-lite";
 
 function emptyExtraction(): KybExtraction {
   return {
@@ -126,7 +126,7 @@ async function extractWithOpenAI(files: KybInputFile[], userPrompt: string): Pro
   return sanitizeExtraction(raw, files);
 }
 
-/** Chiamata Google Gemini (generateContent, vision inline) — free tier. */
+/** Chiamata Google Gemini (generateContent, vision inline) — free tier, con retry su 429/503. */
 async function extractWithGemini(files: KybInputFile[], userPrompt: string): Promise<KybExtraction> {
   const inlineParts: Array<any> = [];
   for (const f of files) {
@@ -135,29 +135,39 @@ async function extractWithGemini(files: KybInputFile[], userPrompt: string): Pro
     const mime = meta.match(/data:(.*?);/)?.[1] ?? "image/jpeg";
     inlineParts.push({ inline_data: { mime_type: mime, data: b64 } });
   }
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${KYB_AI_MODEL}:generateContent`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-goog-api-key": process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? "" },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `${KYB_SYSTEM_PROMPT}\n\n${userPrompt}` }, ...inlineParts],
-          },
-        ],
-        generationConfig: { temperature: 0, responseMimeType: "application/json" },
-      }),
+  const body = JSON.stringify({
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: `${KYB_SYSTEM_PROMPT}\n\n${userPrompt}` }, ...inlineParts],
+      },
+    ],
+    generationConfig: { temperature: 0, responseMimeType: "application/json" },
+  });
+
+  let lastErr: string = "errore sconosciuto";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    if (attempt > 1) await new Promise((r) => setTimeout(r, 1_500 * attempt));
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${KYB_AI_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-goog-api-key": process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? "" },
+        body,
+      }
+    );
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      lastErr = `Gemini KYB error ${res.status}: ${txt.slice(0, 300)}`;
+      const retryable = res.status === 429 || res.status === 503;
+      if (retryable && attempt < 3) continue;
+      throw new Error(lastErr);
     }
-  );
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`Gemini KYB error ${res.status}: ${txt.slice(0, 300)}`);
+    const data = await res.json();
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+    return sanitizeExtraction(raw, files);
   }
-  const data = await res.json();
-  const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
-  return sanitizeExtraction(raw, files);
+  throw new Error(lastErr);
 }
 
 /**
