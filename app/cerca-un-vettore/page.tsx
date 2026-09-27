@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen } from "lucide-react";
+import { Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen, CalendarClock } from "lucide-react";
+import PublicFooter from "@/components/PublicFooter";
 
 export default function CercaUnVettorePage() {
   return (
@@ -12,6 +13,7 @@ export default function CercaUnVettorePage() {
           Truck Radar
         </Link>
         <div className="flex items-center gap-4 text-sm">
+          <Link href="/prezzi" className="hidden text-slate-300 hover:text-white sm:block">Prezzi</Link>
           <Link href="/login" className="text-slate-300 hover:text-white">Accedi</Link>
           <Link href="/register" className="rounded-xl bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-500">Registra la tua azienda</Link>
         </div>
@@ -32,15 +34,15 @@ export default function CercaUnVettorePage() {
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-rose-700 px-6 py-3.5 text-base font-semibold shadow-lg shadow-rose-900/30 hover:bg-rose-600"
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-semibold shadow-lg shadow-blue-600/20 hover:bg-blue-500"
             >
               Crea l&apos;account e pubblica un viaggio <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              href="/login"
+              href="/contatti"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-6 py-3.5 text-base font-semibold text-slate-200 hover:border-slate-500"
             >
-              Accedi come azienda
+              <CalendarClock className="h-5 w-5" /> Parla con noi
             </Link>
           </div>
         </div>
@@ -79,16 +81,7 @@ export default function CercaUnVettorePage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-800 px-6 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-xs text-slate-500 md:flex-row">
-          <span>© {new Date().getFullYear()} Truck Radar · Transport Operating System</span>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-slate-300">Privacy</Link>
-            <Link href="/termini" className="hover:text-slate-300">Termini</Link>
-            <Link href="/cookie" className="hover:text-slate-300">Cookie</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </main>
   );
 }

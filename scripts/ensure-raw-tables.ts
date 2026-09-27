@@ -395,6 +395,23 @@ const statements = [
   );
   CREATE INDEX IF NOT EXISTS "KybExtraction_companyId_idx" ON "KybExtraction"("companyId");
   `,
+
+  // Lead pubblica — richieste demo dal sito (funnel conversione, no auth)
+  `
+  CREATE TABLE IF NOT EXISTS "DemoRequest" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "nome" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "azienda" TEXT,
+    "telefono" TEXT,
+    "mezzi" TEXT,
+    "messaggio" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'NUOVA',
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "DemoRequest_status_idx" ON "DemoRequest"("status");
+  CREATE INDEX IF NOT EXISTS "DemoRequest_createdAt_idx" ON "DemoRequest"("createdAt");
+  `,
 ];
 
 async function main() {

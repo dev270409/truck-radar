@@ -230,6 +230,19 @@ export default function RegisterForm() {
           </Link>
         </div>
 
+        {/* Disclosure funnel */}
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-[11px] text-slate-300">
+          <span className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-blue-400" /> ~5 minuti
+          </span>
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Nessuna carta di credito
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> 30 giorni gratis
+          </span>
+        </div>
+
         {/* Wizard Steps Navigation Bar */}
         <div className="grid grid-cols-4 gap-2 mb-8">
           {[

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" role="img" aria-label="Anteprima dashboard Truck Radar">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="map" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="440" fill="url(#bg)"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="168" height="440" fill="#0b1220"/>
+  <rect x="16" y="20" width="26" height="26" rx="8" fill="#2563eb"/>
+  <text x="52" y="38" fill="#e2e8f0" font-family="Segoe UI, Arial" font-size="13" font-weight="700">Truck Radar</text>
+  <text x="52" y="50" fill="#64748b" font-family="Segoe UI, Arial" font-size="8">Transport OS</text>
+
+  <g font-family="Segoe UI, Arial" font-size="10" fill="#94a3b8">
+    <rect x="10" y="78" width="148" height="24" rx="8" fill="#111c33"/>
+    <text x="30" y="93" fill="#bfdbfe">Panoramica</text>
+    <text x="30" y="122">Mezzi</text>
+    <text x="30" y="146">Autisti</text>
+    <text x="30" y="170">Viaggi</text>
+    <text x="30" y="194">Flotta live</text>
+    <text x="30" y="218">Manutenzione</text>
+    <text x="30" y="242">Analytics</text>
+    <text x="30" y="266">Economia</text>
+    <text x="30" y="290">Network</text>
+    <text x="30" y="314">ESG</text>
+  </g>
+
+  <!-- Header -->
+  <text x="188" y="40" fill="#f1f5f9" font-family="Segoe UI, Arial" font-size="18" font-weight="700">Flotta live</text>
+  <text x="188" y="58" fill="#64748b" font-family="Segoe UI, Arial" font-size="10">18 mezzi in viaggio · aggiornato 15 s fa</text>
+
+  <!-- KPI cards -->
+  <g font-family="Segoe UI, Arial">
+    <rect x="188" y="76" width="160" height="66" rx="12" fill="#0b1220" stroke="#1e293b"/>
+    <text x="202" y="98" fill="#64748b" font-size="9">MARGINE MESE</text>
+    <text x="202" y="122" fill="#34d399" font-size="20" font-weight="700">€ 84.320</text>
+
+    <rect x="362" y="76" width="160" height="66" rx="12" fill="#0b1220" stroke="#1e293b"/>
+    <text x="376" y="98" fill="#64748b" font-size="9">KM A VUOTO</text>
+    <text x="376" y="122" fill="#fbbf24" font-size="20" font-weight="700">-12%</text>
+
+    <rect x="536" y="76" width="160" height="66" rx="12" fill="#0b1220" stroke="#1e293b"/>
+    <text x="550" y="98" fill="#64748b" font-size="9">SCADENZE 30GG</text>
+    <text x="550" y="122" fill="#f87171" font-size="20" font-weight="700">3</text>
+  </g>
+
+  <!-- Map panel -->
+  <rect x="188" y="158" width="348" height="258" rx="14" fill="url(#map)" stroke="#1e293b"/>
+  <g stroke="#1e293b" stroke-width="1">
+    <line x1="188" y1="222" x2="536" y2="222"/>
+    <line x1="188" y1="286" x2="536" y2="286"/>
+    <line x1="188" y1="350" x2="536" y2="350"/>
+    <line x1="304" y1="158" x2="304" y2="416"/>
+    <line x1="420" y1="158" x2="420" y2="416"/>
+  </g>
+  <path d="M230 380 C 300 320, 330 300, 400 250 S 480 200, 505 190" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="1 8" stroke-linecap="round"/>
+  <circle cx="230" cy="380" r="7" fill="#1d4ed8" stroke="#bfdbfe" stroke-width="2"/>
+  <circle cx="505" cy="190" r="8" fill="#dc2626" stroke="#fecaca" stroke-width="2"/>
+  <rect x="212" y="176" width="126" height="30" rx="8" fill="#111c33" stroke="#1e293b"/>
+  <text x="224" y="195" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="9">Targa AB123CD · 78 km/h</text>
+  <text x="188" y="404" fill="#475569" font-family="Segoe UI, Arial" font-size="8">Segnali da GPS/telematica connessa via API</text>
+
+  <!-- Right list -->
+  <rect x="548" y="158" width="148" height="258" rx="14" fill="#0b1220" stroke="#1e293b"/>
+  <text x="562" y="180" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="10" font-weight="700">Viaggi oggi</text>
+  <g font-family="Segoe UI, Arial" font-size="9">
+    <rect x="560" y="192" width="124" height="34" rx="8" fill="#0f172a"/>
+    <circle cx="572" cy="209" r="3.5" fill="#34d399"/>
+    <text x="584" y="206" fill="#e2e8f0">Roma → Milano</text>
+    <text x="584" y="218" fill="#64748b">In corso · 62%</text>
+
+    <rect x="560" y="232" width="124" height="34" rx="8" fill="#0f172a"/>
+    <circle cx="572" cy="249" r="3.5" fill="#fbbf24"/>
+    <text x="584" y="246" fill="#e2e8f0">Torino → Bari</text>
+    <text x="584" y="258" fill="#64748b">Assegnato</text>
+
+    <rect x="560" y="272" width="124" height="34" rx="8" fill="#0f172a"/>
+    <circle cx="572" cy="289" r="3.5" fill="#3b82f6"/>
+    <text x="584" y="286" fill="#e2e8f0">Napoli → Bologna</text>
+    <text x="584" y="298" fill="#64748b">Smart Return trovato</text>
+
+    <rect x="560" y="312" width="124" height="34" rx="8" fill="#0f172a"/>
+    <circle cx="572" cy="329" r="3.5" fill="#34d399"/>
+    <text x="584" y="326" fill="#e2e8f0">Genova → Verona</text>
+    <text x="584" y="338" fill="#64748b">Consegnato · DDT ok</text>
+  </g>
+  <text x="562" y="382" fill="#64748b" font-family="Segoe UI, Arial" font-size="8">DDT digitale raccolto dall'autista</text>
+  <text x="562" y="396" fill="#64748b" font-family="Segoe UI, Arial" font-size="8">dalla PWA, senza carta.</text>
+</svg>

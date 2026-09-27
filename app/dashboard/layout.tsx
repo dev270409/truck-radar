@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
+import DashboardShell from "@/components/DashboardShell";
 import { listApiConnections } from "@/lib/raw-tables";
 
 function SidebarLink({
@@ -112,10 +113,8 @@ export default async function DashboardLayout({
     accountVerificato = false;
   }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 md:h-screen md:sticky md:top-0 overflow-y-auto bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-4">
+  const sidebar = (
+    <div className="flex flex-col justify-between">
         <div>
           {/* Brand & Tenant Info */}
           <div className="flex items-center space-x-3 pb-5 mb-6 border-b border-slate-800">
@@ -360,12 +359,8 @@ export default async function DashboardLayout({
           </div>
           <LogoutButton />
         </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 bg-slate-950 p-6 md:p-10 overflow-y-auto">
-        {children}
-      </main>
     </div>
   );
+
+  return <DashboardShell sidebar={sidebar}>{children}</DashboardShell>;
 }
