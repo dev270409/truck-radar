@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen, CalendarClock } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
+import Logo from "@/components/Logo";
 
 export default function CercaUnVettorePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-2 font-bold">
-          <img src="/logo.jpg" alt="Truck Radar" className="h-9 w-9 rounded-xl object-cover" />
-          Truck Radar
+          <Logo />
         </Link>
         <div className="flex items-center gap-4 text-sm">
           <Link href="/prezzi" className="hidden text-slate-300 hover:text-white sm:block">Prezzi</Link>
@@ -29,7 +29,7 @@ export default function CercaUnVettorePage() {
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-400">
             Pubblica i carichi della tua azienda e affida i viaggi solo a vettori verificati del
-            Network Truck Radar: documenti in regola, reputazione pubblica e tracciabilità dei subappalti.
+            Network Truck Radar: documenti in regola, reputazione pubblica e tracciabilitÃ  dei subappalti.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Link
@@ -59,12 +59,12 @@ export default function CercaUnVettorePage() {
             <ShieldCheck className="h-6 w-6 text-emerald-400" />
             <h2 className="mt-4 text-lg font-bold">Vettori solo verificati</h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">
-              Ogni candidato ha account verificato, visura e documenti in regola. La reputazione dei subappalti è pubblica.
+              Ogni candidato ha account verificato, visura e documenti in regola. La reputazione dei subappalti Ã¨ pubblica.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <FileCheck2 className="h-6 w-6 text-amber-400" />
-            <h2 className="mt-4 text-lg font-bold">Documenti e tracciabilità</h2>
+            <h2 className="mt-4 text-lg font-bold">Documenti e tracciabilitÃ </h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               DDT, stato di consegna e storico del viaggio restano disponibili per la tua azienda.
             </p>
@@ -75,7 +75,7 @@ export default function CercaUnVettorePage() {
           <h2 className="text-2xl font-bold">Il Network ammette solo aziende verificate.</h2>
           <p className="mt-3 text-sm leading-7 text-slate-300">
             Per pubblicare e affidare viaggi la tua azienda completa il percorso di verifica: dati societari,
-            visura e identità del rappresentante, gestiti tramite fornitori specializzati. Il gestionale resta
+            visura e identitÃ  del rappresentante, gestiti tramite fornitori specializzati. Il gestionale resta
             utilizzabile subito, senza attestazioni.
           </p>
         </div>

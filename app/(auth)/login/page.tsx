@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, ArrowRight, Lock, Mail, AlertCircle, Loader2 } from "lucide-react";
+import Logo from "@/components/Logo";
 
 const SHOW_DEMO_CREDS = process.env.NEXT_PUBLIC_SHOW_DEMO_CREDS === "true";
 
@@ -53,11 +54,9 @@ function LoginForm() {
       <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl relative z-10">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8">
-          <img
-            src="/logo.jpg"
-            alt="Truck Radar"
-            className="w-14 h-14 rounded-2xl object-cover shadow-lg shadow-blue-500/25 mb-3"
-          />
+          <div className="mb-3">
+            <Logo size={56} withWordmark={false} />
+          </div>
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             Truck Radar
           </h1>

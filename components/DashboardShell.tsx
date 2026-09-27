@@ -6,9 +6,9 @@ import OpsTopbar from "./OpsTopbar";
 import BottomNav from "./BottomNav";
 
 /**
- * Shell client della console operativa: topbar sticky in vetro, sidebar 252px
- * su desktop, drawer su mobile e bottom-nav flottante. La sidebar è
- * server-rendered e arriva come children.
+ * Shell della console operativa: topbar sticky a piena larghezza, sotto il
+ * flex sidebar (252px, vetro) + contenuto. Su mobile la sidebar è un drawer
+ * e c'è la bottom-nav flottante. La sidebar è server-rendered (children).
  */
 export default function DashboardShell({
   sidebar,
@@ -21,6 +21,8 @@ export default function DashboardShell({
 
   return (
     <div className="min-h-screen">
+      <OpsTopbar onMenu={() => setOpen(true)} />
+
       <div className="flex">
         {/* Backdrop mobile */}
         {open && (
@@ -57,14 +59,12 @@ export default function DashboardShell({
           </div>
         </aside>
 
-        {/* Colonna principale */}
-        <div className="flex min-h-screen flex-1 flex-col">
-          <OpsTopbar onMenu={() => setOpen(true)} />
-          <main className="mx-auto w-full max-w-[1460px] flex-1 px-4 py-6 pb-28 md:px-8 md:py-8 md:pb-10">
-            {children}
-          </main>
-        </div>
+        {/* Colonna contenuto */}
+        <main className="mx-auto w-full max-w-[1460px] flex-1 px-4 py-6 pb-28 md:px-8 md:py-8 md:pb-10">
+          {children}
+        </main>
       </div>
+
       <BottomNav />
     </div>
   );

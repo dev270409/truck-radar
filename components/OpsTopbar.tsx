@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { Search } from "lucide-react";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 
-/** Topbar sticky 68px in vetro: logo · ricerca · pill LIVE · tema. */
+/** Topbar sticky 68px a piena larghezza: logo · ricerca · pill LIVE · tema. */
 export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
   return (
     <header
@@ -30,11 +31,11 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
         </span>
       </button>
 
-      <div className="md:hidden">
-        <Logo withWordmark={false} size={36} />
-      </div>
+      <Link href="/dashboard" aria-label="Truck Radar — home">
+        <Logo />
+      </Link>
 
-      <div className="relative hidden flex-1 max-w-[520px] md:block">
+      <div className="relative ml-auto hidden max-w-[520px] flex-1 md:ml-8 md:block">
         <Search
           className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"
           style={{ color: "var(--text-label-soft)" }}
@@ -51,7 +52,7 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-2.5">
+      <div className="ml-auto flex items-center gap-2.5 md:ml-3">
         <span
           className="hidden items-center gap-1.5 rounded-[var(--radius-pill)] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide sm:inline-flex"
           style={{ background: "color-mix(in oklch, var(--success) 12%, transparent)", color: "var(--success)" }}

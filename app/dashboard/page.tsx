@@ -19,8 +19,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import MetricCard from "@/components/ops/MetricCard";
-import OpsMap from "@/components/ops/OpsMap";
+import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
+import { getFleetMap } from "@/lib/fleet";
 
 const daysUntil = (iso: Date) => Math.ceil((iso.getTime() - Date.now()) / 86400000);
 
@@ -46,6 +47,13 @@ export default async function DashboardPage() {
     tenantDb.users.findMany(),
     tenantDb.kycDocuments.findMany(),
   ]);
+
+  let fleetRows: Awaited<ReturnType<typeof getFleetMap>> = [];
+  try {
+    fleetRows = await getFleetMap(session.user.companyId);
+  } catch {
+    fleetRows = [];
+  }
 
   const availableVehicles = vehicles.filter((v) => v.status === "DISPONIBILE").length;
   const driverCount = users.filter((u) => u.role === "AUTISTA").length;
@@ -128,9 +136,9 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Mappa + grafico */}
+      {/* Operativo flotta + grafico */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <OpsMap />
+        <FleetOpsPanel rows={fleetRows} />
         <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni · consuntivo" data={chartData} />
       </div>
 

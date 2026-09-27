@@ -24,7 +24,6 @@ import {
 import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
 import DashboardShell from "@/components/DashboardShell";
-import Logo from "@/components/Logo";
 import { listApiConnections } from "@/lib/raw-tables";
 
 function SidebarLink({
@@ -139,17 +138,15 @@ export default async function DashboardLayout({
 
   const sidebar = (
     <>
-      {/* Brand & tenant */}
-      <div className="flex items-center gap-3 border-b pb-4" style={{ borderColor: "var(--glass-border)" }}>
-        <Logo size={40} withWordmark={false} />
-        <div className="min-w-0">
-          <h2 className="font-display truncate text-[13px] font-bold" style={{ color: INK }}>
-            {company?.ragioneSociale || "Truck Radar"}
-          </h2>
-          <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>
-            P.IVA {company?.partitaIva || "N/A"}
-          </p>
-        </div>
+      {/* Tenant corrente (il logo è nella topbar) */}
+      <div className="border-b pb-4" style={{ borderColor: "var(--glass-border)" }}>
+        <p className="ops-label">Azienda</p>
+        <h2 className="font-display mt-1 truncate text-[14px] font-bold" style={{ color: INK }}>
+          {company?.ragioneSociale || "Truck Radar"}
+        </h2>
+        <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+          P.IVA {company?.partitaIva || "N/A"}
+        </p>
       </div>
 
       {/* Piano / contatori */}

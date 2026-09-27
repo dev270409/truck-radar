@@ -19,6 +19,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
+import Logo from "@/components/Logo";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -214,11 +215,7 @@ export default function RegisterForm() {
         {/* Brand Header */}
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-800">
           <div className="flex items-center space-x-3">
-            <img
-              src="/logo.jpg"
-              alt="Truck Radar"
-              className="w-10 h-10 rounded-xl object-cover shadow-lg"
-            />
+            <Logo size={40} withWordmark={false} />
             <div>
               <h1 className="text-xl font-bold tracking-tight">Truck Radar</h1>
               <p className="text-xs text-slate-400">Registrazione Piattaforma Trasporti</p>
