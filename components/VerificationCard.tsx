@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function VerificationCard() {
 
   if (loading) {
     return (
-      <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+      <div className="glass p-6 enter-up">
         <div className="flex items-center space-x-2 text-slate-400 text-sm">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>Verifica account...</span>
@@ -57,7 +57,7 @@ export default function VerificationCard() {
   const nextCriterio = data.criteria.find((c) => !c.ok && !c.beneficio);
 
   return (
-    <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+    <div className="glass p-6 enter-up">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-bold text-slate-100 flex items-center">
           <ShieldCheck className="w-5 h-5 mr-2 text-blue-400" /> Verified Account

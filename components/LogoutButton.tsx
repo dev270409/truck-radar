@@ -7,9 +7,14 @@ export default function LogoutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: "/login" })}
-      className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-slate-900 hover:bg-red-950/60 border border-slate-800 hover:border-red-800 text-slate-400 hover:text-red-300 rounded-xl text-xs font-semibold transition"
+      className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-base)] px-3 py-2 text-[12px] font-semibold transition"
+      style={{
+        background: "var(--surface-soft)",
+        border: "1px solid var(--glass-border)",
+        color: "var(--text-label)",
+      }}
     >
-      <LogOut className="w-3.5 h-3.5" />
+      <LogOut className="h-3.5 w-3.5" />
       <span>Disconnetti</span>
     </button>
   );

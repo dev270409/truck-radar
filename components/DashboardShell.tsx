@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react";
+import OpsTopbar from "./OpsTopbar";
+import BottomNav from "./BottomNav";
 
 /**
- * Shell client per la dashboard: gestisce l'apertura/chiusura della sidebar
- * su mobile (drawer) senza impilare il menu sopra il contenuto.
- * La sidebar vera (server-rendered) arriva come children.
+ * Shell client della console operativa: topbar sticky in vetro, sidebar 252px
+ * su desktop, drawer su mobile e bottom-nav flottante. La sidebar è
+ * server-rendered e arriva come children.
  */
 export default function DashboardShell({
   sidebar,
@@ -18,53 +20,52 @@ export default function DashboardShell({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Top bar mobile */}
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-800 bg-slate-900/95 px-4 py-3 backdrop-blur md:hidden">
-        <div className="flex items-center gap-2 font-bold">
-          <img src="/logo.jpg" alt="" className="h-8 w-8 rounded-lg object-cover" />
-          Truck Radar
-        </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Apri il menu"
-          className="rounded-lg border border-slate-700 p-2 text-slate-200 hover:bg-slate-800"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-      </header>
-
-      <div className="flex flex-col md:flex-row">
+    <div className="min-h-screen">
+      <div className="flex">
         {/* Backdrop mobile */}
         {open && (
           <div
-            className="fixed inset-0 z-40 bg-black/60 md:hidden"
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
             onClick={() => setOpen(false)}
-            aria-hidden="true"
+            aria-hidden
           />
         )}
 
-        {/* Sidebar: drawer su mobile, colonna fissa su desktop */}
+        {/* Sidebar vetro 252px (desktop) / drawer (mobile) */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-72 transform overflow-y-auto bg-slate-900 border-r border-slate-800 p-4 transition-transform duration-200 md:static md:z-auto md:w-64 md:h-screen md:sticky md:top-0 md:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 flex w-[252px] transform flex-col overflow-y-auto p-4 transition-transform duration-200 md:sticky md:top-[68px] md:z-auto md:h-[calc(100vh-68px)] md:translate-x-0 ${
             open ? "translate-x-0" : "-translate-x-full"
           }`}
+          style={{
+            background: "var(--glass-sidebar)",
+            backdropFilter: "blur(24px) saturate(150%)",
+            WebkitBackdropFilter: "blur(24px) saturate(150%)",
+            borderRight: "1px solid var(--glass-border)",
+          }}
         >
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Chiudi il menu"
-            className="mb-3 ml-auto flex rounded-lg border border-slate-700 p-1.5 text-slate-300 hover:bg-slate-800 md:hidden"
+            className="mb-3 ml-auto grid h-8 w-8 place-items-center rounded-[var(--radius-pill)] border md:hidden"
+            style={{ borderColor: "var(--glass-border)", color: "var(--text)" }}
           >
             <X className="h-4 w-4" />
           </button>
-          {/* Chiude il drawer al click su un link */}
-          <div onClick={() => setOpen(false)}>{sidebar}</div>
+          <div className="flex flex-1 flex-col justify-between" onClick={() => setOpen(false)}>
+            {sidebar}
+          </div>
         </aside>
 
-        <main className="flex-1 bg-slate-950 p-6 md:p-10 overflow-y-auto">{children}</main>
+        {/* Colonna principale */}
+        <div className="flex min-h-screen flex-1 flex-col">
+          <OpsTopbar onMenu={() => setOpen(true)} />
+          <main className="mx-auto w-full max-w-[1460px] flex-1 px-4 py-6 pb-28 md:px-8 md:py-8 md:pb-10">
+            {children}
+          </main>
+        </div>
       </div>
+      <BottomNav />
     </div>
   );
 }

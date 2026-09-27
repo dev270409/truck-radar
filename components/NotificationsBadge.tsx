@@ -30,13 +30,17 @@ export default function NotificationsBadge() {
   return (
     <Link
       href="/dashboard/notifiche"
-      className="relative flex w-9 h-9 items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+      className="relative grid h-9 w-9 place-items-center rounded-[var(--radius-pill)] transition"
+      style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)", color: "var(--text)" }}
       title="Notifiche"
       aria-label="Notifiche"
     >
-      <Bell className="w-4.5 h-4.5" />
+      <Bell className="h-[18px] w-[18px]" />
       {totale > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold">
+        <span
+          className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
+          style={{ background: "var(--danger)" }}
+        >
           {totale > 99 ? "99+" : totale}
         </span>
       )}

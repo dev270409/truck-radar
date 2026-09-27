@@ -1,26 +1,218 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   Truck Radar — "Frosted Ops Console"
+   Design tokens semantici (oklch). Mai colori hardcoded nei componenti.
+   Tema chiaro di default; dark via [data-theme="dark"].
+   ========================================================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- Brand & accent ---- */
+  --brand: oklch(0.29 0.08 250);
+  --brand-strong: oklch(0.24 0.08 250);
+  --accent: oklch(0.68 0.19 42);
+
+  /* ---- Stati ---- */
+  --success: oklch(0.64 0.16 158);
+  --warning: oklch(0.78 0.17 78);
+  --danger: oklch(0.62 0.2 28);
+  --info: oklch(0.76 0.14 226);
+
+  /* ---- Superfici (vetro) ---- */
+  --bg-grad-a: oklch(0.985 0.006 246);
+  --bg-grad-b: oklch(0.955 0.012 236);
+  --bg-grad-c: oklch(0.94 0.016 230);
+
+  --surface: oklch(1 0 0 / 0.7);
+  --surface-strong: oklch(1 0 0 / 0.82);
+  --surface-soft: oklch(1 0 0 / 0.55);
+  --surface-border: oklch(1 0 0 / 0.78);
+  --surface-shadow: 0 14px 40px oklch(0.29 0.08 250 / 0.07);
+
+  --glass-sidebar: oklch(1 0 0 / 0.72);
+  --glass-topbar: oklch(1 0 0 / 0.66);
+  --glass-border: oklch(1 0 0 / 0.7);
+
+  /* ---- Testo ---- */
+  --text: oklch(0.26 0.03 250);
+  --text-soft: oklch(0.46 0.03 250);
+  --text-label: oklch(0.29 0.08 250 / 0.62);
+  --text-label-soft: oklch(0.29 0.08 250 / 0.43);
+
+  /* ---- Mappa ---- */
+  --map-bg: oklch(0.96 0.02 226);
+  --map-grid: oklch(0.29 0.08 250 / 0.12);
+
+  /* ---- radius ---- */
+  --radius-base: 10px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --brand: oklch(0.72 0.09 250);
+  --brand-strong: oklch(0.8 0.09 250);
+  --accent: oklch(0.72 0.18 45);
+
+  --bg-grad-a: oklch(0.16 0.02 250);
+  --bg-grad-b: oklch(0.2 0.025 244);
+  --bg-grad-c: oklch(0.24 0.03 238);
+
+  --surface: oklch(0.26 0.02 248 / 0.62);
+  --surface-strong: oklch(0.3 0.02 248 / 0.78);
+  --surface-soft: oklch(0.24 0.02 248 / 0.5);
+  --surface-border: oklch(1 0 0 / 0.12);
+  --surface-shadow: 0 14px 40px oklch(0 0 0 / 0.35);
+
+  --glass-sidebar: oklch(0.22 0.02 248 / 0.72);
+  --glass-topbar: oklch(0.22 0.02 248 / 0.66);
+  --glass-border: oklch(1 0 0 / 0.12);
+
+  --text: oklch(0.95 0.01 250);
+  --text-soft: oklch(0.78 0.02 250);
+  --text-label: oklch(0.9 0.02 250 / 0.68);
+  --text-label-soft: oklch(0.9 0.02 250 / 0.48);
+
+  --map-bg: oklch(0.22 0.03 240);
+  --map-grid: oklch(1 0 0 / 0.12);
+
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-space-grotesk);
   --font-mono: var(--font-geist-mono);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-soft: var(--surface-soft);
+  --color-glass-border: var(--glass-border);
+
+  --color-text: var(--text);
+  --color-text-soft: var(--text-soft);
+  --color-text-label: var(--text-label);
+
+  --radius-base: var(--radius-base);
+  --radius-card: var(--radius-card);
+  --radius-pill: var(--radius-pill);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--surface-border);
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
+  background:
+    linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 52%, var(--bg-grad-c) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+}
+
+/* ============================ Vetro (frosted) ============================ */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--surface-shadow);
+}
+
+.glass-strong {
+  background: var(--surface-strong);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-shadow);
+}
+
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--surface-shadow);
+}
+
+/* ============================ Chips di stato ============================ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--radius-pill);
+  padding: 3px 9px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.chip-success { color: var(--success); background: color-mix(in oklch, var(--success) 12%, transparent); }
+.chip-warning { color: var(--warning); background: color-mix(in oklch, var(--warning) 14%, transparent); }
+.chip-danger  { color: var(--danger);  background: color-mix(in oklch, var(--danger) 12%, transparent); }
+.chip-info    { color: var(--info);    background: color-mix(in oklch, var(--info) 12%, transparent); }
+.chip-brand   { color: var(--brand);   background: color-mix(in oklch, var(--brand) 10%, transparent); }
+.chip-accent  { color: var(--accent);  background: color-mix(in oklch, var(--accent) 14%, transparent); }
+
+/* Etichette tecniche */
+.ops-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-label);
+}
+
+/* ============================ Animazioni ============================ */
+@keyframes enter-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.enter-up { animation: enter-up 0.45s ease both; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.85); }
+}
+.pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

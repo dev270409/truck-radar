@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, type ReactNode } from "react";
 import {
@@ -34,7 +34,7 @@ interface ComingSoonProps {
 }
 
 /**
- * Card "Soon / In arrivo" per funzionalità future.
+ * Card "Soon / In arrivo" per funzionalitÃ  future.
  * Senza leadApi mostra solo l'annuncio; con leadApi attiva il flusso
  * "Avvisami quando disponibile" (endpoint idempotente, rate-limited).
  */
@@ -72,8 +72,8 @@ export default function ComingSoonCard({
       setReg("ok");
       setMsg(
         json.already
-          ? "Sei già in lista: ti avviseremo appena sarà disponibile."
-          : "Perfetto: ti avviseremo appena sarà disponibile."
+          ? "Sei giÃ  in lista: ti avviseremo appena sarÃ  disponibile."
+          : "Perfetto: ti avviseremo appena sarÃ  disponibile."
       );
     } catch (err) {
       setReg("err");
@@ -82,7 +82,7 @@ export default function ComingSoonCard({
   };
 
   return (
-    <div className="p-4 bg-slate-900 border border-dashed border-slate-700 rounded-2xl flex flex-wrap items-center gap-4">
+    <div className="glass p-4 enter-up flex flex-wrap items-center gap-4">
       <div className="flex items-center space-x-3 min-w-0 flex-1">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${colors[color]}`}>
           <Icon className="w-5 h-5" />
@@ -155,7 +155,7 @@ export default function ComingSoonCard({
                   {reg === "err" && <p className="text-xs text-red-300 mt-2">{msg}</p>}
                   <p className="text-[11px] text-slate-500 mt-2 flex items-center">
                     <AlertTriangle className="w-3 h-3 mr-1" />
-                    Disponibile dopo l'attivazione del provider (§9 del paper di deploy).
+                    Disponibile dopo l'attivazione del provider (Â§9 del paper di deploy).
                   </p>
                 </>
               )}
