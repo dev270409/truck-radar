@@ -3,6 +3,10 @@ import { analyzeKyb } from "@/lib/kyb";
 import type { KybInputFile } from "@/lib/kyb/types";
 import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
 
+// L'estrazione AI (download documenti + chiamata vision a Gemini) può richiedere
+// più dei 10s di default di Vercel: alziamo il limite per evitare timeout 504.
+export const maxDuration = 60;
+
 const ALLOWED_TIPI = new Set([
   "VISURA",
   "DOCUMENTO_IDENTITA",

@@ -144,7 +144,18 @@ export default function RegisterForm() {
           hints: { ragioneSociale, partitaIva, nome, cognome },
         }),
       });
-      const data = await res.json();
+      const rawBody = await res.text();
+      let data: any;
+      try {
+        data = rawBody ? JSON.parse(rawBody) : {};
+      } catch {
+        // Risposta non-JSON (es. timeout 504 di Vercel): messaggio comprensibile.
+        throw new Error(
+          res.status === 504
+            ? "L'analisi sta impiegando troppo tempo. Riprova con documenti più leggeri o tra qualche istante."
+            : `Errore del server (${res.status}). Riprova tra qualche istante.`
+        );
+      }
       if (!res.ok) throw new Error(data.error || "Errore nell'estrazione automatica");
       const ex = data.extraction;
       setKybExtraction(data);
