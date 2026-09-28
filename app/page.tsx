@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -40,7 +40,7 @@ export default async function HomePage() {
     {
       icon: BarChart3,
       title: "Margini reali, non solo grafici",
-      text: "Costi €/km, ricavi, km a vuoto e margine per mezzo, autista e viaggio. Export CSV per il tuo commercialista.",
+      text: "Costi â‚¬/km, ricavi, km a vuoto e margine per mezzo, autista e viaggio. Export CSV per il tuo commercialista.",
     },
   ];
 
@@ -49,7 +49,7 @@ export default async function HomePage() {
       icon: Route,
       title: "Smart Return",
       metric: "-12 km a vuoto",
-      text: "Il sistema propone carichi di ritorno compatibili con percorso, data e capacità del mezzo, prima nella rete interna e poi sulle borse carichi collegate.",
+      text: "Il sistema propone carichi di ritorno compatibili con percorso, data e capacitÃ  del mezzo, prima nella rete interna e poi sulle borse carichi collegate.",
     },
     {
       icon: Wrench,
@@ -60,37 +60,37 @@ export default async function HomePage() {
     {
       icon: Fuel,
       title: "Consumi & carburante",
-      metric: "€/km e km/l",
-      text: "Registro rifornimenti e consumi per mezzo, così individui derive, anomalie e mezzi che ti costano più di quanto rendono.",
+      metric: "â‚¬/km e km/l",
+      text: "Registro rifornimenti e consumi per mezzo, cosÃ¬ individui derive, anomalie e mezzi che ti costano piÃ¹ di quanto rendono.",
     },
     {
       icon: Sparkles,
       title: "Efficienza autista",
-      metric: "Puntualità e stile di guida",
-      text: "Indicatori per autista su puntualità, viaggi completati ed eventi rilevanti, con suggerimenti di miglioramento misurabili.",
+      metric: "PuntualitÃ  e stile di guida",
+      text: "Indicatori per autista su puntualitÃ , viaggi completati ed eventi rilevanti, con suggerimenti di miglioramento misurabili.",
     },
   ];
 
   const segments = [
     {
       icon: Building2,
-      title: "Micro-flotte (2–5 mezzi)",
-      text: "Parti dal gestionale e dal DDT digitale senza stravolgere i tuoi processi. Trial 30 giorni, nessuna carta.",
+      title: "Micro-flotte (2â€“5 mezzi)",
+      text: "Parti dal gestionale e dal DDT digitale senza stravolgere i tuoi processi. Trial 21 giorni, nessuna carta.",
     },
     {
       icon: Truck,
-      title: "PMI del trasporto (6–20 mezzi)",
+      title: "PMI del trasporto (6â€“20 mezzi)",
       text: "Controllo di margine per viaggio, scadenze e subappalto: le sezioni del Network si attivano dopo la verifica.",
     },
     {
       icon: BarChart3,
-      title: "Flotte strutturate (20–50+)",
-      text: "Analytics per mezzo e autista, API verso GPS/TMS/ERP esistenti e piani su misura per flotte più grandi.",
+      title: "Flotte strutturate (20â€“50+)",
+      text: "Analytics per mezzo e autista, API verso GPS/TMS/ERP esistenti e piani su misura per flotte piÃ¹ grandi.",
     },
   ];
 
   const integrations = [
-    "GPS e telematica già installati (API, hardware-agnostic)",
+    "GPS e telematica giÃ  installati (API, hardware-agnostic)",
     "TMS, ERP e sistemi di fatturazione",
     "Tachigrafo e carte carburante",
     "Borse carichi esterne collegate dal cliente",
@@ -149,7 +149,7 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-lg"
               style={{ background: "var(--brand)", boxShadow: "0 14px 40px color-mix(in oklch, var(--brand) 22%, transparent)" }}
             >
-              Prova gratis 30 giorni <ArrowRight className="h-4 w-4" />
+              Prova gratis 21 giorni <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/cerca-un-vettore"
@@ -164,7 +164,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <p className="mt-4 text-sm" style={{ color: "var(--text-label)" }}>
-            Nessuna carta di credito · Dati in UE · Il Network è riservato alle aziende verificate.
+            Nessuna carta di credito Â· Dati in UE Â· Il Network Ã¨ riservato alle aziende verificate.
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export default async function HomePage() {
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--warning)" }} />
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--success)" }} />
             <span className="ml-3 text-[11px] font-medium" style={{ color: "var(--text-label)" }}>
-              Flotta live · Truck Radar
+              Flotta live Â· Truck Radar
             </span>
           </div>
           <div className="glass-panel overflow-hidden">
@@ -235,10 +235,10 @@ export default async function HomePage() {
             <Sparkles className="h-3.5 w-3.5" /> Intelligenza operativa
           </p>
           <h2 className="font-display mt-4 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            Meno km a vuoto, meno fermi, più margine
+            Meno km a vuoto, meno fermi, piÃ¹ margine
           </h2>
           <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Truck Radar non è una raccolta di grafici: incrocia mezzi, autisti, viaggi, km, consumi e
+            Truck Radar non Ã¨ una raccolta di grafici: incrocia mezzi, autisti, viaggi, km, consumi e
             costi per darti indicazioni operative concrete, basate sui tuoi dati.
           </p>
         </div>
@@ -254,7 +254,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* PER CHI È */}
+      {/* PER CHI Ãˆ */}
       <section className="border-y" style={{ borderColor: "var(--glass-border)", background: "var(--surface-soft)" }}>
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
@@ -293,14 +293,14 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
               style={{ background: "var(--surface-soft)", color: "var(--text-soft)", border: "1px solid var(--glass-border)" }}
             >
-              <Server className="h-3.5 w-3.5" /> Hardware-agnostic · API-first
+              <Server className="h-3.5 w-3.5" /> Hardware-agnostic Â· API-first
             </p>
             <h2 className="font-display mt-4 text-3xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              Collegati a ciò che la tua azienda ha già
+              Collegati a ciÃ² che la tua azienda ha giÃ 
             </h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-soft)" }}>
               Non devi comprare nuovo hardware. Truck Radar si collega tramite API ai sistemi che usi
-              già, così riduci costi, installazioni e complessità. Le credenziali delle integrazioni sono
+              giÃ , cosÃ¬ riduci costi, installazioni e complessitÃ . Le credenziali delle integrazioni sono
               cifrate (AES-256-GCM) e mai esposte.
             </p>
           </div>
@@ -327,7 +327,7 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
               style={{ background: "color-mix(in oklch, var(--success) 10%, transparent)", color: "var(--success)", border: "1px solid var(--glass-border)" }}
             >
-              <Lock className="h-3.5 w-3.5" /> Sicurezza e conformità
+              <Lock className="h-3.5 w-3.5" /> Sicurezza e conformitÃ 
             </p>
             <h2 className="font-display mt-4 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
               Fiducia verificabile, non promesse
@@ -364,7 +364,7 @@ export default async function HomePage() {
               <Leaf className="h-6 w-6" style={{ color: "var(--success)" }} />
               <h3 className="font-display mt-4 text-base font-bold" style={{ color: "var(--text)" }}>Report ESG</h3>
               <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-                Km, km a vuoto evitati e stima CO₂ per i tuoi report di sostenibilità.
+                Km, km a vuoto evitati e stima COâ‚‚ per i tuoi report di sostenibilitÃ .
               </p>
             </article>
           </div>
@@ -389,8 +389,8 @@ export default async function HomePage() {
           </div>
           <div className="text-sm leading-7" style={{ color: "var(--text-soft)" }}>
             Puoi usare il gestionale immediatamente, senza attestazioni. Per pubblicare carichi,
-            subappaltare e accedere alle opportunità del Network, l'azienda completa una verifica con
-            documenti societari e identità del rappresentante. I dati sensibili sono gestiti tramite
+            subappaltare e accedere alle opportunitÃ  del Network, l'azienda completa una verifica con
+            documenti societari e identitÃ  del rappresentante. I dati sensibili sono gestiti tramite
             fornitori specializzati e non vengono ceduti a terzi.
           </div>
         </div>
@@ -406,7 +406,7 @@ export default async function HomePage() {
             Inizia a guidare i dati della tua flotta
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Prova Truck Radar gratis per 30 giorni. Nessuna carta di credito, nessun hardware da
+            Prova Truck Radar gratis per 21 giorni. Nessuna carta di credito, nessun hardware da
             installare. Preferisci parlare con noi? Prenota una demo.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

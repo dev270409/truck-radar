@@ -75,9 +75,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // 30 days trial date
+    // Trial di 21 giorni
     const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 30);
+    trialEndsAt.setDate(trialEndsAt.getDate() + 21);
 
     const hashedPassword = await hashPassword(password);
 
@@ -162,7 +162,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Registrazione completata con successo! Account in periodo di prova (30 giorni).",
+      message: "Registrazione completata con successo! Account in periodo di prova (21 giorni).",
       companyId: result.company.id,
       email: result.adminUser.email,
     });

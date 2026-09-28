@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -58,7 +59,7 @@ function buildQuery(da: string, a: string, status: string) {
   return q ? `?${q}` : "";
 }
 
-export default function ReportiPage() {
+function Original_ReportiPage() {
   const [data, setData] = useState<ReportData | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -306,4 +307,9 @@ export default function ReportiPage() {
       ) : null}
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function ReportiPage() {
+  return soonPage("reporti");
 }

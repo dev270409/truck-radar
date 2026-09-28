@@ -13,6 +13,7 @@ import {
   ExternalLink,
   X,
   BarChart3,
+  Pencil,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
@@ -77,6 +78,17 @@ export default function VehiclesPage() {
   const [status, setStatus] = useState("DISPONIBILE");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // Edit vehicle state
+  const [editVehicle, setEditVehicle] = useState<Vehicle | null>(null);
+  const [editTarga, setEditTarga] = useState("");
+  const [editCategoria, setEditCategoria] = useState("FRIGO");
+  const [editPortata, setEditPortata] = useState("");
+  const [editVolume, setEditVolume] = useState("");
+  const [editStatus, setEditStatus] = useState("DISPONIBILE");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [rowBusy, setRowBusy] = useState<string | null>(null);
   const geotabByLocalVehicle = new Map(
     geotabDevices.filter((device) => device.linkedLocalVehicleId).map((device) => [device.linkedLocalVehicleId!, device])
   );
@@ -138,6 +150,60 @@ export default function VehiclesPage() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openEdit = (v: Vehicle) => {
+    setEditVehicle(v);
+    setEditTarga(v.targa);
+    setEditCategoria(v.categoria);
+    setEditPortata(String(v.portataMaxKg));
+    setEditVolume(String(v.volumeMaxM3));
+    setEditStatus(v.status);
+    setEditError("");
+  };
+
+  const handleEditVehicle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editVehicle) return;
+    setEditSaving(true);
+    setEditError("");
+    try {
+      const res = await fetch(`/api/vehicles/${editVehicle.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targa: editTarga,
+          categoria: editCategoria,
+          portataMaxKg: editPortata,
+          volumeMaxM3: editVolume,
+          status: editStatus,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nell'aggiornamento del mezzo");
+      setEditVehicle(null);
+      fetchVehicles();
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  const handleDeleteVehicle = async (v: Vehicle) => {
+    if (!window.confirm(`Eliminare il mezzo ${v.targa}? L'operazione non è reversibile.`)) return;
+    setRowBusy(v.id);
+    setError("");
+    try {
+      const res = await fetch(`/api/vehicles/${v.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nell'eliminazione");
+      fetchVehicles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setRowBusy(null);
     }
   };
 
@@ -322,6 +388,7 @@ export default function VehiclesPage() {
                   <th className="px-6 py-4">Geotab</th>
                   <th className="px-6 py-4">Autista Assegnato</th>
                   <th className="px-6 py-4">Documenti</th>
+                  <th className="px-6 py-4">Azioni</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80">
@@ -373,6 +440,25 @@ export default function VehiclesPage() {
                         <span>Documenti ({(v.documents ?? []).length})</span>
                       </button>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEdit(v)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700"
+                          title="Modifica mezzo"
+                        >
+                          <Pencil className="w-3.5 h-3.5" /> Modifica
+                        </button>
+                        <button
+                          onClick={() => handleDeleteVehicle(v)}
+                          disabled={rowBusy === v.id}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-800/60 bg-red-950/40 px-2.5 py-1.5 text-xs font-semibold text-red-300 transition hover:bg-red-900/50 disabled:opacity-50"
+                          title="Elimina mezzo"
+                        >
+                          {rowBusy === v.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                   );
                 })}
@@ -381,6 +467,97 @@ export default function VehiclesPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Vehicle Modal */}
+      {editVehicle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+            <h3 className="flex items-center text-lg font-bold text-slate-100">
+              <Pencil className="mr-2 h-5 w-5 text-emerald-400" /> Modifica Veicolo {editVehicle.targa}
+            </h3>
+            {editError && (
+              <div className="rounded-xl border border-red-800 bg-red-950/60 p-3 text-xs text-red-200">{editError}</div>
+            )}
+            <form onSubmit={handleEditVehicle} className="space-y-4 text-sm">
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Targa Veicolo *</label>
+                <input
+                  type="text"
+                  required
+                  value={editTarga}
+                  onChange={(e) => setEditTarga(e.target.value)}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-mono text-slate-100 outline-none focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Categoria *</label>
+                <select
+                  value={editCategoria}
+                  onChange={(e) => setEditCategoria(e.target.value)}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                >
+                  <option value="FRIGO">FRIGO</option>
+                  <option value="TELONATO">TELONATO</option>
+                  <option value="SPONDA_IDRAULICA">SPONDA_IDRAULICA</option>
+                  <option value="CISTERNA">CISTERNA</option>
+                  <option value="ADR">ADR</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Portata Max (Kg)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editPortata}
+                    onChange={(e) => setEditPortata(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Volume Max (M³)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editVolume}
+                    onChange={(e) => setEditVolume(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Stato</label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                >
+                  <option value="DISPONIBILE">DISPONIBILE</option>
+                  <option value="IN_VIAGGIO">IN_VIAGGIO</option>
+                  <option value="IN_MANUTENZIONE">IN_MANUTENZIONE</option>
+                  <option value="NON_IDONEO">NON_IDONEO</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-3 border-t border-slate-800 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setEditVehicle(null)}
+                  className="rounded-xl bg-slate-800 px-4 py-2 font-medium text-slate-300 hover:bg-slate-700"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="flex items-center space-x-2 rounded-xl bg-emerald-600 px-5 py-2 font-semibold text-white hover:bg-emerald-500"
+                >
+                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>Salva modifiche</span>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Add Vehicle Modal */}
       {showAddModal && (

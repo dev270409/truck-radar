@@ -157,6 +157,80 @@ function normalizeDate(r: FuelLogRow): FuelLogRow {
   return { ...r, createdAt: r.createdAt ? new Date(r.createdAt) : r.createdAt };
 }
 
+/**
+ * Stima consumi quando non ci sono abbastanza rifornimenti reali.
+ * Basata sui km reali percorsi (Geotab/storico) e su un consumo medio di
+ * riferimento per categoria di mezzo. È una STIMA dichiarata, non un dato
+ * preciso, e non riguarda i km a vuoto (non stimabili in modo affidabile).
+ */
+export const STIMA_CONSUMO_MEDIO_KM_PER_LITRO: Record<string, number> = {
+  FRIGO: 3.2,
+  TELONATO: 3.5,
+  SPONDA_IDRAULICA: 3.4,
+  CISTERNA: 3.0,
+  ADR: 3.0,
+};
+export const STIMA_PREZZO_GASOLIO_EUR_PER_LITRO = 1.75;
+
+export interface FuelEstimate {
+  estimated: true;
+  kmTotali: number;
+  kmSource: "GEOTAB" | "TRIPS" | "NESSUNO";
+  litriStimati: number;
+  costoStimato: number;
+  kmPerLitroMedio: number;
+  prezzoRiferimento: number;
+  nota: string;
+}
+
+export async function estimateFuelForCompany(companyId: string): Promise<FuelEstimate> {
+  // Km reali dagli snapshot Geotab, se presenti.
+  const geotabKmRows = (await db.$queryRawUnsafe(
+    `SELECT COALESCE(SUM(g."distanceKm"), 0)::float8 AS km
+     FROM "GeotabTripSnapshot" g
+     WHERE g."companyId" = $1 AND g."startAt" >= now() - interval '30 days'`,
+    companyId
+  )) as Array<{ km: number }>;
+  let kmTotali = Number(geotabKmRows[0]?.km ?? 0);
+  let kmSource: FuelEstimate["kmSource"] = kmTotali > 0 ? "GEOTAB" : "NESSUNO";
+
+  if (kmTotali <= 0) {
+    // Ripiego: km dai viaggi registrati (tabella TripKm).
+    const tripKmRows = (await db.$queryRawUnsafe(
+      `SELECT COALESCE(SUM("km"), 0)::float8 AS km FROM "TripKm" WHERE "companyId" = $1`,
+      companyId
+    )) as Array<{ km: number }>;
+    kmTotali = Number(tripKmRows[0]?.km ?? 0);
+    if (kmTotali > 0) kmSource = "TRIPS";
+  }
+
+  const vehicles = await db.vehicle.findMany({
+    where: { companyId },
+    select: { categoria: true },
+  });
+  const avgKmPerLitro =
+    vehicles.length > 0
+      ? vehicles.reduce((sum, v) => sum + (STIMA_CONSUMO_MEDIO_KM_PER_LITRO[v.categoria] ?? 3.3), 0) / vehicles.length
+      : 3.3;
+
+  const litriStimati = avgKmPerLitro > 0 ? kmTotali / avgKmPerLitro : 0;
+  const costoStimato = litriStimati * STIMA_PREZZO_GASOLIO_EUR_PER_LITRO;
+
+  return {
+    estimated: true,
+    kmTotali: Math.round(kmTotali),
+    kmSource,
+    litriStimati: round2(litriStimati),
+    costoStimato: round2(costoStimato),
+    kmPerLitroMedio: round2(avgKmPerLitro),
+    prezzoRiferimento: STIMA_PREZZO_GASOLIO_EUR_PER_LITRO,
+    nota:
+      kmSource === "NESSUNO"
+        ? "Nessun km disponibile: collega Geotab o registra viaggi per una stima basata su dati reali."
+        : `Stima su ${Math.round(kmTotali).toLocaleString("it-IT")} km reali (${kmSource === "GEOTAB" ? "Geotab" : "viaggi"}) e consumo medio ${round2(avgKmPerLitro)} km/l. Non include i km a vuoto.`,
+  };
+}
+
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }

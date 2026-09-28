@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -41,13 +41,13 @@ export default function RegisterForm() {
   // Step C Data: KYC Files (Livello 1 - SaaS Interno)
   const [kycFiles, setKycFiles] = useState([
     { tipo: "PARTITA_IVA", label: "Certificato Partita IVA", fileName: "", fileUrl: "" },
-    { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE", label: "Documento Identità Legale Rappresentante", fileName: "", fileUrl: "" },
+    { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE", label: "Documento IdentitÃ  Legale Rappresentante", fileName: "", fileUrl: "" },
   ]);
 
   // KYB Zero-Form: upload documenti per compilazione automatica
   const [kybDocs, setKybDocs] = useState<{ tipo: string; label: string; fileName: string; fileUrl: string }[]>([
     { tipo: "VISURA", label: "Visura Camerale", fileName: "", fileUrl: "" },
-    { tipo: "DOCUMENTO_IDENTITA", label: "Documento d'Identità (Legale Rappresentante)", fileName: "", fileUrl: "" },
+    { tipo: "DOCUMENTO_IDENTITA", label: "Documento d'IdentitÃ  (Legale Rappresentante)", fileName: "", fileUrl: "" },
   ]);
   const [kybAnalyzing, setKybAnalyzing] = useState(false);
   const [kybInfo, setKybInfo] = useState("");
@@ -132,7 +132,7 @@ export default function RegisterForm() {
     setKybInfo("");
     const ready = kybDocs.filter((d) => d.fileUrl);
     if (ready.length === 0) {
-      setError("Carica almeno una Visura Camerale o un Documento d'Identità per l'estrazione automatica.");
+      setError("Carica almeno una Visura Camerale o un Documento d'IdentitÃ  per l'estrazione automatica.");
       return;
     }
     setKybAnalyzing(true);
@@ -153,7 +153,7 @@ export default function RegisterForm() {
         // Risposta non-JSON (es. timeout 504 di Vercel): messaggio comprensibile.
         throw new Error(
           res.status === 504
-            ? "L'analisi sta impiegando troppo tempo. Riprova con documenti più leggeri o tra qualche istante."
+            ? "L'analisi sta impiegando troppo tempo. Riprova con documenti piÃ¹ leggeri o tra qualche istante."
             : `Errore del server (${res.status}). Riprova tra qualche istante.`
         );
       }
@@ -169,7 +169,7 @@ export default function RegisterForm() {
       if (ex?.legale_rappresentante?.nome) { setNome(ex.legale_rappresentante.nome); prefilled++; }
       if (ex?.legale_rappresentante?.cognome) { setCognome(ex.legale_rappresentante.cognome); prefilled++; }
 
-      // Link automatico dei documenti KYB → upload KYC dello Step C
+      // Link automatico dei documenti KYB â†’ upload KYC dello Step C
       setKycFiles((prev) =>
         prev.map((item) => {
           if (item.tipo === "PARTITA_IVA") {
@@ -188,12 +188,12 @@ export default function RegisterForm() {
       const verification = data.verification;
       const verifyMsg =
         verification?.status === "ATTIVA"
-          ? `Azienda ATTIVA confermata${verification.ragioneSocialeMatch ? " · corrispondenza ragione sociale OK" : ""}.`
+          ? `Azienda ATTIVA confermata${verification.ragioneSocialeMatch ? " Â· corrispondenza ragione sociale OK" : ""}.`
           : verification?.status === "NON_CONFIGURATO"
           ? "Verifica sistemi ufficiali non configurata in questa sessione (demo)."
           : "Attenzione: verifica ufficiale non confermata.";
       setKybInfo(
-        (data.mode === "ai" ? `Estrazione AI (${data.provider}) completata · ` : "Estrazione manuale (campi inseriti) · ") +
+        (data.mode === "ai" ? `Estrazione AI (${data.provider}) completata Â· ` : "Estrazione manuale (campi inseriti) Â· ") +
           (prefilled > 0 ? `${prefilled} campi precompilati automaticamente. ` : "") +
           verifyMsg
       );
@@ -223,7 +223,7 @@ export default function RegisterForm() {
           </div>
 
           <Link href="/login" className="text-xs text-slate-400 hover:text-white transition">
-            Hai già un account? <span className="text-blue-400 font-semibold">Accedi</span>
+            Hai giÃ  un account? <span className="text-blue-400 font-semibold">Accedi</span>
           </Link>
         </div>
 
@@ -236,7 +236,7 @@ export default function RegisterForm() {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Nessuna carta di credito
           </span>
           <span className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> 30 giorni gratis
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> 21 giorni gratis
           </span>
         </div>
 
@@ -304,7 +304,7 @@ export default function RegisterForm() {
                       <span>Compilazione automatica KYB (Zero-Form)</span>
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Carica Visura Camerale e Documento d'Identità: l'AI estrae i dati e compila il form al posto tuo.
+                      Carica Visura Camerale e Documento d'IdentitÃ : l'AI estrae i dati e compila il form al posto tuo.
                     </p>
                   </div>
                 </div>
@@ -544,7 +544,7 @@ export default function RegisterForm() {
                 <FileCheck className="w-5 h-5 mr-2 text-blue-400" /> Step C: Upload Documentazione KYC - Livello 1 (SaaS Interno)
               </h2>
               <p className="text-xs text-slate-400 mt-1">
-                Documenti obbligatori per attivare il gestionale flotta (SaaS Interno). La verifica Livello 2 (Borsa Carichi) sarà richiesta separatamente.
+                Documenti obbligatori per attivare il gestionale flotta (SaaS Interno). La verifica Livello 2 (Borsa Carichi) sarÃ  richiesta separatamente.
               </p>
             </div>
 
@@ -617,7 +617,7 @@ export default function RegisterForm() {
             <div>
               <h2 className="text-2xl font-bold text-white">Registrazione Completata con Successo!</h2>
               <p className="text-sm text-slate-400 mt-2 max-w-md mx-auto">
-                La tua azienda <span className="text-blue-300 font-semibold">{ragioneSociale}</span> è ora registrata su Truck Radar.
+                La tua azienda <span className="text-blue-300 font-semibold">{ragioneSociale}</span> Ã¨ ora registrata su Truck Radar.
               </p>
             </div>
 
@@ -627,7 +627,7 @@ export default function RegisterForm() {
                 <Clock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-slate-400 uppercase">Stato Subscription</p>
-                  <p className="text-sm font-bold text-amber-300">TRIAL (30 Giorni)</p>
+                  <p className="text-sm font-bold text-amber-300">TRIAL (21 Giorni)</p>
                   <p className="text-[11px] text-slate-500">Accesso completo attivo</p>
                 </div>
               </div>

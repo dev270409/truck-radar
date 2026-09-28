@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -68,7 +69,7 @@ const emptyForm = {
   note: "",
 };
 
-export default function MarketplacePage() {
+function Original_MarketplacePage() {
   const [carichi, setCarichi] = useState<Carico[] | null>(null);
   const [mioAccount, setMioAccount] = useState<{ verified: boolean; missing: string[] } | null>(null);
   const [filterKind, setFilterKind] = useState<string>("");
@@ -538,4 +539,9 @@ export default function MarketplacePage() {
       )}
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function MarketplacePage() {
+  return soonPage("marketplace");
 }

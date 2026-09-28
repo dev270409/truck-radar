@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import {
   Handshake,
@@ -73,7 +74,7 @@ interface Analysis {
   applicati: AppliedRow[];
 }
 
-export default function SmartReturnPage() {
+function Original_SmartReturnPage() {
   const [trips, setTrips] = useState<TripOption[]>([]);
   const [tripId, setTripId] = useState("");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -347,4 +348,9 @@ export default function SmartReturnPage() {
       )}
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function SmartReturnPage() {
+  return soonPage("smart-return");
 }

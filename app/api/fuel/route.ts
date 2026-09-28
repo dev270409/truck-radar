@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { createFuelLog, listFuelLogs, deleteFuelLog, getFuelStats } from "@/lib/fuel";
+import { createFuelLog, listFuelLogs, deleteFuelLog, getFuelStats, estimateFuelForCompany } from "@/lib/fuel";
 
 async function requireSession() {
   const session = await auth();
@@ -21,7 +21,8 @@ export async function GET(req: Request) {
   try {
     const items = await listFuelLogs(session.user.companyId, vehicleId);
     const stats = await getFuelStats(session.user.companyId, items);
-    return NextResponse.json({ items, stats });
+    const estimate = await estimateFuelForCompany(session.user.companyId);
+    return NextResponse.json({ items, stats, estimate });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Errore del server";
     return NextResponse.json({ error: msg }, { status: 500 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import { Leaf, Loader2, Route, StretchHorizontal, Trees, Repeat, TrendingUp, Fuel } from "lucide-react";
 
@@ -37,7 +38,7 @@ function Card({ icon, label, value, unit, tone }: { icon: any; label: string; va
   );
 }
 
-export default function EsgPage() {
+function Original_EsgPage() {
   const [report, setReport] = useState<EsgReport | null>(null);
   const [granularity, setGranularity] = useState<"mese" | "anno">("mese");
 
@@ -142,4 +143,9 @@ export default function EsgPage() {
       </div>
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function EsgPage() {
+  return soonPage("esg");
 }

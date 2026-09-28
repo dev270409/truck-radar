@@ -6,11 +6,11 @@ import Logo from "@/components/Logo";
 const plans = [
   {
     key: "BASE",
-    price: "99",
+    price: "59",
     label: "per mese",
     tagline: "Per piccole flotte e avvio del network.",
     limits: ["Fino a 15 mezzi", "Fino a 15 autisti", "Gestione flotta, viaggi, DDT digitale", "Documenti e scadenze con alert", "Analytics di base"],
-    cta: "Prova gratis 30 giorni",
+    cta: "Prova gratis 21 giorni",
     highlight: false,
   },
   {
@@ -19,7 +19,7 @@ const plans = [
     label: "per mese",
     tagline: "Borsa carichi, subappalto e Smart Return completi.",
     limits: ["Fino a 50 mezzi", "Fino a 50 autisti", "Borsa Carichi e Network verificato", "Subappalto e Smart Return", "Analytics avanzate ed ESG", "Integrazioni API (GPS/TMS/ERP)"],
-    cta: "Prova gratis 30 giorni",
+    cta: "Prova gratis 21 giorni",
     highlight: true,
   },
 ];
@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: "Come funziona il periodo di prova?",
-    a: "30 giorni gratuiti, senza carta di credito. Usi tutte le funzioni del piano scelto; alla scadenza decidi se attivare l'abbonamento.",
+    a: "21 giorni gratuiti, senza carta di credito. Usi tutte le funzioni del piano scelto; alla scadenza decidi se attivare l'abbonamento.",
   },
   {
     q: "Cosa serve per accedere al Network?",
@@ -70,7 +70,7 @@ export default function PrezziPage() {
           Un prezzo chiaro per ogni dimensione di flotta
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-          30 giorni gratis, nessuna carta di credito, nessun hardware da installare. Disdici quando vuoi.
+          21 giorni gratis, nessuna carta di credito, nessun hardware da installare. Disdici quando vuoi.
         </p>
       </section>
 

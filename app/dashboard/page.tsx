@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTenantDb } from "@/lib/tenant";
@@ -6,17 +6,17 @@ import { db } from "@/lib/db";
 import type { Vehicle, VehicleDocument } from "@prisma/client";
 import {
   Car,
-  Users,
   Clock,
   ShieldCheck,
   CheckCircle2,
-  FileCheck,
   FileWarning,
   CalendarClock,
   Boxes,
   Plug,
   ArrowRight,
   Sparkles,
+  Route,
+  Gauge,
 } from "lucide-react";
 import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
@@ -57,6 +57,32 @@ export default async function DashboardPage() {
 
   const availableVehicles = vehicles.filter((v) => v.status === "DISPONIBILE").length;
   const driverCount = users.filter((u) => u.role === "AUTISTA").length;
+
+  // Viaggi attivi (reali, tenant-scoped)
+  let activeTrips = 0;
+  try {
+    const trips = await tenantDb.trips.findMany({ select: { status: true } });
+    activeTrips = trips.filter((t) => t.status === "IN_CORSO" || t.status === "ASSEGNATO").length;
+  } catch {
+    activeTrips = 0;
+  }
+
+  // Km reali Geotab ultimi 30 giorni (se collegato)
+  let geotabKm30 = 0;
+  let geotabTrips30 = 0;
+  try {
+    const rows = (await db.$queryRawUnsafe(
+      `SELECT COUNT(*)::int AS trips, COALESCE(SUM("distanceKm"),0)::float8 AS km
+       FROM "GeotabTripSnapshot"
+       WHERE "companyId" = $1 AND "startAt" >= now() - interval '30 days'`,
+      session.user.companyId
+    )) as Array<{ trips: number; km: number }>;
+    geotabTrips30 = Number(rows[0]?.trips ?? 0);
+    geotabKm30 = Math.round(Number(rows[0]?.km ?? 0));
+  } catch {
+    geotabKm30 = 0;
+    geotabTrips30 = 0;
+  }
 
   const expiring = vehicles
     .flatMap((v) => (v.documents ?? []).map((d) => ({ ...d, targa: v.targa })))
@@ -111,27 +137,27 @@ export default async function DashboardPage() {
           delay={0}
         />
         <MetricCard
-          label="Utenti registrati"
-          value={String(users.length)}
-          hint={`${driverCount} autisti`}
+          label="Viaggi attivi"
+          value={String(activeTrips)}
+          hint="Assegnati o in corso"
           tone={INFO}
-          icon={<Users className="h-[18px] w-[18px]" />}
+          icon={<Route className="h-[18px] w-[18px]" />}
           delay={60}
+        />
+        <MetricCard
+          label="Km Geotab (30gg)"
+          value={geotabKm30 > 0 ? geotabKm30.toLocaleString("it-IT") : "—"}
+          hint={geotabTrips30 > 0 ? `${geotabTrips30} viaggi registrati` : "Collega Geotab"}
+          tone={BRAND}
+          icon={<Gauge className="h-[18px] w-[18px]" />}
+          delay={120}
         />
         <MetricCard
           label="Stato abbonamento"
           value={(company?.subscriptionStatus ?? "TRIAL").toString()}
-          hint="30 giorni di prova"
+          hint="21 giorni di prova"
           tone={AMBER}
           icon={<Clock className="h-[18px] w-[18px]" />}
-          delay={120}
-        />
-        <MetricCard
-          label="Stato verifica KYC"
-          value={kycOk ? "Verificata" : kycPending > 0 ? "In attesa" : kycRejected > 0 ? "Rifiutata" : "—"}
-          hint={`${kycDocs.length} documenti`}
-          tone={kycOk ? GREEN : kycRejected > 0 ? DANGER : AMBER}
-          icon={<FileCheck className="h-[18px] w-[18px]" />}
           delay={180}
         />
       </div>
@@ -139,7 +165,7 @@ export default async function DashboardPage() {
       {/* Operativo flotta + grafico */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
         <FleetOpsPanel rows={fleetRows} />
-        <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni · consuntivo" data={chartData} />
+        <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni Â· consuntivo" data={chartData} />
       </div>
 
       {/* Banner borsa carichi (promo, non attiva) */}
@@ -157,8 +183,8 @@ export default async function DashboardPage() {
             </span>
             <h2 className="font-display mt-3 text-[20px] font-bold">Borsa Carichi</h2>
             <p className="mt-1.5 text-[13px] opacity-85">
-              Pubblica, cerca e affida carichi solo ad aziende verificate. Il Network sarà attivato
-              gradualmente: nel frattempo puoi già usare il gestionale completo.
+              Pubblica, cerca e affida carichi solo ad aziende verificate. Il Network sarÃ  attivato
+              gradualmente: nel frattempo puoi giÃ  usare il gestionale completo.
             </p>
           </div>
           <Link
@@ -166,7 +192,7 @@ export default async function DashboardPage() {
             className="inline-flex items-center gap-2 rounded-[var(--radius-base)] px-4 py-2.5 text-[13px] font-semibold"
             style={{ background: "rgba(255,255,255,0.14)" }}
           >
-            Scopri di più <ArrowRight className="h-4 w-4" />
+            Scopri di piÃ¹ <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         <svg className="absolute -right-6 -top-8 h-48 w-48 opacity-20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -174,6 +200,39 @@ export default async function DashboardPage() {
           <circle cx="12" cy="12" r="5.5" stroke="white" strokeWidth="0.6" />
           <circle cx="12" cy="12" r="2" fill="white" />
         </svg>
+      </section>
+
+      {/* Sezioni in arrivo (SOON) */}
+      <section className="enter-up" style={{ animationDelay: "320ms" }}>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+            Sezioni in arrivo
+          </h2>
+          <span className="text-[11px]" style={{ color: "var(--text-label)" }}>
+            Anteprima di esempio · non ancora attive
+          </span>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { href: "/dashboard/marketplace", label: "Borsa Carichi", desc: "Pubblica e trova carichi." },
+            { href: "/dashboard/smart-return", label: "Smart Return", desc: "Carichi di ritorno, meno km a vuoto." },
+            { href: "/dashboard/network", label: "Network", desc: "Aziende verificate e reputazione." },
+            { href: "/dashboard/esg", label: "ESG", desc: "Km, emissioni e sostenibilità." },
+          ].map((s) => (
+            <Link
+              key={s.href}
+              href={s.href}
+              className="glass group p-4 transition hover:-translate-y-0.5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="chip chip-warning" style={{ fontSize: 8 }}>Soon</span>
+                <ArrowRight className="h-4 w-4" style={{ color: "var(--text-label)" }} />
+              </div>
+              <p className="font-display mt-3 text-[14px] font-bold" style={{ color: "var(--text)" }}>{s.label}</p>
+              <p className="text-[11px]" style={{ color: "var(--text-soft)" }}>{s.desc}</p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Flotta + Alert */}
@@ -202,7 +261,7 @@ export default async function DashboardPage() {
                     <span className="font-display text-[13px] font-bold" style={{ color: "var(--text)" }}>{v.targa}</span>
                     <span className="ml-2 text-[11px]" style={{ color: "var(--text-label)" }}>{v.categoria}</span>
                     <p className="text-[11px]" style={{ color: "var(--text-label-soft)" }}>
-                      {v.portataMaxKg} kg · {v.volumeMaxM3} m³
+                      {v.portataMaxKg} kg Â· {v.volumeMaxM3} mÂ³
                     </p>
                   </div>
                   <span className={`chip ${v.status === "DISPONIBILE" ? "chip-success" : "chip-warning"}`}>
@@ -306,7 +365,7 @@ export default async function DashboardPage() {
             <Boxes className="h-4 w-4" style={{ color: ACCENT }} /> Borsa Carichi & Smart Return
           </h2>
           <p className="text-[12px]" style={{ color: "var(--text-soft)" }}>
-            Riduci i km a vuoto trovando carichi di ritorno compatibili con percorso, data e capacità del
+            Riduci i km a vuoto trovando carichi di ritorno compatibili con percorso, data e capacitÃ  del
             mezzo. Funzione del Network, in attivazione graduale.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">

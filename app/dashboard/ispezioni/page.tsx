@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import { Loader2, ClipboardCheck, Save, Plus, Trash2, ShieldAlert } from "lucide-react";
 
@@ -20,7 +21,7 @@ interface Inspection {
   createdAt: string;
 }
 
-export default function IspezioniPage() {
+function Original_IspezioniPage() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [itemsInput, setItemsInput] = useState<string[]>([]);
   const [inspections, setInspections] = useState<Inspection[]>([]);
@@ -193,4 +194,9 @@ export default function IspezioniPage() {
       </div>
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function IspezioniPage() {
+  return soonPage("ispezioni");
 }

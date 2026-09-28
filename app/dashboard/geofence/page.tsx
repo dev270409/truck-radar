@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import { Loader2, MapPin, Plus, Trash2, Edit3 } from "lucide-react";
 
@@ -16,7 +17,7 @@ interface Geofence {
 
 const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#a855f7"];
 
-export default function GeofencePage() {
+function Original_GeofencePage() {
   const [items, setItems] = useState<Geofence[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -304,4 +305,9 @@ export default function GeofencePage() {
       )}
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function GeofencePage() {
+  return soonPage("geofence");
 }

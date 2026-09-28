@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Fuel, Plus, Trash2, Wallet, Droplets, Gauge, TrendingUp } from "lucide-react";
+import { Loader2, Fuel, Plus, Trash2, Wallet, Droplets, Gauge, TrendingUp, Sparkles } from "lucide-react";
 
 interface VehicleLite {
   id: string;
@@ -39,9 +39,21 @@ interface FuelStats {
   }>;
 }
 
+interface FuelEstimate {
+  estimated: true;
+  kmTotali: number;
+  kmSource: "GEOTAB" | "TRIPS" | "NESSUNO";
+  litriStimati: number;
+  costoStimato: number;
+  kmPerLitroMedio: number;
+  prezzoRiferimento: number;
+  nota: string;
+}
+
 export default function CarburantePage() {
   const [items, setItems] = useState<FuelItem[]>([]);
   const [stats, setStats] = useState<FuelStats | null>(null);
+  const [estimate, setEstimate] = useState<FuelEstimate | null>(null);
   const [vehicles, setVehicles] = useState<VehicleLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -64,6 +76,7 @@ export default function CarburantePage() {
       const vData = await vRes.json();
       if (fData.items) setItems(fData.items);
       if (fData.stats) setStats(fData.stats);
+      if (fData.estimate) setEstimate(fData.estimate);
       if (vData.vehicles) {
         setVehicles(vData.vehicles.map((v: { id: string; targa: string }) => ({ id: v.id, targa: v.targa })));
       }
@@ -165,6 +178,32 @@ export default function CarburantePage() {
           <p className="text-xs text-slate-400 mt-1">Km misurati su rifornimenti</p>
         </div>
       </div>
+
+      {(stats?.perVehicle.length ?? 0) === 0 && estimate && (
+        <div className="rounded-2xl border border-amber-800/50 bg-amber-950/20 p-4">
+          <h3 className="flex items-center text-sm font-bold text-amber-100">
+            <Sparkles className="mr-2 h-4 w-4" /> Stima consumi carburante
+          </h3>
+          <p className="mt-1 text-xs leading-5 text-amber-100/80">{estimate.nota}</p>
+          {estimate.kmSource !== "NESSUNO" && (
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Litri stimati (30gg)</p>
+                <p className="mt-1 text-lg font-bold text-amber-200">{estimate.litriStimati.toLocaleString("it-IT", { maximumFractionDigits: 0 })}</p>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Costo stimato</p>
+                <p className="mt-1 text-lg font-bold text-amber-200">€ {estimate.costoStimato.toLocaleString("it-IT", { maximumFractionDigits: 0 })}</p>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Consumo rif.</p>
+                <p className="mt-1 text-lg font-bold text-amber-200">{estimate.kmPerLitroMedio} km/l</p>
+              </div>
+            </div>
+          )}
+          <p className="mt-2 text-[10px] text-amber-200/70">Stima indicativa a {estimate.prezzoRiferimento} €/l. Registra i rifornimenti reali per dati precisi. I km a vuoto non sono stimati.</p>
+        </div>
+      )}
 
       {(stats?.perVehicle.length ?? 0) > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">

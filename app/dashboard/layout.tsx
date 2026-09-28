@@ -25,6 +25,22 @@ import LogoutButton from "@/components/LogoutButton";
 import NotificationsBadge from "@/components/NotificationsBadge";
 import DashboardShell from "@/components/DashboardShell";
 import { listApiConnections } from "@/lib/raw-tables";
+import { isSoonSection } from "@/lib/soon-sections";
+
+/** Etichetta badge per voce premium o sezione non ancora disponibile. */
+function NavBadge({ href, blocked }: { href: string; blocked: boolean }) {
+  if (isSoonSection(href)) {
+    return (
+      <span className="ml-auto rounded-full border border-amber-800/60 bg-amber-950/60 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
+        Soon
+      </span>
+    );
+  }
+  if (blocked) {
+    return <span className="chip chip-accent ml-auto" style={{ fontSize: 8 }}>PRO</span>;
+  }
+  return null;
+}
 
 function SidebarLink({
   href,
@@ -42,7 +58,7 @@ function SidebarLink({
   const blocked = premium && !fullAccess;
   return (
     <Link
-      href={blocked ? "/dashboard/abbonamenti" : href}
+      href={href}
       className={`group flex items-center gap-3 rounded-[var(--radius-base)] px-3 py-2.5 text-[13px] font-medium transition ${
         blocked ? "cursor-pointer opacity-55" : ""
       }`}
@@ -50,11 +66,7 @@ function SidebarLink({
     >
       <span className={blocked ? "opacity-50" : ""}>{icon}</span>
       <span>{label}</span>
-      {premium && (
-        <span className="chip chip-accent ml-auto" style={{ fontSize: 8 }}>
-          PRO
-        </span>
-      )}
+      <NavBadge href={href} blocked={blocked} />
     </Link>
   );
 }
@@ -69,6 +81,7 @@ function NavLink({ href, label, icon }: { href: string; label: string; icon: Rea
     >
       {icon}
       <span>{label}</span>
+      <NavBadge href={href} blocked={false} />
     </Link>
   );
 }

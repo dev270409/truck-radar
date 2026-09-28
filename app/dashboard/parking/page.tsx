@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useCallback, useEffect, useState } from "react";
 import {
   MapPin,
@@ -60,7 +61,7 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-export default function ParkingPage() {
+function Original_ParkingPage() {
   const [areas, setAreas] = useState<ParkingArea[] | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<ParkingArea>({ ...empty, name: "", address: "" });
@@ -268,4 +269,9 @@ export default function ParkingPage() {
       )}
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function ParkingPage() {
+  return soonPage("parking");
 }

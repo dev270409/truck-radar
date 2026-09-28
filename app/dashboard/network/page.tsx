@@ -1,5 +1,6 @@
 "use client";
 
+import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Globe, Loader2, Star, Truck, Users, Award, ShieldCheck } from "lucide-react";
@@ -28,7 +29,7 @@ const badgeLabel: Record<string, string> = {
   SUBAPPALTO_OK: "Network",
 };
 
-export default function NetworkPage() {
+function Original_NetworkPage() {
   const [directory, setDirectory] = useState<NetworkCompany[] | null>(null);
 
   useEffect(() => {
@@ -119,4 +120,9 @@ export default function NetworkPage() {
       </div>
     </div>
   );
+}
+
+/** Wrapper SOON: mostra l'anteprima "In arrivo"; la pagina originale resta invariata sopra. */
+export default function NetworkPage() {
+  return soonPage("network");
 }
