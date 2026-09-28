@@ -25,6 +25,7 @@ interface ExternalGeotabDriver {
   geotabId: string;
   firstName: string;
   lastName: string;
+  linkedLocalUserId?: string | null;
 }
 
 export default function UsersPage() {
@@ -46,6 +47,8 @@ export default function UsersPage() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const geotabLinkedLocalIds = new Set(geotabDrivers.map((driver) => driver.linkedLocalUserId).filter((id): id is string => Boolean(id)));
+  const unmatchedGeotabDrivers = geotabDrivers.filter((driver) => !driver.linkedLocalUserId);
 
   const fetchData = async () => {
     try {
@@ -154,9 +157,11 @@ export default function UsersPage() {
           </div>
           {geotabDrivers.length === 0 ? (
             <p className="px-5 py-6 text-sm text-slate-400">Nessun driver restituito da MyGeotab. Verifica che l&apos;utente API abbia accesso agli utenti/driver e che i profili siano marcati come driver.</p>
+          ) : unmatchedGeotabDrivers.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-emerald-200">Tutti i driver Geotab letti sono già associati a un account locale tramite lo username/email.</p>
           ) : (
             <div className="grid gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
-              {geotabDrivers.map((driver) => (
+              {unmatchedGeotabDrivers.map((driver) => (
                 <div key={driver.geotabId} className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5">
                   <p className="text-sm font-semibold text-slate-100">{`${driver.firstName} ${driver.lastName}`.trim() || "Nome non disponibile"}</p>
                   <p className="mt-0.5 font-mono text-[10px] text-slate-500">ID Geotab · {driver.geotabId}</p>
@@ -195,6 +200,7 @@ export default function UsersPage() {
                   <tr key={u.id} className="hover:bg-slate-800/40 transition">
                     <td className="px-6 py-4 font-semibold text-slate-100">
                       {u.nome} {u.cognome}
+                      {geotabLinkedLocalIds.has(u.id) && <span className="ml-2 rounded-full border border-sky-700/60 bg-sky-950/40 px-2 py-0.5 text-[9px] font-bold uppercase text-sky-200">Geotab collegato</span>}
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-slate-300">{u.email}</td>
                     <td className="px-6 py-4 text-xs text-slate-400">{u.telefono || "-"}</td>

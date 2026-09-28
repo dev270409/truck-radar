@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { deleteApiConnection, getApiConnection } from "@/lib/raw-tables";
+import { deleteApiConnection, deleteGeotabTripSnapshots, getApiConnection } from "@/lib/raw-tables";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -28,6 +28,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Connessione non trovata." }, { status: 404 });
   }
 
+  await deleteGeotabTripSnapshots(session.user.companyId, id);
   const ok = await deleteApiConnection(session.user.companyId, id);
   if (!ok) {
     return NextResponse.json({ error: "Impossibile scollegare la connessione." }, { status: 500 });

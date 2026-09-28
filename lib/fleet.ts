@@ -2,7 +2,10 @@ import { db } from "./db";
 
 export interface FleetVehicleRow {
   id: string;
-  source?: "LOCAL" | "GEOTAB";
+  source?: "LOCAL" | "GEOTAB" | "LOCAL+GEOTAB";
+  geotabDeviceIds?: string[];
+  duplicateDeviceCount?: number;
+  geotabPlate?: string | null;
   targa: string;
   categoria: string;
   status: string;

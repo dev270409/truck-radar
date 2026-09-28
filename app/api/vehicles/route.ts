@@ -40,6 +40,15 @@ export async function POST(req: Request) {
 
     const tenantDb = getTenantDb(session.user.companyId);
 
+    const normalizedPlate = String(targa).toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const samePlate = await tenantDb.vehicles.findMany({ select: { id: true, targa: true } });
+    if (samePlate.some((vehicle) => vehicle.targa.toUpperCase().replace(/[^A-Z0-9]/g, "") === normalizedPlate)) {
+      return NextResponse.json(
+        { error: "Questa targa è già presente nella flotta. Collega il dispositivo Geotab alla targa esistente invece di creare un duplicato." },
+        { status: 409 }
+      );
+    }
+
     const company = await tenantDb.getCompany();
     const limit = getPlanLimits(company?.subscriptionPlan).vehicleLimit;
     const currentCount = await tenantDb.vehicles.findMany({ select: { id: true } });

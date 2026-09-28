@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { decryptSecret } from "@/lib/crypto";
-import { getApiConnection, getExternalIntegration, updateApiConnection } from "@/lib/raw-tables";
+import { decryptSecret, encryptSecret } from "@/lib/crypto";
+import { getApiConnection, getExternalIntegration, updateApiConnection, updateApiConnectionCredentialsCipher } from "@/lib/raw-tables";
 import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
 import { testGeotab } from "@/lib/geotab";
 import { safeLog } from "@/lib/safe-log";
@@ -79,6 +79,12 @@ export async function POST(
         connection.baseUrl ?? "my.geotab.com"
       );
       const latencyMs = Date.now() - startedAt;
+      const savedSession = await updateApiConnectionCredentialsCipher(
+        session.user.companyId,
+        id,
+        encryptSecret(JSON.stringify({ ...stored, geotabSession: result.session }))
+      );
+      if (!savedSession) return NextResponse.json({ error: "Connessione non trovata." }, { status: 404 });
 
       const updated = await updateApiConnection(session.user.companyId, id, {
         status: "TESTED",

@@ -11,6 +11,7 @@ import {
   Fuel,
   TrendingUp,
 } from "lucide-react";
+import GeotabAnalyticsPanel from "@/components/GeotabAnalyticsPanel";
 
 interface Row {
   id: string;
@@ -200,6 +201,8 @@ export default function AnalyticsPage() {
           </div>
         </>
       )}
+
+      <GeotabAnalyticsPanel from={from} to={to} scope={scope} />
     </div>
   );
 }

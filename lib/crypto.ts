@@ -1,6 +1,7 @@
 import {
   createCipheriv,
   createDecipheriv,
+  createHmac,
   createHash,
   randomBytes,
 } from "node:crypto";
@@ -41,4 +42,11 @@ export function decryptSecret(payload: string): string {
 
 export function hasSecret(payload: string | null | undefined): boolean {
   return Boolean(payload && payload.includes(":"));
+}
+
+/** HMAC per confrontare un'identità con servizi esterni senza salvarla in chiaro. */
+export function hashIdentityForMatch(value: string): string {
+  return createHmac("sha256", getKey())
+    .update(value.trim().toLocaleLowerCase("en-US"))
+    .digest("base64url");
 }

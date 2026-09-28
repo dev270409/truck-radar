@@ -1,4 +1,4 @@
-import { authenticateGeotab, getGeotabDevices, testGeotab } from "../lib/geotab";
+import { authenticateGeotab, getGeotabDevices, readGeotabTripHistory, testGeotab } from "../lib/geotab";
 import { readGeotabInventory } from "../lib/geotab";
 
 function assert(ok: boolean, message: string) {
@@ -38,6 +38,13 @@ async function main() {
         id: "driver-1", firstName: "Mario", lastName: "Rossi", isDriver: true,
       }] }), { status: 200, headers: { "content-type": "application/json" } });
     }
+    if (body.method === "Get" && body.params.typeName === "Trip") {
+      return new Response(JSON.stringify({ result: [{
+        id: "trip-1", device: { id: "device-1" }, driver: { id: "driver-1" },
+        start: "2026-09-28T08:00:00.000Z", stop: "2026-09-28T10:00:00.000Z",
+        distance: 123.4, odometer: 456000, drivingDuration: "PT2H", idlingDuration: "PT5M",
+      }] }), { status: 200, headers: { "content-type": "application/json" } });
+    }
     return new Response("{}", { status: 400 });
   }) as typeof fetch;
 
@@ -62,6 +69,17 @@ async function main() {
     assert(inventory.count === 1 && inventory.positionsAvailable, "snapshot include il DeviceStatusInfo corrente");
     assert(inventory.devices[0].latitude === 45.46 && inventory.devices[0].driverName === "Mario Rossi", "posizione e driver sono associati al mezzo corretto");
     assert(inventory.drivers[0].firstName === "Mario", "driver snapshot contiene solo campi necessari");
+    const history = await readGeotabTripHistory(
+      credentials,
+      inventory.devices,
+      inventory.drivers,
+      new Date("2026-09-01T00:00:00Z"),
+      new Date("2026-09-30T23:59:59Z"),
+      "my.geotab.com",
+      inventory.session
+    );
+    assert(history.trips.length === 1 && history.trips[0].distanceKm === 123.4, "storico Trip.distance Geotab letto in km");
+    assert(history.trips[0].licensePlate === "AB123CD" && history.trips[0].driverName === "Mario Rossi", "trip Geotab associato a mezzo e driver");
 
     let rejectedHost = false;
     try {

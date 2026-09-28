@@ -412,6 +412,31 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "DemoRequest_status_idx" ON "DemoRequest"("status");
   CREATE INDEX IF NOT EXISTS "DemoRequest_createdAt_idx" ON "DemoRequest"("createdAt");
   `,
+
+  // Snapshot storico Geotab (Trip API: km percorsi certi, non km a vuoto)
+  `
+  CREATE TABLE IF NOT EXISTS "GeotabTripSnapshot" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "connectionId" TEXT NOT NULL,
+    "geotabTripId" TEXT NOT NULL,
+    "geotabDeviceId" TEXT,
+    "geotabDriverId" TEXT,
+    "deviceName" TEXT,
+    "licensePlate" TEXT,
+    "driverName" TEXT,
+    "startAt" TIMESTAMPTZ NOT NULL,
+    "stopAt" TIMESTAMPTZ,
+    "distanceKm" DOUBLE PRECISION,
+    "odometerMeters" DOUBLE PRECISION,
+    "drivingSeconds" TEXT,
+    "idlingSeconds" TEXT,
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("connectionId", "geotabTripId")
+  );
+  CREATE INDEX IF NOT EXISTS "GeotabTripSnapshot_company_start_idx" ON "GeotabTripSnapshot"("companyId", "startAt");
+  CREATE INDEX IF NOT EXISTS "GeotabTripSnapshot_company_plate_idx" ON "GeotabTripSnapshot"("companyId", "licensePlate");
+  `,
 ];
 
 async function main() {

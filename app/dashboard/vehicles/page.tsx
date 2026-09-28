@@ -44,6 +44,8 @@ interface ExternalGeotabDevice {
   latitude: number | null;
   longitude: number | null;
   isDeviceCommunicating: boolean;
+  speedKph: number | null;
+  linkedLocalVehicleId?: string | null;
 }
 
 const DOC_TYPES = ["ASSICURAZIONE", "REVISIONE", "TAGLIANDO", "BOLLO"];
@@ -75,6 +77,10 @@ export default function VehiclesPage() {
   const [status, setStatus] = useState("DISPONIBILE");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const geotabByLocalVehicle = new Map(
+    geotabDevices.filter((device) => device.linkedLocalVehicleId).map((device) => [device.linkedLocalVehicleId!, device])
+  );
+  const unmatchedGeotabDevices = geotabDevices.filter((device) => !device.linkedLocalVehicleId);
 
   // Documents modal
   const [docVehicle, setDocVehicle] = useState<Vehicle | null>(null);
@@ -270,13 +276,15 @@ export default function VehiclesPage() {
           </div>
           {geotabDevices.length === 0 ? (
             <p className="px-5 py-6 text-sm text-slate-400">Lettura completata ma nessun dispositivo è visibile all&apos;utente API. Verifica database, gruppi e permessi in MyGeotab.</p>
+          ) : unmatchedGeotabDevices.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-emerald-200">Tutti i dispositivi Geotab sono associati a un mezzo Truck Radar tramite targa.</p>
           ) : <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950/70 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                 <tr><th className="px-5 py-3">Targa</th><th className="px-5 py-3">Dispositivo</th><th className="px-5 py-3">VIN</th><th className="px-5 py-3">Posizione</th><th className="px-5 py-3">Stato dispositivo</th></tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80">
-                {geotabDevices.map((device) => (
+                {unmatchedGeotabDevices.map((device) => (
                   <tr key={device.geotabId}>
                     <td className="px-5 py-3 font-mono font-bold text-slate-100">{device.licensePlate || "—"}</td>
                     <td className="px-5 py-3">{device.name || "—"}</td>
@@ -311,12 +319,15 @@ export default function VehiclesPage() {
                   <th className="px-6 py-4">Portata (kg)</th>
                   <th className="px-6 py-4">Volume (m³)</th>
                   <th className="px-6 py-4">Stato Operativo</th>
+                  <th className="px-6 py-4">Geotab</th>
                   <th className="px-6 py-4">Autista Assegnato</th>
                   <th className="px-6 py-4">Documenti</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80">
-                {vehicles.map((v) => (
+                {vehicles.map((v) => {
+                  const geo = geotabByLocalVehicle.get(v.id);
+                  return (
                   <tr key={v.id} className="hover:bg-slate-800/40 transition">
                     <td className="px-6 py-4 font-mono font-bold text-slate-100">{v.targa}</td>
                     <td className="px-6 py-4">
@@ -339,6 +350,15 @@ export default function VehiclesPage() {
                         {v.status}
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-xs">
+                      {geo ? (
+                        <span className="text-sky-200">
+                          {geo.latitude != null && geo.longitude != null
+                            ? `${geo.latitude.toFixed(4)}, ${geo.longitude.toFixed(4)}${geo.speedKph != null ? ` · ${geo.speedKph.toFixed(0)} km/h` : ""}`
+                            : "Collegato · GPS assente"}
+                        </span>
+                      ) : <span className="text-slate-500">—</span>}
+                    </td>
                     <td className="px-6 py-4 text-xs text-slate-400 font-mono">
                       {v.drivers && v.drivers.length > 0
                         ? `${v.drivers[0].nome} ${v.drivers[0].cognome}`
@@ -354,7 +374,8 @@ export default function VehiclesPage() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

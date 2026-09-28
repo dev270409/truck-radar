@@ -251,6 +251,88 @@ export async function saveGeotabSnapshot(
   return rows.length > 0;
 }
 
+export async function updateApiConnectionCredentialsCipher(
+  companyId: string,
+  id: string,
+  credentialsCipher: string
+): Promise<boolean> {
+  const count = await db.$executeRawUnsafe(
+    `UPDATE "ApiConnection" SET "credentialsCipher" = $3, "updatedAt" = now()
+     WHERE "id" = $1 AND "companyId" = $2`,
+    id,
+    companyId,
+    credentialsCipher
+  );
+  return count > 0;
+}
+
+export interface GeotabTripSnapshotInput {
+  geotabTripId: string;
+  geotabDeviceId: string | null;
+  geotabDriverId: string | null;
+  deviceName: string | null;
+  licensePlate: string | null;
+  driverName: string | null;
+  startAt: string;
+  stopAt: string | null;
+  distanceKm: number | null;
+  odometerMeters: number | null;
+  drivingSeconds: string | null;
+  idlingSeconds: string | null;
+}
+
+/** Upsert idempotente dello storico viaggi Geotab, sempre tenant-scoped. */
+export async function upsertGeotabTripSnapshots(
+  companyId: string,
+  connectionId: string,
+  trips: GeotabTripSnapshotInput[]
+): Promise<number> {
+  if (trips.length === 0) return 0;
+  const rows = (await db.$queryRawUnsafe(
+    `INSERT INTO "GeotabTripSnapshot" (
+       "companyId", "connectionId", "geotabTripId", "geotabDeviceId", "geotabDriverId",
+       "deviceName", "licensePlate", "driverName", "startAt", "stopAt", "distanceKm",
+       "odometerMeters", "drivingSeconds", "idlingSeconds", "updatedAt"
+     )
+     SELECT $1, $2, x."geotabTripId", x."geotabDeviceId", x."geotabDriverId",
+       x."deviceName", x."licensePlate", x."driverName", x."startAt", x."stopAt", x."distanceKm",
+       x."odometerMeters", x."drivingSeconds", x."idlingSeconds", now()
+     FROM jsonb_to_recordset($3::jsonb) AS x(
+       "geotabTripId" TEXT, "geotabDeviceId" TEXT, "geotabDriverId" TEXT,
+       "deviceName" TEXT, "licensePlate" TEXT, "driverName" TEXT,
+       "startAt" TIMESTAMPTZ, "stopAt" TIMESTAMPTZ, "distanceKm" DOUBLE PRECISION,
+       "odometerMeters" DOUBLE PRECISION, "drivingSeconds" TEXT, "idlingSeconds" TEXT
+     )
+     ON CONFLICT ("connectionId", "geotabTripId") DO UPDATE SET
+       "companyId" = EXCLUDED."companyId",
+       "geotabDeviceId" = EXCLUDED."geotabDeviceId",
+       "geotabDriverId" = EXCLUDED."geotabDriverId",
+       "deviceName" = EXCLUDED."deviceName",
+       "licensePlate" = EXCLUDED."licensePlate",
+       "driverName" = EXCLUDED."driverName",
+       "startAt" = EXCLUDED."startAt",
+       "stopAt" = EXCLUDED."stopAt",
+       "distanceKm" = EXCLUDED."distanceKm",
+       "odometerMeters" = EXCLUDED."odometerMeters",
+       "drivingSeconds" = EXCLUDED."drivingSeconds",
+       "idlingSeconds" = EXCLUDED."idlingSeconds",
+       "updatedAt" = now()
+     RETURNING "id"`,
+    companyId,
+    connectionId,
+    JSON.stringify(trips)
+  )) as Array<{ id: string }>;
+  return rows.length;
+}
+
+export async function deleteGeotabTripSnapshots(companyId: string, connectionId: string): Promise<number> {
+  return db.$executeRawUnsafe(
+    `DELETE FROM "GeotabTripSnapshot" WHERE "companyId" = $1 AND "connectionId" = $2`,
+    companyId,
+    connectionId
+  );
+}
+
 export async function deleteApiConnection(companyId: string, id: string): Promise<boolean> {
   const res = await db.$executeRawUnsafe(
     `DELETE FROM "ApiConnection" WHERE "id" = $1 AND "companyId" = $2`,

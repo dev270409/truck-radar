@@ -7,7 +7,8 @@ import {
   getExternalIntegration,
   createApiConnection,
 } from "@/lib/raw-tables";
-import { encryptSecret, hasSecret } from "@/lib/crypto";
+import { encryptSecret, hasSecret, hashIdentityForMatch } from "@/lib/crypto";
+import { normalizePlate } from "@/lib/geotab";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -31,17 +32,54 @@ export async function GET() {
   const guard = await requireAdmin();
   if (guard.error) return guard.error;
 
-  const [catalogo, connessioni] = await Promise.all([
+  const [catalogo, connessioni, localUsers, localVehicles] = await Promise.all([
     listExternalIntegrations(),
     listApiConnections(guard.session!.user.companyId),
+    db.user.findMany({
+      where: { companyId: guard.session!.user.companyId },
+      select: { id: true, email: true },
+    }),
+    db.vehicle.findMany({
+      where: { companyId: guard.session!.user.companyId },
+      select: { id: true, targa: true },
+    }),
   ]);
+  const localUserIdsByIdentity = new Map(
+    localUsers.map((user) => [hashIdentityForMatch(user.email), user.id])
+  );
 
   const masked = connessioni.map((c) => {
     const provider = catalogo.find((i) => i.id === c.integrationId)?.provider ?? "GENERICO";
     const config = (c.config as Record<string, unknown> | null) ?? {};
-    const snapshot = provider === "GEOTAB" && config.geotabSnapshot && typeof config.geotabSnapshot === "object"
+    const snapshotRaw = provider === "GEOTAB" && config.geotabSnapshot && typeof config.geotabSnapshot === "object"
       ? config.geotabSnapshot as Record<string, unknown>
       : null;
+    let snapshot = snapshotRaw;
+    if (snapshotRaw && Array.isArray(snapshotRaw.drivers)) {
+      snapshot = {
+        ...snapshotRaw,
+        // Rimuove l'HMAC interno e restituisce solo un riferimento al local user
+        // corrispondente, se username Geotab ed email locale coincidono.
+        drivers: snapshotRaw.drivers.map((rawDriver) => {
+          const driver = rawDriver && typeof rawDriver === "object" ? rawDriver as Record<string, unknown> : {};
+          const identityHash = typeof driver.identityHash === "string" ? driver.identityHash : null;
+          const { identityHash: _privateHash, ...safeDriver } = driver;
+          return {
+            ...safeDriver,
+            linkedLocalUserId: identityHash ? localUserIdsByIdentity.get(identityHash) ?? null : null,
+          };
+        }),
+      };
+    }
+    if (snapshot && Array.isArray(snapshot.devices)) {
+      const devices = snapshot.devices.map((rawDevice) => {
+        const device = rawDevice && typeof rawDevice === "object" ? rawDevice as Record<string, unknown> : {};
+        const plate = typeof device.licensePlate === "string" ? normalizePlate(device.licensePlate) : "";
+        const localVehicle = plate ? localVehicles.find((vehicle) => normalizePlate(vehicle.targa) === plate) : undefined;
+        return { ...device, linkedLocalVehicleId: localVehicle?.id ?? null };
+      });
+      snapshot = { ...snapshot, devices };
+    }
     return {
       id: c.id,
       name: c.name,

@@ -1,5 +1,5 @@
 import { startDev, stopDev, login, makeClient } from "./e2e-http";
-import { listApiConnections, saveGeotabSnapshot } from "../lib/raw-tables";
+import { deleteGeotabTripSnapshots, listApiConnections, saveGeotabSnapshot, upsertGeotabTripSnapshots } from "../lib/raw-tables";
 import { decryptSecret, hasSecret } from "../lib/crypto";
 
 const ADMIN = { email: "admin@demo.com", password: "Demo123!" };
@@ -94,10 +94,28 @@ async function main() {
       devices: [{ geotabId: "geo-device-1", name: "Taros truck", licensePlate: "TR123OS", latitude: 45.46, longitude: 9.19, isDriving: true, isDeviceCommunicating: true, driverName: "Mario Rossi" }],
       drivers: [{ geotabId: "geo-driver-1", firstName: "Mario", lastName: "Rossi" }],
     });
+    const historicalStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    await upsertGeotabTripSnapshots(companyId, geotabId, [{
+      geotabTripId: "geo-trip-e2e",
+      geotabDeviceId: "geo-device-1",
+      geotabDriverId: "geo-driver-1",
+      deviceName: "Taros truck",
+      licensePlate: "TR123OS",
+      driverName: "Mario Rossi",
+      startAt: historicalStart,
+      stopAt: new Date().toISOString(),
+      distanceKm: 123.4,
+      odometerMeters: 456000,
+      drivingSeconds: "PT2H",
+      idlingSeconds: "PT5M",
+    }]);
     const fleetMap = await admin.req("/api/fleet/map");
     assert(fleetMap.status === 200, `GET mappa flotta 200 (${fleetMap.status})`);
     assert(fleetMap.body.vehicles.some((v: any) => v.source === "GEOTAB" && v.targa === "TR123OS"), "dispositivo snapshot presente sulla mappa");
     assert(!fleetMap.body.vehicles.some((v: any) => v.id === "geo-device-1"), "snapshot non inventa ID Vehicle locali");
+    const analyticsGeotab = await admin.req("/api/analytics/geotab");
+    assert(analyticsGeotab.status === 200 && analyticsGeotab.body.totalTrips === 1, "analytics Geotab legge lo storico tenant-scoped");
+    assert(analyticsGeotab.body.totalKm === 123.4 && analyticsGeotab.body.unladenKm === null, "km tracciati reali, km a vuoto non inventati");
     const geotabList = await admin.req("/api/integrazioni");
     const geotabListed = geotabList.body.connessioni.find((c: any) => c.id === geotabId);
     assert(geotabListed?.geotabSnapshot?.drivers?.length === 1, "snapshot driver disponibile alla UI admin");
