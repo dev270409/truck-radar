@@ -100,13 +100,75 @@ export async function testGeotab(credentials: GeotabCredentials, host = "my.geot
 export async function readGeotabInventory(credentials: GeotabCredentials, host = "my.geotab.com") {
   const authenticated = await authenticateGeotab(credentials, host);
   const devices = await getGeotabDevices(authenticated.host, authenticated.session, 500);
+  let statuses: Array<Record<string, any>> = [];
+  let users: Array<Record<string, any>> = [];
+
+  // GPS status and driver records are optional: some MyGeotab service users
+  // have Device read access but limited access to these entity types.
+  try {
+    statuses = await rpc(authenticated.host, "Get", {
+      typeName: "DeviceStatusInfo",
+      resultsLimit: 500,
+      credentials: authenticated.session,
+    });
+  } catch {
+    statuses = [];
+  }
+  try {
+    users = await rpc(authenticated.host, "Get", {
+      typeName: "User",
+      resultsLimit: 500,
+      propertySelector: { fields: ["id", "firstName", "lastName", "isDriver"], isIncluded: true },
+      credentials: authenticated.session,
+    });
+  } catch {
+    users = [];
+  }
+
+  const drivers = users
+    .filter((user) => user.isDriver === true)
+    .map((user) => ({
+      geotabId: String(user.id ?? ""),
+      firstName: typeof user.firstName === "string" ? user.firstName.slice(0, 255) : "",
+      lastName: typeof user.lastName === "string" ? user.lastName.slice(0, 255) : "",
+    }))
+    .filter((user) => user.geotabId);
+  const driverById = new Map(drivers.map((driver) => [driver.geotabId, driver]));
+  const statusByDeviceId = new Map<string, Record<string, any>>();
+  for (const status of statuses) {
+    const deviceId = typeof status.device === "string" ? status.device : status.device?.id;
+    if (typeof deviceId === "string") statusByDeviceId.set(deviceId, status);
+  }
+
   return {
     count: devices.length,
-    devices: devices.map((device) => ({
-      geotabId: device.id,
-      name: device.name ?? null,
-      licensePlate: device.licensePlate ?? null,
-      vehicleIdentificationNumber: device.vehicleIdentificationNumber ?? null,
-    })),
+    devices: devices.map((device) => {
+      const status = statusByDeviceId.get(device.id);
+      const driverRef = status?.driver;
+      const driverId = typeof driverRef === "string" ? driverRef : driverRef?.id;
+      const driver = typeof driverId === "string" ? driverById.get(driverId) : undefined;
+      return {
+        geotabId: device.id,
+        name: device.name ?? null,
+        licensePlate: device.licensePlate ?? null,
+        vehicleIdentificationNumber: device.vehicleIdentificationNumber ?? null,
+        latitude: finiteCoordinate(status?.latitude, -90, 90),
+        longitude: finiteCoordinate(status?.longitude, -180, 180),
+        speedKph: finiteCoordinate(status?.speed, 0, 500),
+        bearing: finiteCoordinate(status?.bearing, 0, 360),
+        isDriving: status?.isDriving === true,
+        isDeviceCommunicating: status?.isDeviceCommunicating === true,
+        positionAt: typeof status?.dateTime === "string" ? status.dateTime : null,
+        driverId: typeof driverId === "string" ? driverId : null,
+        driverName: driver ? `${driver.firstName} ${driver.lastName}`.trim() : null,
+      };
+    }),
+    drivers,
+    positionsAvailable: statuses.length > 0,
   };
+}
+
+function finiteCoordinate(value: unknown, min: number, max: number): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < min || value > max) return null;
+  return value;
 }

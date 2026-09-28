@@ -1,4 +1,5 @@
 import { authenticateGeotab, getGeotabDevices, testGeotab } from "../lib/geotab";
+import { readGeotabInventory } from "../lib/geotab";
 
 function assert(ok: boolean, message: string) {
   if (!ok) throw new Error(`ASSERT FAILED: ${message}`);
@@ -20,10 +21,22 @@ async function main() {
         },
       }), { status: 200, headers: { "content-type": "application/json" } });
     }
-    if (body.method === "Get") {
+    if (body.method === "Get" && body.params.typeName === "Device") {
       return new Response(JSON.stringify({
         result: [{ id: "device-1", name: "Truck 01", licensePlate: "AB123CD" }],
       }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (body.method === "Get" && body.params.typeName === "DeviceStatusInfo") {
+      return new Response(JSON.stringify({ result: [{
+        device: { id: "device-1" }, latitude: 45.46, longitude: 9.19,
+        speed: 72, bearing: 180, isDriving: true, isDeviceCommunicating: true,
+        dateTime: "2026-09-28T12:00:00.000Z", driver: { id: "driver-1" },
+      }] }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (body.method === "Get" && body.params.typeName === "User") {
+      return new Response(JSON.stringify({ result: [{
+        id: "driver-1", firstName: "Mario", lastName: "Rossi", isDriver: true,
+      }] }), { status: 200, headers: { "content-type": "application/json" } });
     }
     return new Response("{}", { status: 400 });
   }) as typeof fetch;
@@ -44,6 +57,11 @@ async function main() {
       sessionId: "mock-session",
     }, 9999);
     assert(devices.length === 1 && devices[0].licensePlate === "AB123CD", "lettura dispositivi e limite massimo applicato");
+
+    const inventory = await readGeotabInventory(credentials);
+    assert(inventory.count === 1 && inventory.positionsAvailable, "snapshot include il DeviceStatusInfo corrente");
+    assert(inventory.devices[0].latitude === 45.46 && inventory.devices[0].driverName === "Mario Rossi", "posizione e driver sono associati al mezzo corretto");
+    assert(inventory.drivers[0].firstName === "Mario", "driver snapshot contiene solo campi necessari");
 
     let rejectedHost = false;
     try {

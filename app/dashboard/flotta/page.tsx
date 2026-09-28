@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Map as MapIcon, Car, Satellite, Navigation, Wrench, PlayCircle } from "lucide-react";
+import { Loader2, Map as MapIcon, Car, Satellite, Navigation, Wrench, PlayCircle, RefreshCw } from "lucide-react";
 import type { FleetVehicleRow } from "@/lib/fleet";
 import FleetMapLazy from "@/components/FleetMapLazy";
 
@@ -19,6 +19,12 @@ export default function FlottaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [geotabSnapshotAt, setGeotabSnapshotAt] = useState<string | null>(null);
+  const [geotabVehicles, setGeotabVehicles] = useState(0);
+  const [geotabConnectionId, setGeotabConnectionId] = useState<string | null>(null);
+  const [geotabConnectionStatus, setGeotabConnectionStatus] = useState<string | null>(null);
+  const [refreshingGeotab, setRefreshingGeotab] = useState(false);
+  const [refreshMessage, setRefreshMessage] = useState("");
 
   const fetchFleet = async () => {
     try {
@@ -26,11 +32,33 @@ export default function FlottaPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Errore nel caricamento della flotta");
       setVehicles(data.vehicles);
+      setGeotabSnapshotAt(data.geotabSnapshotAt ?? null);
+      setGeotabVehicles(typeof data.geotabVehicles === "number" ? data.geotabVehicles : 0);
+      setGeotabConnectionId(data.geotabConnectionId ?? null);
+      setGeotabConnectionStatus(data.geotabConnectionStatus ?? null);
       setError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshGeotab = async () => {
+    if (!geotabConnectionId) return;
+    setRefreshingGeotab(true);
+    setError("");
+    setRefreshMessage("");
+    try {
+      const res = await fetch(`/api/integrazioni/${geotabConnectionId}/sync`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Lettura MyGeotab non riuscita.");
+      setRefreshMessage(data.detail?.message ?? "Snapshot Geotab aggiornato.");
+      await fetchFleet();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setRefreshingGeotab(false);
     }
   };
 
@@ -61,14 +89,35 @@ export default function FlottaPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
         <h1 className="text-2xl font-bold text-slate-100 flex items-center">
           <MapIcon className="w-6 h-6 mr-2.5 text-blue-400" /> Flotta Live
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Posizione in tempo reale dei veicoli e stato operativo della flotta (aggiornamento automatico).
+          Mezzi locali e dispositivi Geotab. La posizione Geotab riflette l&apos;ultima lettura manuale, non un polling live.
         </p>
+        </div>
+        {geotabConnectionId && (
+          <button
+            onClick={refreshGeotab}
+            disabled={refreshingGeotab || geotabConnectionStatus !== "TESTED"}
+            className="inline-flex items-center gap-2 rounded-xl border border-sky-700/70 bg-sky-950/40 px-4 py-2.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-900/50 disabled:cursor-not-allowed disabled:opacity-50"
+            title={geotabConnectionStatus !== "TESTED" ? "Prima testa la connessione Geotab dalla pagina Integrazioni." : "Legge un nuovo snapshot dal provider; non importa o modifica i mezzi locali."}
+          >
+            {refreshingGeotab ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Aggiorna da Geotab
+          </button>
+        )}
       </div>
+
+      {refreshMessage && <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/30 px-4 py-3 text-xs text-emerald-100">{refreshMessage}</div>}
+
+      {geotabSnapshotAt && (
+        <div className="rounded-xl border border-blue-800/60 bg-blue-950/30 px-4 py-3 text-xs text-blue-100">
+          Geotab: {geotabVehicles} dispositivi letti · snapshot {new Date(geotabSnapshotAt).toLocaleString("it-IT")} · sola lettura
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -179,6 +228,13 @@ export default function FlottaPage() {
                                 {v.driverNome} {v.driverCognome}
                               </p>
                             )}
+                          </div>
+                        ) : v.source === "GEOTAB" ? (
+                          <div>
+                            <span className="text-sky-300 font-semibold">Geotab · sola lettura</span>
+                            {v.driverNome && <p className="text-slate-400 mt-0.5">Autista: {v.driverNome} {v.driverCognome}</p>}
+                            {v.status === "IN_VIAGGIO" && <p className="mt-0.5 text-blue-300">Veicolo in marcia secondo Geotab</p>}
+                            {v.isDeviceCommunicating === false && <p className="text-amber-300 mt-0.5">Dispositivo non sta comunicando</p>}
                           </div>
                         ) : (
                           <span className="text-slate-500">Nessun viaggio attivo</span>

@@ -36,6 +36,16 @@ interface Vehicle {
   drivers?: { id: string; nome: string; cognome: string }[];
 }
 
+interface ExternalGeotabDevice {
+  geotabId: string;
+  name: string | null;
+  licensePlate: string | null;
+  vehicleIdentificationNumber: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  isDeviceCommunicating: boolean;
+}
+
 const DOC_TYPES = ["ASSICURAZIONE", "REVISIONE", "TAGLIANDO", "BOLLO"];
 
 const daysUntil = (iso: string) =>
@@ -52,6 +62,8 @@ function docBadge(dataScadenza: string) {
 
 export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [geotabDevices, setGeotabDevices] = useState<ExternalGeotabDevice[]>([]);
+  const [geotabSnapshotAt, setGeotabSnapshotAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -84,6 +96,16 @@ export default function VehiclesPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+    try {
+      const res = await fetch("/api/integrazioni");
+      if (!res.ok) return;
+      const data = await res.json();
+      const geotab = (data.connessioni ?? []).find((connection: any) => connection.provider === "GEOTAB");
+      setGeotabDevices(geotab?.geotabSnapshot?.devices ?? []);
+      setGeotabSnapshotAt(geotab?.geotabSnapshot?.snapshotAt ?? null);
+    } catch {
+      // La vista veicoli locali resta disponibile anche senza permesso al catalogo integrazioni.
     }
   };
 
@@ -235,6 +257,38 @@ export default function VehiclesPage() {
             </ul>
           </div>
         </div>
+      )}
+
+      {geotabSnapshotAt && (
+        <section className="overflow-hidden rounded-2xl border border-sky-800/60 bg-slate-900/80">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-5 py-4">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">Dispositivi Geotab · sola lettura</h2>
+              <p className="mt-1 text-[11px] text-slate-400">Non sono ancora veicoli Truck Radar: categoria, portata e volume vanno confermati prima dell&apos;import.</p>
+            </div>
+            {geotabSnapshotAt && <span className="text-[10px] text-slate-400">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
+          </div>
+          {geotabDevices.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-slate-400">Lettura completata ma nessun dispositivo è visibile all&apos;utente API. Verifica database, gruppi e permessi in MyGeotab.</p>
+          ) : <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-300">
+              <thead className="bg-slate-950/70 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                <tr><th className="px-5 py-3">Targa</th><th className="px-5 py-3">Dispositivo</th><th className="px-5 py-3">VIN</th><th className="px-5 py-3">Posizione</th><th className="px-5 py-3">Stato dispositivo</th></tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/80">
+                {geotabDevices.map((device) => (
+                  <tr key={device.geotabId}>
+                    <td className="px-5 py-3 font-mono font-bold text-slate-100">{device.licensePlate || "—"}</td>
+                    <td className="px-5 py-3">{device.name || "—"}</td>
+                    <td className="px-5 py-3 font-mono text-xs">{device.vehicleIdentificationNumber || "—"}</td>
+                    <td className="px-5 py-3 text-xs">{device.latitude != null && device.longitude != null ? `${device.latitude.toFixed(5)}, ${device.longitude.toFixed(5)}` : "Nessuna posizione recente"}</td>
+                    <td className="px-5 py-3 text-xs">{device.isDeviceCommunicating ? "Comunica" : "Non comunica / dato assente"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>}
+        </section>
       )}
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">

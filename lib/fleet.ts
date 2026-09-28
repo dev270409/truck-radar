@@ -2,6 +2,7 @@ import { db } from "./db";
 
 export interface FleetVehicleRow {
   id: string;
+  source?: "LOCAL" | "GEOTAB";
   targa: string;
   categoria: string;
   status: string;
@@ -16,6 +17,9 @@ export interface FleetVehicleRow {
   posizione: string | null;
   eventType: string | null;
   lastEventAt: Date | null;
+  speedKph?: number | null;
+  bearing?: number | null;
+  isDeviceCommunicating?: boolean | null;
 }
 
 /**
@@ -53,6 +57,7 @@ export async function getFleetMap(companyId: string): Promise<FleetVehicleRow[]>
   )) as FleetVehicleRow[];
   return rows.map((r) => ({
     ...r,
+    source: "LOCAL" as const,
     lastEventAt: r.lastEventAt ? new Date(r.lastEventAt) : null,
   }));
 }

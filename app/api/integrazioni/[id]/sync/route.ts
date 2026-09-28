@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { getApiConnection, updateApiConnection, listExternalIntegrations } from "@/lib/raw-tables";
+import { getApiConnection, updateApiConnection, listExternalIntegrations, saveGeotabSnapshot } from "@/lib/raw-tables";
 import { decryptSecret } from "@/lib/crypto";
 import { readGeotabInventory } from "@/lib/geotab";
+import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
+import { safeLog } from "@/lib/safe-log";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -16,13 +18,29 @@ const requireAdmin = async () => {
   return { session };
 };
 
+function publicConnection(connection: Awaited<ReturnType<typeof getApiConnection>>) {
+  if (!connection) return null;
+  return {
+    id: connection.id,
+    name: connection.name,
+    integrationId: connection.integrationId,
+    baseUrl: connection.baseUrl,
+    status: connection.status,
+    lastTestedAt: connection.lastTestedAt,
+    lastSyncAt: connection.lastSyncAt,
+    createdAt: connection.createdAt,
+  };
+}
+
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const guard = await requireAdmin();
   if (guard.error) return guard.error;
   const session = guard.session!;
+  const rl = rateLimit(rateLimitKeyFromRequest(req, "integration-sync"), 3, 60_000);
+  if (!rl.ok) return NextResponse.json({ error: "Troppe letture flotta. Riprova tra un minuto." }, { status: 429 });
 
   const { id } = await params;
   const connection = await getApiConnection(session.user.companyId, id);
@@ -56,12 +74,18 @@ export async function POST(
         connection.baseUrl ?? "my.geotab.com"
       );
 
-      const updated = await updateApiConnection(session.user.companyId, id, {
-        // Questa prima fase legge l'inventario remoto ma non importa/modifica
-        // Vehicle: manteniamo lo stato TESTED per non dichiarare una sync dati.
-        status: "TESTED",
-        lastSyncAt: new Date(),
-      });
+      // Snapshot tenant-scoped: mappa, Mezzi e Team possono mostrarlo senza
+      // creare duplicati o inventare dimensioni/categorie dei Vehicle locali.
+      const snapshot = {
+        source: "GEOTAB",
+        snapshotAt: new Date().toISOString(),
+        positionsAvailable: inventory.positionsAvailable,
+        devices: inventory.devices,
+        drivers: inventory.drivers,
+      };
+      const saved = await saveGeotabSnapshot(session.user.companyId, id, snapshot);
+      if (!saved) return NextResponse.json({ error: "Connessione Geotab non trovata." }, { status: 404 });
+      const updated = await getApiConnection(session.user.companyId, id);
       await db.auditLog.create({
         data: {
           userId: session.user.id,
@@ -74,17 +98,24 @@ export async function POST(
       });
 
       return NextResponse.json({
-        connection: updated,
+        connection: publicConnection(updated),
         detail: {
           ok: true,
           provider,
           records: inventory.count,
-          message: `Lettura MyGeotab completata: ${inventory.count} dispositivi restituiti (limite 500). Nessun veicolo è stato creato o modificato in Truck Radar.`,
+          message: `Dati MyGeotab aggiornati: ${inventory.count} dispositivi, ${inventory.drivers.length} autisti e ${inventory.devices.filter((d) => d.latitude != null && d.longitude != null).length} posizioni GPS. Sono mostrati come dati esterni: nessun mezzo o account è stato creato o modificato.`,
           devices: inventory.devices,
+          drivers: inventory.drivers,
+          snapshotAt: snapshot.snapshotAt,
         },
       });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Errore di lettura MyGeotab.";
+      safeLog("warn", "Lettura flotta MyGeotab fallita", {
+        companyId: session.user.companyId,
+        connectionId: id,
+        reason: message,
+      });
       return NextResponse.json({ error: message }, { status: 400 });
     }
   }
@@ -116,7 +147,7 @@ export async function POST(
     });
 
     return NextResponse.json({
-      connection: updated,
+      connection: publicConnection(updated),
       detail: { ok: true, provider, records, message: `Sandbox locale (${provider}: ${records} record simulati).` },
     });
   } catch (error: unknown) {

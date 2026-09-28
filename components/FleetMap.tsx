@@ -31,6 +31,16 @@ const STATUS_COLOR: Record<string, string> = {
   NON_IDONEO: "#ef4444",
 };
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]!);
+}
+
 export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -119,7 +129,7 @@ export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
     });
     const marker = L.marker(latlngs[0], { icon }).addTo(play);
     markerRef.current = marker;
-    marker.bindPopup(`<div class="text-xs"><strong>Riproduzione percorso</strong><br/>${pts[0]?.posizione ?? ""}</div>`);
+    marker.bindPopup(`<div class="text-xs"><strong>Riproduzione percorso</strong><br/>${escapeHtml(pts[0]?.posizione)}</div>`);
     map.fitBounds(L.latLngBounds(latlngs), { padding: [50, 50] });
 
     let i = 1;
@@ -130,7 +140,7 @@ export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
       }
       const p = pts[i];
       marker.setLatLng([p.lat, p.lng]);
-      marker.setPopupContent(`<div class="text-xs"><strong>${p.posizione ?? "Posizione"}</strong><br/>${new Date(p.createdAt).toLocaleString("it-IT")}</div>`);
+      marker.setPopupContent(`<div class="text-xs"><strong>${escapeHtml(p.posizione ?? "Posizione")}</strong><br/>${escapeHtml(new Date(p.createdAt).toLocaleString("it-IT"))}</div>`);
       map.setView([p.lat, p.lng], Math.max(map.getZoom(), 11));
       i += 1;
       setTimeout(step, 1200);
@@ -155,15 +165,17 @@ export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
         iconAnchor: [9, 9],
       });
 
+      const canReplay = v.source !== "GEOTAB";
       const popup = L.popup({ autoClose: false, closeButton: true }).setContent(
         `<div style="min-width:190px">
-          <strong>${v.targa}</strong>
-          <div class="text-xs">${v.categoria} · ${STATUS_LABEL[v.status] ?? v.status}</div>
-          ${v.driverNome ? `<div class="text-xs">Autista: ${v.driverNome} ${v.driverCognome ?? ""}</div>` : ""}
-          ${v.luogoRitiro ? `<div class="text-xs">Da: ${v.luogoRitiro}</div>` : ""}
-          ${v.luogoConsegna ? `<div class="text-xs">A: ${v.luogoConsegna}</div>` : ""}
-          ${v.posizione ? `<div class="text-xs">Ultimo ping: ${v.posizione}</div>` : ""}
-          <button data-replay-vehicle="${v.id}" style="margin-top:8px;background:#f59e0b;color:#fff;border:0;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">▶ Riproduci percorso</button>
+          <strong>${escapeHtml(v.targa)}</strong>
+          <div class="text-xs">${escapeHtml(v.categoria)} · ${escapeHtml(STATUS_LABEL[v.status] ?? v.status)}</div>
+          ${v.driverNome ? `<div class="text-xs">Autista: ${escapeHtml(v.driverNome)} ${escapeHtml(v.driverCognome ?? "")}</div>` : ""}
+          ${v.luogoRitiro ? `<div class="text-xs">Da: ${escapeHtml(v.luogoRitiro)}</div>` : ""}
+          ${v.luogoConsegna ? `<div class="text-xs">A: ${escapeHtml(v.luogoConsegna)}</div>` : ""}
+          ${v.posizione ? `<div class="text-xs">Ultimo ping: ${escapeHtml(v.posizione)}</div>` : ""}
+          ${typeof v.speedKph === "number" ? `<div class="text-xs">Velocità: ${escapeHtml(v.speedKph.toFixed(0))} km/h</div>` : ""}
+          ${canReplay ? `<button data-replay-vehicle="${escapeHtml(v.id)}" style="margin-top:8px;background:#f59e0b;color:#fff;border:0;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">▶ Riproduci percorso</button>` : `<div class="text-xs">Fonte: Geotab · sola lettura</div>`}
         </div>`
       );
 
@@ -173,7 +185,7 @@ export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
         onSelect?.(v.id);
         const content = popup.getElement();
         const btn = content?.querySelector<HTMLButtonElement>("[data-replay-vehicle]");
-        if (btn) btn.onclick = () => handleReplay(v.id);
+        if (btn && canReplay) btn.onclick = () => handleReplay(v.id);
       });
     });
 

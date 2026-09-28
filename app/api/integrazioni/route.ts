@@ -36,17 +36,26 @@ export async function GET() {
     listApiConnections(guard.session!.user.companyId),
   ]);
 
-  const masked = connessioni.map((c) => ({
-    id: c.id,
-    name: c.name,
-    integrationId: c.integrationId,
-    baseUrl: c.baseUrl,
-    status: c.status,
-    lastTestedAt: c.lastTestedAt,
-    lastSyncAt: c.lastSyncAt,
-    createdAt: c.createdAt,
-    ...mask(c),
-  }));
+  const masked = connessioni.map((c) => {
+    const provider = catalogo.find((i) => i.id === c.integrationId)?.provider ?? "GENERICO";
+    const config = (c.config as Record<string, unknown> | null) ?? {};
+    const snapshot = provider === "GEOTAB" && config.geotabSnapshot && typeof config.geotabSnapshot === "object"
+      ? config.geotabSnapshot as Record<string, unknown>
+      : null;
+    return {
+      id: c.id,
+      name: c.name,
+      integrationId: c.integrationId,
+      provider,
+      baseUrl: c.baseUrl,
+      status: c.status,
+      lastTestedAt: c.lastTestedAt,
+      lastSyncAt: c.lastSyncAt,
+      createdAt: c.createdAt,
+      ...mask(c),
+      ...(snapshot ? { geotabSnapshot: snapshot } : {}),
+    };
+  });
 
   return NextResponse.json({ catalogo, connessioni: masked });
 }

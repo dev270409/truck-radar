@@ -230,6 +230,27 @@ export async function updateApiConnection(
   return rows[0] ?? null;
 }
 
+/** Persistisce uno snapshot non sensibile del provider, mantenendo la lista
+ * dei nomi credentiali già presente in config. L'oggetto credentialsCipher
+ * non viene letto né modificato da questa funzione. */
+export async function saveGeotabSnapshot(
+  companyId: string,
+  id: string,
+  snapshot: Record<string, unknown>
+): Promise<boolean> {
+  const rows = (await db.$queryRawUnsafe(
+    `UPDATE "ApiConnection"
+     SET "config" = COALESCE("config", '{}'::jsonb) || jsonb_build_object('geotabSnapshot', $3::jsonb),
+         "status" = 'TESTED', "lastSyncAt" = now(), "updatedAt" = now()
+     WHERE "id" = $1 AND "companyId" = $2
+     RETURNING "id"`,
+    id,
+    companyId,
+    JSON.stringify(snapshot)
+  )) as Array<{ id: string }>;
+  return rows.length > 0;
+}
+
 export async function deleteApiConnection(companyId: string, id: string): Promise<boolean> {
   const res = await db.$executeRawUnsafe(
     `DELETE FROM "ApiConnection" WHERE "id" = $1 AND "companyId" = $2`,

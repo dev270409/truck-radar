@@ -18,6 +18,20 @@ const requireAdmin = async () => {
   return { session };
 };
 
+function publicConnection(connection: Awaited<ReturnType<typeof getApiConnection>>) {
+  if (!connection) return null;
+  return {
+    id: connection.id,
+    name: connection.name,
+    integrationId: connection.integrationId,
+    baseUrl: connection.baseUrl,
+    status: connection.status,
+    lastTestedAt: connection.lastTestedAt,
+    lastSyncAt: connection.lastSyncAt,
+    createdAt: connection.createdAt,
+  };
+}
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -83,7 +97,7 @@ export async function POST(
       });
 
       return NextResponse.json({
-        connection: updated,
+        connection: publicConnection(updated),
         detail: {
           ok: true,
           latencyMs,
@@ -130,7 +144,7 @@ export async function POST(
     },
   });
   return NextResponse.json({
-    connection: updated,
+    connection: publicConnection(updated),
     detail: { ok: true, latencyMs, message: "Test sandbox locale completato; nessuna chiamata al provider è stata effettuata." },
   });
 }

@@ -21,9 +21,17 @@ interface VehicleItem {
   targa: string;
 }
 
+interface ExternalGeotabDriver {
+  geotabId: string;
+  firstName: string;
+  lastName: string;
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [vehicles, setVehicles] = useState<VehicleItem[]>([]);
+  const [geotabDrivers, setGeotabDrivers] = useState<ExternalGeotabDriver[]>([]);
+  const [geotabSnapshotAt, setGeotabSnapshotAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -54,6 +62,16 @@ export default function UsersPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+    try {
+      const res = await fetch("/api/integrazioni");
+      if (!res.ok) return;
+      const data = await res.json();
+      const geotab = (data.connessioni ?? []).find((connection: any) => connection.provider === "GEOTAB");
+      setGeotabDrivers(geotab?.geotabSnapshot?.drivers ?? []);
+      setGeotabSnapshotAt(geotab?.geotabSnapshot?.snapshotAt ?? null);
+    } catch {
+      // Il roster locale non dipende dall'accesso al catalogo integrazioni.
     }
   };
 
@@ -124,6 +142,30 @@ export default function UsersPage() {
           </button>
         </div>
       </div>
+
+      {geotabSnapshotAt && (
+        <section className="overflow-hidden rounded-2xl border border-sky-800/60 bg-slate-900/80">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-5 py-4">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">Driver presenti in Geotab · sola lettura</h2>
+              <p className="mt-1 text-[11px] text-slate-400">Non sono account Truck Radar e non possono accedere alla PWA. Crea un account locale solo dopo aver verificato il nominativo.</p>
+            </div>
+            {geotabSnapshotAt && <span className="text-[10px] text-slate-400">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
+          </div>
+          {geotabDrivers.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-slate-400">Nessun driver restituito da MyGeotab. Verifica che l&apos;utente API abbia accesso agli utenti/driver e che i profili siano marcati come driver.</p>
+          ) : (
+            <div className="grid gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
+              {geotabDrivers.map((driver) => (
+                <div key={driver.geotabId} className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5">
+                  <p className="text-sm font-semibold text-slate-100">{`${driver.firstName} ${driver.lastName}`.trim() || "Nome non disponibile"}</p>
+                  <p className="mt-0.5 font-mono text-[10px] text-slate-500">ID Geotab · {driver.geotabId}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Users Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">

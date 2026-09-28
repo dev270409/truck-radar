@@ -1,5 +1,5 @@
 import { startDev, stopDev, login, makeClient } from "./e2e-http";
-import { listApiConnections } from "../lib/raw-tables";
+import { listApiConnections, saveGeotabSnapshot } from "../lib/raw-tables";
 import { decryptSecret, hasSecret } from "../lib/crypto";
 
 const ADMIN = { email: "admin@demo.com", password: "Demo123!" };
@@ -72,6 +72,38 @@ async function main() {
     });
     assert(missingGeotabCreds.status === 400, `Geotab senza credenziali complete 400 (${missingGeotabCreds.status})`);
 
+    console.log("5c) Snapshot Geotab letto e mostrato in mappa senza creare un Vehicle locale...");
+    const geotabConn = await admin.req("/api/integrazioni", {
+      method: "POST",
+      body: JSON.stringify({
+        integrationId: byProv.GEOTAB,
+        name: "Geotab snapshot e2e",
+        baseUrl: "https://my.geotab.com",
+        credentials: { database: "test-db", username: "api@test.invalid", password: "test-secret" },
+      }),
+    });
+    assert(geotabConn.status === 201, `crea configurazione Geotab (${geotabConn.status})`);
+    assert(!("credentialsCipher" in geotabConn.body.connection), "cipher Geotab assente dalla risposta browser");
+    const session = await admin.req("/api/auth/session");
+    const companyId = session.body.user.companyId as string;
+    const geotabId = geotabConn.body.connection.id as string;
+    await saveGeotabSnapshot(companyId, geotabId, {
+      source: "GEOTAB",
+      snapshotAt: new Date().toISOString(),
+      positionsAvailable: true,
+      devices: [{ geotabId: "geo-device-1", name: "Taros truck", licensePlate: "TR123OS", latitude: 45.46, longitude: 9.19, isDriving: true, isDeviceCommunicating: true, driverName: "Mario Rossi" }],
+      drivers: [{ geotabId: "geo-driver-1", firstName: "Mario", lastName: "Rossi" }],
+    });
+    const fleetMap = await admin.req("/api/fleet/map");
+    assert(fleetMap.status === 200, `GET mappa flotta 200 (${fleetMap.status})`);
+    assert(fleetMap.body.vehicles.some((v: any) => v.source === "GEOTAB" && v.targa === "TR123OS"), "dispositivo snapshot presente sulla mappa");
+    assert(!fleetMap.body.vehicles.some((v: any) => v.id === "geo-device-1"), "snapshot non inventa ID Vehicle locali");
+    const geotabList = await admin.req("/api/integrazioni");
+    const geotabListed = geotabList.body.connessioni.find((c: any) => c.id === geotabId);
+    assert(geotabListed?.geotabSnapshot?.drivers?.length === 1, "snapshot driver disponibile alla UI admin");
+    const geotabDisconnect = await admin.req(`/api/integrazioni/${geotabId}`, { method: "DELETE" });
+    assert(geotabDisconnect.status === 200, "rimuove snapshot/connessione di test");
+
     console.log("6) Test senza baseUrl → 400...");
     const noUrl = await admin.req("/api/integrazioni", {
       method: "POST",
@@ -84,6 +116,7 @@ async function main() {
     const t1 = await admin.req(`/api/integrazioni/${connId}/test`, { method: "POST" });
     assert(t1.status === 200 && t1.body.connection.status === "TESTED", `test GPS → TESTED (${t1.status})`);
     assert(t1.body.detail?.ok === true, "detail.ok true");
+    assert(!("credentialsCipher" in t1.body.connection), "test API non restituisce ciphertext");
 
     console.log("8) Sync senza test → 400...");
     const trySyncNoUrl = await admin.req(`/api/integrazioni/${noUrl.body.connection.id}/sync`, { method: "POST" });
@@ -92,10 +125,9 @@ async function main() {
     console.log("9) Sync GPS → SYNCED...");
     const s1 = await admin.req(`/api/integrazioni/${connId}/sync`, { method: "POST" });
     assert(s1.status === 200 && s1.body.connection.status === "SYNCED", `sync GPS → SYNCED (${s1.status})`);
+    assert(!("credentialsCipher" in s1.body.connection), "sync API non restituisce ciphertext");
 
     console.log("10) Roundtrip cifratura (nessun segreto in chiaro)...");
-    const session = await admin.req("/api/auth/session");
-    const companyId = session.body.user.companyId as string;
     const direct = await listApiConnections(companyId);
     const myRow = direct.find((r) => r.id === connId);
     assert(myRow !== undefined, "connessione presente su DB");
