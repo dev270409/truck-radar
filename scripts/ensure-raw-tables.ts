@@ -431,12 +431,13 @@ async function main() {
 
   // Seed catalogo provider esterni (idempotente)
   const providerSeed: Array<[string, string, string, string]> = [
-    ["GPS", "GPS / Telemetria", "GPS", "https://esempiogps.dev/docs"],
-    ["TMS", "TMS Aziendale", "TMS", "https://esempiotms.dev/docs"],
-    ["ERP", "ERP (fatturazione)", "ERP", "https://esempioerp.dev/docs"],
-    ["TACHIGRAFO", "Tachigrafi digitali", "TACHIGRAFO", "https://esempiotach.dev/docs"],
-    ["BORSA-CARICHI", "Borsa carichi esterna", "BORSA", "https://esempioborsa.dev/docs"],
-    ["CARBURANTE", "Carte carburante", "CARBURANTE", "https://esempiocarburante.dev/docs"],
+    ["GEOTAB", "Geotab MyGeotab", "GPS", "https://developers.geotab.com/myGeotab/guides/gettingStarted/"],
+    ["GPS", "GPS / Telemetria (generico)", "GPS", ""],
+    ["TMS", "TMS Aziendale (generico)", "TMS", ""],
+    ["ERP", "ERP (fatturazione, generico)", "ERP", ""],
+    ["TACHIGRAFO", "Tachigrafi digitali (generico)", "TACHIGRAFO", ""],
+    ["BORSA-CARICHI", "Borsa carichi esterna (generico)", "BORSA", ""],
+    ["CARBURANTE", "Carte carburante (generico)", "CARBURANTE", ""],
   ];
   for (const [provider, name, type, docsUrl] of providerSeed) {
     try {
@@ -455,6 +456,11 @@ async function main() {
       process.exitCode = 1;
     }
   }
+  // Ripulisce i placeholder .dev precedentemente inseriti nel catalogo demo.
+  await db.$executeRawUnsafe(
+    `UPDATE "ExternalIntegration" SET "docsUrl" = NULL
+     WHERE "provider" <> 'GEOTAB' AND "docsUrl" LIKE '%esempio%.dev%'`
+  );
   console.log(`ensure-raw-tables: provider catalogo ok (${providerSeed.length})`);
 
   // Seed network: seconda azienda VERIFICATA (Vettore Demo SRL) — subappalto, review, borsa carichi cross-azienda

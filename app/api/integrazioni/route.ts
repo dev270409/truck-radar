@@ -66,7 +66,15 @@ export async function POST(req: Request) {
   const integrationId = String(body.integrationId ?? "");
   const name = String(body.name ?? "").trim();
   const baseUrl = body.baseUrl ? String(body.baseUrl).trim() : null;
-  const creds = (body.credentials ?? {}) as Record<string, unknown>;
+  const credentialsInput = body.credentials ?? {};
+  if (!credentialsInput || typeof credentialsInput !== "object" || Array.isArray(credentialsInput)) {
+    return NextResponse.json({ error: "Formato credenziali non valido." }, { status: 400 });
+  }
+  const entries = Object.entries(credentialsInput as Record<string, unknown>);
+  if (entries.length > 12 || entries.some(([key, value]) => key.length > 80 || typeof value !== "string" || value.length > 4096)) {
+    return NextResponse.json({ error: "Credenziali non valide o troppo grandi." }, { status: 400 });
+  }
+  const creds = Object.fromEntries(entries) as Record<string, string>;
 
   if (!integrationId || !name) {
     return NextResponse.json(
@@ -74,13 +82,28 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  if (baseUrl && !/^https?:\/\//i.test(baseUrl)) {
-    return NextResponse.json({ error: "Base URL non valida (serve http/https)." }, { status: 400 });
-  }
-
   const integration = await getExternalIntegration(integrationId);
   if (!integration) {
     return NextResponse.json({ error: "Provider non trovato." }, { status: 404 });
+  }
+
+  if (integration.provider === "GEOTAB") {
+    const database = typeof creds.database === "string" ? creds.database.trim() : "";
+    const username = typeof creds.username === "string" ? creds.username.trim() : "";
+    const password = typeof creds.password === "string" ? creds.password : "";
+    if (!database || !username || !password) {
+      return NextResponse.json({ error: "Per Geotab servono database, username e password dell'utente API." }, { status: 400 });
+    }
+    if (database.length > 120 || username.length > 200 || password.length > 500) {
+      return NextResponse.json({ error: "Uno o più campi Geotab superano la lunghezza consentita." }, { status: 400 });
+    }
+  } else if (baseUrl) {
+    try {
+      const parsed = new URL(baseUrl);
+      if (parsed.protocol !== "https:" || !parsed.hostname) throw new Error("invalid");
+    } catch {
+      return NextResponse.json({ error: "Base URL non valida (serve un URL HTTPS valido)." }, { status: 400 });
+    }
   }
 
   const credsJson = JSON.stringify({ creds });
@@ -107,7 +130,17 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ connection }, { status: 201 });
+    // Non restituire mai credentialsCipher al browser, nemmeno cifrato.
+    return NextResponse.json({
+      connection: {
+        id: connection.id,
+        name: connection.name,
+        integrationId: connection.integrationId,
+        baseUrl: connection.baseUrl,
+        status: connection.status,
+        createdAt: connection.createdAt,
+      },
+    }, { status: 201 });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Errore del server";
     return NextResponse.json({ error: msg }, { status: 500 });

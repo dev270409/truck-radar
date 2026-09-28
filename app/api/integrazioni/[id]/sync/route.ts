@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { getApiConnection, updateApiConnection, listExternalIntegrations } from "@/lib/raw-tables";
+import { decryptSecret } from "@/lib/crypto";
+import { readGeotabInventory } from "@/lib/geotab";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -35,10 +37,66 @@ export async function POST(
     );
   }
 
+  const integrations = await listExternalIntegrations();
+  const integration = integrations.find((i) => i.id === connection.integrationId);
+  const provider = integration?.provider ?? "GENERICO";
+
+  if (provider === "GEOTAB") {
+    try {
+      const stored = JSON.parse(decryptSecret(connection.credentialsCipher ?? "")) as {
+        creds?: Record<string, unknown>;
+      };
+      const creds = stored.creds ?? {};
+      const inventory = await readGeotabInventory(
+        {
+          database: String(creds.database ?? ""),
+          username: String(creds.username ?? ""),
+          password: String(creds.password ?? ""),
+        },
+        connection.baseUrl ?? "my.geotab.com"
+      );
+
+      const updated = await updateApiConnection(session.user.companyId, id, {
+        // Questa prima fase legge l'inventario remoto ma non importa/modifica
+        // Vehicle: manteniamo lo stato TESTED per non dichiarare una sync dati.
+        status: "TESTED",
+        lastSyncAt: new Date(),
+      });
+      await db.auditLog.create({
+        data: {
+          userId: session.user.id,
+          companyId: session.user.companyId,
+          action: "INTEGRATION_READ",
+          entity: "ApiConnection",
+          entityId: id,
+          payload: { provider, devicesRead: inventory.count, mode: "READ_ONLY" },
+        },
+      });
+
+      return NextResponse.json({
+        connection: updated,
+        detail: {
+          ok: true,
+          provider,
+          records: inventory.count,
+          message: `Lettura MyGeotab completata: ${inventory.count} dispositivi restituiti (limite 500). Nessun veicolo è stato creato o modificato in Truck Radar.`,
+          devices: inventory.devices,
+        },
+      });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Errore di lettura MyGeotab.";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({
+      error: "La sincronizzazione live non è ancora implementata per questo provider.",
+    }, { status: 501 });
+  }
+
+  // Sandbox locale usata dai test automatici; non è una sincronizzazione reale.
   try {
-    const integrations = await listExternalIntegrations();
-    const integration = integrations.find((i) => i.id === connection.integrationId);
-    const provider = integration?.provider ?? "GENERICO";
     const records = 8 + Math.floor(Math.random() * 25);
 
     const updated = await updateApiConnection(session.user.companyId, id, {
@@ -59,7 +117,7 @@ export async function POST(
 
     return NextResponse.json({
       connection: updated,
-      detail: { ok: true, provider, records, message: `Sincronizzazione completata (${provider}: ${records} record).` },
+      detail: { ok: true, provider, records, message: `Sandbox locale (${provider}: ${records} record simulati).` },
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Errore del server";

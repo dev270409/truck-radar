@@ -23,12 +23,15 @@ async function main() {
     console.log("1) Catalogo provider...");
     const cat = await admin.req("/api/integrazioni");
     assert(cat.status === 200, `GET /api/integrazioni 200 (${cat.status})`);
-    const providers = cat.body.catalogo as Array<{ id: string; provider: string; type: string }>;
+    const providers = cat.body.catalogo as Array<{ id: string; provider: string; type: string; docsUrl?: string | null }>;
     assert(providers.length >= 6, `catalogo >= 6 provider (${providers.length})`);
     const byProv = Object.fromEntries(providers.map((p) => [p.provider, p.id]));
     for (const k of ["GPS", "TMS", "ERP", "TACHIGRAFO", "BORSA-CARICHI", "CARBURANTE"]) {
       assert(Boolean(byProv[k]), `provider ${k} presente`);
     }
+    assert(Boolean(byProv.GEOTAB), "provider GEOTAB presente");
+    const geotab = providers.find((p) => p.provider === "GEOTAB");
+    assert(Boolean(geotab?.docsUrl?.startsWith("https://developers.geotab.com/")), "Geotab link documentazione ufficiale");
 
     console.log("2) Acces control...");
     const forbidden = await driver.req("/api/integrazioni");
@@ -62,6 +65,13 @@ async function main() {
     });
     assert(badProv.status === 404, `provider sconosciuto 404 (${badProv.status})`);
 
+    console.log("5b) Geotab richiede database, username e password...");
+    const missingGeotabCreds = await admin.req("/api/integrazioni", {
+      method: "POST",
+      body: JSON.stringify({ integrationId: byProv.GEOTAB, name: "MyGeotab", baseUrl: "https://my.geotab.com", credentials: { username: "api@example.test" } }),
+    });
+    assert(missingGeotabCreds.status === 400, `Geotab senza credenziali complete 400 (${missingGeotabCreds.status})`);
+
     console.log("6) Test senza baseUrl → 400...");
     const noUrl = await admin.req("/api/integrazioni", {
       method: "POST",
@@ -84,7 +94,8 @@ async function main() {
     assert(s1.status === 200 && s1.body.connection.status === "SYNCED", `sync GPS → SYNCED (${s1.status})`);
 
     console.log("10) Roundtrip cifratura (nessun segreto in chiaro)...");
-    const companyId = conn.body.connection.companyId as string;
+    const session = await admin.req("/api/auth/session");
+    const companyId = session.body.user.companyId as string;
     const direct = await listApiConnections(companyId);
     const myRow = direct.find((r) => r.id === connId);
     assert(myRow !== undefined, "connessione presente su DB");
@@ -98,6 +109,7 @@ async function main() {
     const mine = list.body.connessioni.find((c: any) => c.id === connId);
     assert(mine?.hasCreds === true, "hasCreds true nella lista");
     assert(mine?.credsKeys === 2, "credsKeys = 2 campi");
+    assert(!("credentialsCipher" in conn.body.connection), "API collegamento non restituisce ciphertext al browser");
     const text = JSON.stringify(mine);
     assert(!text.includes("sk-super-secret"), "lista senza secret in chiaro");
 
@@ -108,7 +120,7 @@ async function main() {
     assert(!after.body.connessioni.some((c: any) => c.id === connId), "connessione rimossa");
 
     console.log("13) Pagina UI...");
-    const page = await admin.req("/dashboard/integrazioni");
+    const page = await fetch("http://localhost:3000/dashboard/integrazioni", { headers: { Cookie: adminCookie } });
     assert(page.status === 200, `pagina /dashboard/integrazioni 200 (${page.status})`);
 
     console.log("INTEGRAZIONI e2e: TUTTI I CHECK PASSATI");

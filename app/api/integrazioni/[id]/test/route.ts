@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { getApiConnection, updateApiConnection } from "@/lib/raw-tables";
+import { decryptSecret } from "@/lib/crypto";
+import { getApiConnection, getExternalIntegration, updateApiConnection } from "@/lib/raw-tables";
+import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
+import { testGeotab } from "@/lib/geotab";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -15,12 +18,15 @@ const requireAdmin = async () => {
 };
 
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const guard = await requireAdmin();
   if (guard.error) return guard.error;
   const session = guard.session!;
+
+  const rl = rateLimit(rateLimitKeyFromRequest(req, "integration-test"), 5, 60_000);
+  if (!rl.ok) return NextResponse.json({ error: "Troppi test. Riprova tra un minuto." }, { status: 429 });
 
   const { id } = await params;
   const connection = await getApiConnection(session.user.companyId, id);
@@ -41,32 +47,82 @@ export async function POST(
     );
   }
 
-  try {
-    const latencyMs = Math.round(90 + Math.random() * 260);
-    await new Promise((r) => setTimeout(r, 40));
+  const integration = await getExternalIntegration(connection.integrationId);
+  if (integration?.provider === "GEOTAB") {
+    try {
+      const startedAt = Date.now();
+      const stored = JSON.parse(decryptSecret(connection.credentialsCipher)) as {
+        creds?: Record<string, unknown>;
+      };
+      const creds = stored.creds ?? {};
+      const result = await testGeotab(
+        {
+          database: String(creds.database ?? ""),
+          username: String(creds.username ?? ""),
+          password: String(creds.password ?? ""),
+        },
+        connection.baseUrl ?? "my.geotab.com"
+      );
+      const latencyMs = Date.now() - startedAt;
 
-    const updated = await updateApiConnection(session.user.companyId, id, {
-      status: "TESTED",
-      lastTestedAt: new Date(),
-    });
+      const updated = await updateApiConnection(session.user.companyId, id, {
+        status: "TESTED",
+        lastTestedAt: new Date(),
+      });
 
-    await db.auditLog.create({
-      data: {
-        userId: session.user.id,
-        companyId: session.user.companyId,
-        action: "INTEGRATION_TESTED",
-        entity: "ApiConnection",
-        entityId: id,
-        payload: { status: "ok", latencyMs },
-      },
-    });
+      await db.auditLog.create({
+        data: {
+          userId: session.user.id,
+          companyId: session.user.companyId,
+          action: "INTEGRATION_TESTED",
+          entity: "ApiConnection",
+          entityId: id,
+          payload: { provider: "GEOTAB", status: "ok", latencyMs, deviceVisible: result.deviceVisible },
+        },
+      });
 
-    return NextResponse.json({
-      connection: updated,
-      detail: { ok: true, latencyMs, message: "Connessione verificata: autorizzazione accettata." },
-    });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Errore del server";
-    return NextResponse.json({ error: msg }, { status: 500 });
+      return NextResponse.json({
+        connection: updated,
+        detail: {
+          ok: true,
+          latencyMs,
+          message: result.deviceVisible
+            ? "MyGeotab autenticato: credenziali valide e almeno un dispositivo visibile."
+            : "MyGeotab autenticato, ma l'utente API non vede dispositivi. Verifica gruppi e permessi.",
+        },
+      });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Errore di connessione MyGeotab.";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
   }
+
+  if (process.env.NODE_ENV === "production") {
+    // Per gli altri provider il catalogo è ancora dimostrativo: non dichiariamo
+    // come reale un test che non effettua chiamate al provider.
+    return NextResponse.json({
+      error: "Il test live non è ancora disponibile per questo provider. Le credenziali sono salvate, ma non verificate.",
+    }, { status: 501 });
+  }
+
+  // Sandbox soltanto per test automatici locali.
+  const latencyMs = Math.round(90 + Math.random() * 260);
+  const updated = await updateApiConnection(session.user.companyId, id, {
+    status: "TESTED",
+    lastTestedAt: new Date(),
+  });
+  await db.auditLog.create({
+    data: {
+      userId: session.user.id,
+      companyId: session.user.companyId,
+      action: "INTEGRATION_TESTED",
+      entity: "ApiConnection",
+      entityId: id,
+      payload: { status: "sandbox", latencyMs },
+    },
+  });
+  return NextResponse.json({
+    connection: updated,
+    detail: { ok: true, latencyMs, message: "Test sandbox locale completato; nessuna chiamata al provider è stata effettuata." },
+  });
 }
