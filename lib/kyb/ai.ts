@@ -40,6 +40,19 @@ export function aiProviderConfigured(): "openai" | "google" | null {
 }
 
 async function fetchAsBase64(fileUrl: string): Promise<string> {
+  // SSRF guard: accettiamo solo host di storage fidati (UploadThing/utfs).
+  let host = "";
+  try {
+    host = new URL(fileUrl).hostname.toLowerCase();
+  } catch {
+    throw new Error("URL documento KYB non valido.");
+  }
+  const allowed = ["utfs.io", "ufs.sh", "uploadthing.com"];
+  const ok = allowed.some((h) => host === h || host.endsWith("." + h));
+  if (!ok) {
+    throw new Error("Host documento KYB non consentito.");
+  }
+
   const res = await fetch(fileUrl);
   if (!res.ok) throw new Error(`Impossibile scaricare il documento KYB (${res.status})`);
   const buf = Buffer.from(await res.arrayBuffer());

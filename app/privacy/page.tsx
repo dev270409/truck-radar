@@ -85,7 +85,7 @@ const sections = [
       },
       {
         h: "Recapito",
-        p: "Per qualsiasi richiesta relativa al trattamento dei dati KYC/KYB e di verifica aziendale, contattare: privacy@truck-radar.it (dpcm da definire), con riscontro entro 30 giorni.",
+        p: "Per qualsiasi richiesta relativa al trattamento dei dati KYC/KYB e di verifica aziendale, contattare il Titolare all'indirizzo privacy@truck-radar.it, con riscontro entro 30 giorni.",
       },
     ],
   },

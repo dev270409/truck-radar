@@ -16,15 +16,19 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
 
+  // In produzione la firma è obbligatoria: senza di essa (o senza secret) si
+  // rifiuta il payload. Il fallback senza firma è consentito solo in sviluppo.
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (process.env.NODE_ENV === "production" && (!secret || !signature)) {
+    safeLog("warn", "Stripe webhook rejected: missing signature/secret in production");
+    return NextResponse.json({ error: "Firma mancante." }, { status: 400 });
+  }
+
   try {
-    if (process.env.STRIPE_WEBHOOK_SECRET && signature) {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
+    if (secret && signature) {
+      event = stripe.webhooks.constructEvent(body, signature, secret);
     } else {
-      // Development mock fallback parsing
+      // Solo sviluppo/mock: parse senza verifica firma.
       event = JSON.parse(body) as Stripe.Event;
     }
   } catch (err: any) {

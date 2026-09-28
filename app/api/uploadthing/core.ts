@@ -9,7 +9,6 @@ export const ourFileRouter = {
       return { uploadedBy: "registration_or_admin" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Uploaded KYC document file url:", file.url);
       return { uploadedBy: metadata.uploadedBy, fileUrl: file.url };
     }),
 
