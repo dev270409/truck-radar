@@ -5,6 +5,7 @@ import { decryptSecret } from "@/lib/crypto";
 import { getApiConnection, getExternalIntegration, updateApiConnection } from "@/lib/raw-tables";
 import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
 import { testGeotab } from "@/lib/geotab";
+import { safeLog } from "@/lib/safe-log";
 
 const requireAdmin = async () => {
   const session = await auth();
@@ -93,6 +94,13 @@ export async function POST(
       });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Errore di connessione MyGeotab.";
+      // I messaggi sono normalizzati da lib/geotab: non contengono username,
+      // password, database o sessionId.
+      safeLog("warn", "Test connessione MyGeotab fallito", {
+        companyId: session.user.companyId,
+        connectionId: id,
+        reason: message,
+      });
       return NextResponse.json({ error: message }, { status: 400 });
     }
   }

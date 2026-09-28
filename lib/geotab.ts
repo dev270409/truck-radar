@@ -41,7 +41,7 @@ async function rpc<T>(host: string, method: string, params: Record<string, unkno
   if (payload.error) {
     const type = payload.error.data?.type ?? "";
     if (/InvalidUser|Authentication|Credentials/i.test(type)) {
-      throw new Error("MyGeotab non ha accettato le credenziali. Controlla database, username e password.");
+      throw new Error("MyGeotab non ha accettato le credenziali. Verifica che l'utente API sia attivo sul database e abbia una password impostata; usa il suo username e la sua password, non quelli di un altro utente.");
     }
     throw new Error("MyGeotab ha rifiutato la richiesta. Verifica i permessi dell'utente API e riprova.");
   }
