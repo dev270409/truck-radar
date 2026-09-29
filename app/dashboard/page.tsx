@@ -1,4 +1,4 @@
-﻿import { auth } from "@/auth";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTenantDb } from "@/lib/tenant";
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
       {/* Operativo flotta + grafico */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
         <FleetOpsPanel rows={fleetRows} />
-        <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni Â· consuntivo" data={chartData} />
+        <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni · consuntivo" data={chartData} />
       </div>
 
       {/* Banner borsa carichi (promo, non attiva) */}
@@ -183,8 +183,8 @@ export default async function DashboardPage() {
             </span>
             <h2 className="font-display mt-3 text-[20px] font-bold">Borsa Carichi</h2>
             <p className="mt-1.5 text-[13px] opacity-85">
-              Pubblica, cerca e affida carichi solo ad aziende verificate. Il Network sarÃ  attivato
-              gradualmente: nel frattempo puoi giÃ  usare il gestionale completo.
+              Pubblica, cerca e affida carichi solo ad aziende verificate. Il Network sarè  attivato
+              gradualmente: nel frattempo puoi giè  usare il gestionale completo.
             </p>
           </div>
           <Link
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
             className="inline-flex items-center gap-2 rounded-[var(--radius-base)] px-4 py-2.5 text-[13px] font-semibold"
             style={{ background: "rgba(255,255,255,0.14)" }}
           >
-            Scopri di piÃ¹ <ArrowRight className="h-4 w-4" />
+            Scopri di più <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         <svg className="absolute -right-6 -top-8 h-48 w-48 opacity-20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -261,7 +261,7 @@ export default async function DashboardPage() {
                     <span className="font-display text-[13px] font-bold" style={{ color: "var(--text)" }}>{v.targa}</span>
                     <span className="ml-2 text-[11px]" style={{ color: "var(--text-label)" }}>{v.categoria}</span>
                     <p className="text-[11px]" style={{ color: "var(--text-label-soft)" }}>
-                      {v.portataMaxKg} kg Â· {v.volumeMaxM3} mÂ³
+                      {v.portataMaxKg} kg · {v.volumeMaxM3} m³
                     </p>
                   </div>
                   <span className={`chip ${v.status === "DISPONIBILE" ? "chip-success" : "chip-warning"}`}>
@@ -365,7 +365,7 @@ export default async function DashboardPage() {
             <Boxes className="h-4 w-4" style={{ color: ACCENT }} /> Borsa Carichi & Smart Return
           </h2>
           <p className="text-[12px]" style={{ color: "var(--text-soft)" }}>
-            Riduci i km a vuoto trovando carichi di ritorno compatibili con percorso, data e capacitÃ  del
+            Riduci i km a vuoto trovando carichi di ritorno compatibili con percorso, data e capacitè  del
             mezzo. Funzione del Network, in attivazione graduale.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">

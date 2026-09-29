@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { Search, ArrowRight, ShieldCheck, FileCheck2, PackageOpen, CalendarClock } from "lucide-react";
@@ -29,7 +29,7 @@ export default function CercaUnVettorePage() {
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-400">
             Pubblica i carichi della tua azienda e affida i viaggi solo a vettori verificati del
-            Network Truck Radar: documenti in regola, reputazione pubblica e tracciabilitÃ  dei subappalti.
+            Network Truck Radar: documenti in regola, reputazione pubblica e tracciabilitè  dei subappalti.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Link
@@ -59,12 +59,12 @@ export default function CercaUnVettorePage() {
             <ShieldCheck className="h-6 w-6 text-emerald-400" />
             <h2 className="mt-4 text-lg font-bold">Vettori solo verificati</h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">
-              Ogni candidato ha account verificato, visura e documenti in regola. La reputazione dei subappalti Ã¨ pubblica.
+              Ogni candidato ha account verificato, visura e documenti in regola. La reputazione dei subappalti è pubblica.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <FileCheck2 className="h-6 w-6 text-amber-400" />
-            <h2 className="mt-4 text-lg font-bold">Documenti e tracciabilitÃ </h2>
+            <h2 className="mt-4 text-lg font-bold">Documenti e tracciabilitè </h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               DDT, stato di consegna e storico del viaggio restano disponibili per la tua azienda.
             </p>
@@ -75,7 +75,7 @@ export default function CercaUnVettorePage() {
           <h2 className="text-2xl font-bold">Il Network ammette solo aziende verificate.</h2>
           <p className="mt-3 text-sm leading-7 text-slate-300">
             Per pubblicare e affidare viaggi la tua azienda completa il percorso di verifica: dati societari,
-            visura e identitÃ  del rappresentante, gestiti tramite fornitori specializzati. Il gestionale resta
+            visura e identitè  del rappresentante, gestiti tramite fornitori specializzati. Il gestionale resta
             utilizzabile subito, senza attestazioni.
           </p>
         </div>

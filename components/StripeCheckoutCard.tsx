@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -20,7 +20,7 @@ interface StripeConfig {
 
 /**
  * Card abbonamento: avvia il checkout Stripe se configurato,
- * altrimenti mostra lo stato "In arrivo" (provider non attivo, Â§9 paper).
+ * altrimenti mostra lo stato "In arrivo" (provider non attivo, §9 paper).
  */
 export default function StripeCheckoutCard() {
   const [cfg, setCfg] = useState<StripeConfig | null>(null);
@@ -124,8 +124,8 @@ export default function StripeCheckoutCard() {
       ) : (
         <>
           <p className="text-sm text-slate-300 leading-relaxed">
-            La gestione dell'abbonamento a pagamento sarÃ  disponibile quando Stripe verrÃ  attivato in modalitÃ 
-            live (vedi roadmap di deploy Â§9). Continuando con l'account in Trial non verrai addebitato.
+            La gestione dell'abbonamento a pagamento sarè  disponibile quando Stripe verrè  attivato in modalitè 
+            live (vedi roadmap di deploy §9). Continuando con l'account in Trial non verrai addebitato.
           </p>
           <p className="text-xs text-slate-500 mt-3 flex items-start space-x-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />

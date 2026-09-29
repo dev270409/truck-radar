@@ -1,4 +1,4 @@
-﻿import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Manrope, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Truck Radar â€” Transport Operating System",
+  title: "Truck Radar — Transport Operating System",
   description:
     "Gestione flotta, autisti, viaggi e Network per aziende di trasporto. Analytics, DDT digitale e Smart Return in un unico sistema.",
   applicationName: "Truck Radar",
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "it_IT",
     siteName: "Truck Radar",
-    title: "Truck Radar â€” Il sistema operativo della tua flotta",
+    title: "Truck Radar — Il sistema operativo della tua flotta",
     description:
       "Mezzi, autisti, viaggi, DDT e margini in un unico posto. Meno km a vuoto, meno scadenze dimenticate. Prova gratis 21 giorni.",
     images: [{ url: "/dashboard-preview.svg", width: 720, height: 440, alt: "Dashboard Truck Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Truck Radar â€” Il sistema operativo della tua flotta",
+    title: "Truck Radar — Il sistema operativo della tua flotta",
     description:
       "Mezzi, autisti, viaggi, DDT e margini in un unico posto. Meno km a vuoto, meno scadenze dimenticate.",
     images: ["/dashboard-preview.svg"],

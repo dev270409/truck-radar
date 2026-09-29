@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -96,7 +96,7 @@ export default function ContattiPage() {
               </div>
               <h2 className="mt-5 text-xl font-bold">Richiesta inviata</h2>
               <p className="mt-2 text-sm text-slate-300">
-                Grazie! Ti contatteremo al piÃ¹ presto per fissare la demo.
+                Grazie! Ti contatteremo al più presto per fissare la demo.
               </p>
               <Link href="/" className="mt-6 inline-block text-sm text-blue-400 hover:text-blue-300">
                 Torna alla home
@@ -125,15 +125,15 @@ export default function ContattiPage() {
               </div>
               <Field label="Numero di mezzi">
                 <select value={form.mezzi} onChange={set("mezzi")} className={inputCls}>
-                  <option value="">Selezionaâ€¦</option>
-                  <option value="1-5">1â€“5 mezzi</option>
-                  <option value="6-20">6â€“20 mezzi</option>
-                  <option value="21-50">21â€“50 mezzi</option>
-                  <option value="50+">PiÃ¹ di 50 mezzi</option>
+                  <option value="">Seleziona…</option>
+                  <option value="1-5">1–5 mezzi</option>
+                  <option value="6-20">6–20 mezzi</option>
+                  <option value="21-50">21–50 mezzi</option>
+                  <option value="50+">Più di 50 mezzi</option>
                 </select>
               </Field>
               <Field label="Di cosa hai bisogno?">
-                <textarea value={form.messaggio} onChange={set("messaggio")} rows={4} placeholder="Es. gestione flotta, DDT, subappalto, integrazione con il nostro GPSâ€¦" className={inputCls} />
+                <textarea value={form.messaggio} onChange={set("messaggio")} rows={4} placeholder="Es. gestione flotta, DDT, subappalto, integrazione con il nostro GPS…" className={inputCls} />
               </Field>
               <button
                 type="submit"
@@ -141,7 +141,7 @@ export default function ContattiPage() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-500 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CalendarClock className="h-4 w-4" />}
-                {loading ? "Invio in corsoâ€¦" : "Richiedi la demo"}
+                {loading ? "Invio in corso…" : "Richiedi la demo"}
               </button>
               <p className="flex items-center justify-center gap-2 text-xs text-slate-400">
                 <Building2 className="h-3.5 w-3.5" /> Nessun costo, nessun impegno.

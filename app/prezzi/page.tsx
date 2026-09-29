@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowRight, CalendarClock, Check, Building2, Truck, BarChart3 } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
 import Logo from "@/components/Logo";
@@ -27,7 +27,7 @@ const plans = [
 const faqs = [
   {
     q: "Serve comprare hardware o installare dispositivi?",
-    a: "No. Truck Radar Ã¨ hardware-agnostic: si collega via API ai sistemi GPS/telematica, TMS ed ERP che usi giÃ . Non devi installare nulla di proprietario.",
+    a: "No. Truck Radar è hardware-agnostic: si collega via API ai sistemi GPS/telematica, TMS ed ERP che usi giè . Non devi installare nulla di proprietario.",
   },
   {
     q: "Come funziona il periodo di prova?",
@@ -35,15 +35,15 @@ const faqs = [
   },
   {
     q: "Cosa serve per accedere al Network?",
-    a: "Il gestionale Ã¨ utilizzabile subito. Per pubblicare carichi e subappaltare, l'azienda completa una verifica con documenti societari e identitÃ  del rappresentante.",
+    a: "Il gestionale è utilizzabile subito. Per pubblicare carichi e subappaltare, l'azienda completa una verifica con documenti societari e identitè  del rappresentante.",
   },
   {
     q: "Dove sono conservati i dati?",
-    a: "In Unione Europea, cifrati in transito e a riposo. Il tracciamento dei conducenti Ã¨ gestito nel rispetto dell'art. 4 dello Statuto dei Lavoratori (L. 300/70).",
+    a: "In Unione Europea, cifrati in transito e a riposo. Il tracciamento dei conducenti è gestito nel rispetto dell'art. 4 dello Statuto dei Lavoratori (L. 300/70).",
   },
   {
     q: "E se la flotta supera i limiti del piano?",
-    a: "Per flotte piÃ¹ grandi di 50 mezzi prepariamo un piano su misura. Scrivici e definiamo insieme le condizioni.",
+    a: "Per flotte più grandi di 50 mezzi prepariamo un piano su misura. Scrivici e definiamo insieme le condizioni.",
   },
 ];
 
@@ -86,13 +86,13 @@ export default function PrezziPage() {
           >
             {p.highlight && (
               <span className="absolute -top-3 left-8 rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                PiÃ¹ scelto
+                Più scelto
               </span>
             )}
             <h2 className="text-lg font-bold text-slate-100">{p.key}</h2>
             <p className="mt-1 text-sm text-slate-300">{p.tagline}</p>
             <div className="mt-6 flex items-end gap-1">
-              <span className="text-4xl font-bold tracking-tight">â‚¬ {p.price}</span>
+              <span className="text-4xl font-bold tracking-tight">€ {p.price}</span>
               <span className="mb-1 text-sm text-slate-400">/ {p.label}</span>
             </div>
             <ul className="mt-6 space-y-3 text-sm">
@@ -120,9 +120,9 @@ export default function PrezziPage() {
       <section className="border-y border-slate-800 bg-slate-900/50">
         <div className="mx-auto grid max-w-6xl gap-5 px-6 py-14 md:grid-cols-3">
           {[
-            { icon: Building2, t: "Micro-flotte (2â€“5)", d: "Parti dal gestionale: mezzi, viaggi e DDT digitale." },
-            { icon: Truck, t: "PMI (6â€“20)", d: "Margine per viaggio, scadenze e subappalto con verifica." },
-            { icon: BarChart3, t: "Flotte (20â€“50+)", d: "Analytics, API e piani su misura oltre i 50 mezzi." },
+            { icon: Building2, t: "Micro-flotte (2–5)", d: "Parti dal gestionale: mezzi, viaggi e DDT digitale." },
+            { icon: Truck, t: "PMI (6–20)", d: "Margine per viaggio, scadenze e subappalto con verifica." },
+            { icon: BarChart3, t: "Flotte (20–50+)", d: "Analytics, API e piani su misura oltre i 50 mezzi." },
           ].map(({ icon: Icon, t, d }) => (
             <article key={t} className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
               <Icon className="h-6 w-6 text-blue-400" />
@@ -154,7 +154,7 @@ export default function PrezziPage() {
         <div className="mx-auto flex max-w-4xl flex-col items-center px-6 py-16 text-center">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Non sei sicuro del piano giusto?</h2>
           <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
-            Prenota una demo: analizziamo insieme la tua flotta e ti indichiamo la configurazione piÃ¹ adatta.
+            Prenota una demo: analizziamo insieme la tua flotta e ti indichiamo la configurazione più adatta.
           </p>
           <Link
             href="/contatti"

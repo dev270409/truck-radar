@@ -12,8 +12,9 @@ Regole guida
 ## 1. Abbonamento e pricing
 - [x] Trial unico portato a **21 giorni** ovunque (codice, DB, marketing, legale).
 - [x] Piano **BASE 59€/mese** (era 99€); PRO invariato.
-- [ ] [n] Creare il nuovo Price Stripe BASE a 59€ e aggiornare `STRIPE_PRICE_ID_BASE`.
+- [x] Creato Price Stripe BASE 59€ (`price_1UL0jmDU9CV3V30w9su6sv3m`) e aggiornata `STRIPE_PRICE_ID_BASE` (Vercel Production+Preview, `.env.local`).
 - [x] Allineare testi: homepage, `/prezzi`, FAQ, abbonamenti.
+- [x] Fix corruzione caratteri accentati (mojibake `Â`/`Ã`) su 6 file di UI: simboli `·`, `§`, `m³`, `CO₂`, `è/à` ripristinati.
 
 ## 2. Gestione flotta / Mezzi
 - [x] Deduplica automatica per targa con i dispositivi Geotab.
