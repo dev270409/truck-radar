@@ -168,20 +168,26 @@ export default async function HomePage() {
           </p>
         </div>
 
-        {/* Mockup reale di dashboard (live map + KPI) */}
+        {/* Mockup dashboard (anteprima con dati di esempio) */}
         <div className="glass-strong p-4">
           <div className="flex items-center gap-1.5 px-2 pb-3">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--danger)" }} />
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--warning)" }} />
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--success)" }} />
             <span className="ml-3 text-[11px] font-medium" style={{ color: "var(--text-label)" }}>
-              Flotta live · Truck Radar
+              Anteprima dashboard
+            </span>
+            <span
+              className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider"
+              style={{ background: "color-mix(in oklch, var(--warning) 16%, transparent)", color: "var(--accent)" }}
+            >
+              Dati di esempio
             </span>
           </div>
           <div className="glass-panel overflow-hidden">
             <img
               src="/dashboard-preview.svg"
-              alt="Dashboard Truck Radar con flotta live, mappa dei mezzi e indicatori di margine"
+              alt="Anteprima della dashboard Truck Radar con mappa dei mezzi e indicatori (dati di esempio)"
               className="h-auto w-full"
             />
           </div>
@@ -205,6 +211,9 @@ export default async function HomePage() {
               <p className="font-display mt-1 text-lg font-bold" style={{ color: "var(--warning)" }}>3</p>
             </div>
           </div>
+          <p className="mt-2 text-center text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+            Valori dimostrativi per mostrare la dashboard. I tuoi dati reali appariranno dopo la registrazione.
+          </p>
         </div>
       </section>
 

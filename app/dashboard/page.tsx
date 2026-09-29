@@ -94,23 +94,16 @@ export default async function DashboardPage() {
   const kycRejected = kycDocs.filter((d) => d.status === "RIFIUTATO").length;
   const kycOk = kycDocs.length > 0 && kycPending === 0 && kycRejected === 0;
 
-  // Barre: distribuzione mezzi per categoria (grafico operativo)
+  // Barre: distribuzione mezzi per categoria (dato reale). Se non ci sono
+  // mezzi con categoria, il grafico mostra uno stato vuoto anziché valori fittizi.
   const byCategory = vehicles.reduce<Record<string, number>>((acc, v) => {
     acc[v.categoria] = (acc[v.categoria] ?? 0) + 1;
     return acc;
   }, {});
-  const chartData =
-    Object.keys(byCategory).length > 0
-      ? Object.entries(byCategory).map(([label, value]) => ({ label: label.slice(0, 6), value }))
-      : [
-          { label: "Lun", value: 6 },
-          { label: "Mar", value: 9 },
-          { label: "Mer", value: 7 },
-          { label: "Gio", value: 11 },
-          { label: "Ven", value: 13 },
-          { label: "Sab", value: 5 },
-          { label: "Dom", value: 2 },
-        ];
+  const chartData = Object.entries(byCategory).map(([label, value]) => ({
+    label: label.slice(0, 6),
+    value,
+  }));
 
   return (
     <div className="space-y-6">
@@ -165,7 +158,12 @@ export default async function DashboardPage() {
       {/* Operativo flotta + grafico */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
         <FleetOpsPanel rows={fleetRows} />
-        <BarChart title="Viaggi per giorno" subtitle="Ultimi 7 giorni · consuntivo" data={chartData} />
+        <BarChart
+          title="Flotta per categoria"
+          subtitle="Distribuzione reale dei tuoi mezzi"
+          data={chartData}
+          emptyMessage="Nessun mezzo con categoria registrata. Aggiungi mezzi in “Mezzi” per vedere il grafico."
+        />
       </div>
 
       {/* Banner borsa carichi (promo, non attiva) */}

@@ -249,12 +249,19 @@ export default function IntegrazioniPage() {
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusStyles[c.status]}`}>
                         {c.status}
                       </span>
+                      {isGeotab ? (
+                        <span className="chip chip-success" style={{ fontSize: 8 }}>Live · reale</span>
+                      ) : (
+                        <span className="chip chip-warning" style={{ fontSize: 8 }}>Demo · non attiva</span>
+                      )}
                     </div>
                     {c.baseUrl && (
                       <p className="text-xs font-mono text-slate-500 mt-0.5 truncate">{c.baseUrl}</p>
                     )}
-                    {!isGeotab && process.env.NODE_ENV === "production" && (
-                      <p className="mt-1 text-[10px] font-semibold text-amber-300">Credenziali salvate; adapter live non ancora disponibile.</p>
+                    {!isGeotab && (
+                      <p className="mt-1 text-[10px] font-semibold text-amber-300">
+                        Connettore dimostrativo: le credenziali sono salvate ma non viene effettuata alcuna chiamata reale al provider.
+                      </p>
                     )}
                     <p className="text-[11px] text-slate-500 mt-1">
                       Credenziali: {c.hasCreds ? `configurate (${c.credsKeys})` : "mancanti"}
