@@ -56,8 +56,14 @@ Da marcare **SOON** con pagina dati d'esempio "In arrivo", senza rimuovere nulla
 
 ## 7. Legale / privacy
 - [x] Cookie policy reale, fix refuso privacy.
-- [ ] [n] Dati societari del Titolare (ragione sociale, sede, P.IVA).
-- [ ] [n] Allineare "dati in UE" alla regione reale dei fornitori.
+- [x] **Account demo bloccati in produzione**: il login per email `@demo.com` è rifiutato quando `NODE_ENV=production` (override esplicito `ALLOW_DEMO_LOGIN=true`). Verificato: `admin@demo.com/Demo123!` accedeva prima via API di produzione sul tenant demo scrivibile; ora bloccato. Gli account restano nel DB per gli e2e locali.
+- [ ] Verifica affermazioni pubblicate (da validare legalmente / documentare):
+  - **Cifratura "in transito e a riposo"**: VERO — TLS in transito; Supabase e UploadThing cifrano a riposo; credenziali integrazioni AES-256-GCM. Documentare nei record di sicurezza.
+  - **"Dati ospitati in Unione Europea"**: PARZIALE — DB Supabase in UE (`eu-west-1`), ma UploadThing è su `sea1` (USA) e Gemini usa endpoint globale senza garanzia di residenza. Da correggere o migrare (scelta A/B pendente).
+  - **"Conforme al GDPR"**: generico — definire ruoli titolare/responsabile e DPA con i fornitori; documentare.
+  - **Tracking conducenti art. 4 L.300/70**: l'informativa `/informativa-autisti` si dichiara "bozza da validare legalmente": NON pronta, da validare prima del go-live.
+- [ ] [n] Dati societari del Titolare (ragione sociale, sede, P.IVA, PEC, email).
+- [ ] [n] Allineare "dati in UE" alla regione reale dei fornitori (decisione A/B).
 
 ## 8. Backlog tecnico
 - [ ] Rate limit distribuito (oggi in-memory).

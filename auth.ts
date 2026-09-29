@@ -6,6 +6,18 @@ import { comparePassword } from "@/lib/hash";
 import { rateLimit } from "@/lib/rate-limit";
 import { getPlanLimits } from "@/lib/plans";
 
+/**
+ * In produzione gli account demo (email @demo.com) sono bloccati per evitare
+ * accessi con credenziali pubbliche note. Gli account restano nel DB e negli
+ * e2e locali; l'override esplicito `ALLOW_DEMO_LOGIN=true` riabilita il login
+ * (utile per demo controllate).
+ */
+const DEMO_EMAIL_SUFFIX = "@demo.com";
+function demoLoginAllowed(): boolean {
+  if (process.env.ALLOW_DEMO_LOGIN === "true") return true;
+  return process.env.NODE_ENV !== "production";
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   session: { strategy: "jwt" },
@@ -23,6 +35,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
+
+        // Blocco account demo in produzione (credenziali pubbliche note).
+        if (email.endsWith(DEMO_EMAIL_SUFFIX) && !demoLoginAllowed()) {
+          return null;
+        }
 
         const rl = rateLimit(`login:${email}`, 30, 60_000);
         if (!rl.ok) {
