@@ -93,7 +93,7 @@ export default function AgevolazioniPage() {
             <div>
               <h2 className="text-sm font-bold text-sky-100">Consorzio Italia e mail periodiche</h2>
               <p className="mt-1 max-w-2xl text-xs leading-5 text-sky-100/80">
-                Inoltra le email del Consorzio a <span className="font-mono">agevolazioni@in.truck-radar.it</span>.
+                In arrivo: inoltro delle email del Consorzio a <span className="font-mono">agevolazioni@in.truck-radar.it</span>.
                 La prossima fase le classificherà e creerà scadenze e checklist automatiche. Oggi il catalogo è manuale.
               </p>
             </div>
