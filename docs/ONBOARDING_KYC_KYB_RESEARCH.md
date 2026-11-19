@@ -68,7 +68,7 @@ Per un team piccolo è un costo e un rischio inutile.
 - non dobbiamo conservare documenti/selfie: riceviamo solo l'esito;
 - se in futuro serve AML/UBO, si passa a Sumsub o si aggiunge un provider KYB.
 
-**Attenzione:** Stripe Identity va attivato nell'account Stripe, configurando webhook e `STRIPE_IDENTITY_ENABLED=true`. Finché non è attivo, la pagina di verifica mostra il provider come non disponibile.
+**Attenzione:** Stripe Identity va attivato nell'account Stripe, con webhook `identity.verification_session.*`; in produzione il codice abilita Identity se `STRIPE_SECRET_KEY` è presente (`STRIPE_IDENTITY_ENABLED=false` lo disattiva). Finché non è attivo, la pagina di verifica mostra il provider come non disponibile.
 
 ### SPID/CIE
 
@@ -166,9 +166,9 @@ Per 100 nuovi clienti al mese:
 
 ## 9. Cosa manca per andare live
 
-1. Attivare Stripe Identity nell'account Stripe.
-2. Impostare `STRIPE_IDENTITY_ENABLED=true` in produzione.
-3. Configurare gli eventi webhook `identity.verification_session.*` sullo stesso endpoint Stripe.
+1. Attivare Stripe Identity nell'account Stripe (accesso API verificato; disponibile).
+2. Deployare il codice in produzione (Identity si abilita da solo con `STRIPE_SECRET_KEY`).
+3. Eventi webhook `identity.verification_session.*` aggiunti all'endpoint Stripe di produzione.
 4. Configurare `OPENAPI_API_KEY` per il KYB italiano (VIES funziona anche senza).
 5. Decidere se dopo la verifica l'utente deve pagare subito o può restare in trial/read-only.
 6. Aggiungere un revisore piattaforma separato se si vogliono verificare manualmente documenti Level 2.
