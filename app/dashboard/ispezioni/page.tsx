@@ -3,6 +3,7 @@
 import { soonPage } from "@/components/soon/soon-pages";
 import { useEffect, useState } from "react";
 import { Loader2, ClipboardCheck, Save, Plus, Trash2, ShieldAlert } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface Template {
   id: string;
@@ -169,7 +170,7 @@ function Original_IspezioniPage() {
                               : "bg-red-950 text-red-300 border border-red-800/60"
                           }`}
                         >
-                          {ins.esito}
+                          {label(ins.esito)}
                         </span>
                       </div>
                       <span className="text-xs text-slate-500">

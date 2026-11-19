@@ -12,6 +12,7 @@ import {
   Truck,
 } from "lucide-react";
 import IncassoRapidoSoon from "@/components/IncassoRapidoSoon";
+import { label } from "@/lib/labels";
 
 interface Tx {
   id: string;
@@ -253,7 +254,7 @@ export default function EconomiaPage() {
                         {tx.type === "COMMISSION" || tx.type === "PAYOUT" ? "−" : "+"}
                         {eur(tx.amount)}
                       </p>
-                      <p className="text-[10px] text-slate-500 uppercase">{tx.status}</p>
+                      <p className="text-[10px] text-slate-500 uppercase">{label(tx.status)}</p>
                     </div>
                   </div>
                 );
@@ -317,7 +318,7 @@ export default function EconomiaPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${PAYOUT_BADGES[p.status]}`}>
-                      {p.status}
+                      {label(p.status)}
                     </span>
                     <div className="flex items-center space-x-1.5">
                       {p.status === "PENDING" && (

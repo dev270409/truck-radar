@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { getTenantDb } from "@/lib/tenant";
+import { optionalHttpUrl } from "@/lib/url-safety";
 import type { VehicleDocType } from "@prisma/client";
 
 const DOC_TYPES = ["ASSICURAZIONE", "REVISIONE", "TAGLIANDO", "BOLLO"];
@@ -65,13 +66,16 @@ export async function POST(
     if (!dataScadenza || isNaN(new Date(dataScadenza).getTime())) {
       return NextResponse.json({ error: "Data di scadenza obbligatoria e valida." }, { status: 400 });
     }
+    if (body.fileUrl && !optionalHttpUrl(body.fileUrl)) {
+      return NextResponse.json({ error: "File documento non valido." }, { status: 400 });
+    }
 
     const document = await db.vehicleDocument.create({
       data: {
         vehicleId: vehicle.id,
         tipo: tipo as VehicleDocType,
         dataScadenza: new Date(dataScadenza),
-        fileUrl: body.fileUrl ? String(body.fileUrl) : null,
+        fileUrl: optionalHttpUrl(body.fileUrl),
       },
     });
 

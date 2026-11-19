@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+npm-debug.log*
+dev-server.log
+license-keys
+.vercel
+.kilo
+coverage
+out
+build
+*.tsbuildinfo
+next-env.d.ts

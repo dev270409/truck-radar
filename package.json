@@ -2,12 +2,21 @@
   "name": "transport-saas",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "effect": "3.22.2",
+    "@effect/platform": "0.97.2"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
+    "db:raw": "tsx scripts/ensure-raw-tables.ts",
+    "selfhost:setup": "prisma db push && tsx scripts/ensure-raw-tables.ts",
+    "license:keygen": "tsx scripts/license-keygen.ts",
+    "license:issue": "tsx scripts/license-issue.ts",
+    "license:e2e": "tsx scripts/e2e-license.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
@@ -23,7 +32,7 @@
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.45.0",
-    "next": "16.3.5",
+    "next": "16.4.6",
     "next-auth": "^5.0.0-beta.32",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -38,7 +47,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.5",
+    "eslint-config-next": "16.4.6",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",

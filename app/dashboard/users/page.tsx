@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3 } from "lucide-react";
+import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3, KeyRound, Copy } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface UserItem {
   id: string;
@@ -35,6 +36,7 @@ export default function UsersPage() {
   const [geotabSnapshotAt, setGeotabSnapshotAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [resetResult, setResetResult] = useState<{ email: string; tempPassword: string } | null>(null);
 
   // Form State
   const [nome, setNome] = useState("");
@@ -42,7 +44,7 @@ export default function UsersPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [role, setRole] = useState<"AUTISTA" | "COMMITTENTE">("AUTISTA");
+  const role = "AUTISTA" as const;
   const [vehicleId, setVehicleId] = useState("");
 
   const [saving, setSaving] = useState(false);
@@ -81,6 +83,23 @@ export default function UsersPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const resetPassword = async (u: UserItem) => {
+    if (!window.confirm(`Reimpostare la password di ${u.email}?`)) return;
+    setSaving(true);
+    setError("");
+    setResetResult(null);
+    try {
+      const res = await fetch(`/api/users/${u.id}/reset-password`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nel reset password");
+      setResetResult({ email: data.email, tempPassword: data.tempPassword });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +156,7 @@ export default function UsersPage() {
             <BarChart3 className="w-4 h-4" /><span>Analisi autisti</span>
           </Link>
           <button
-            onClick={() => { setRole("AUTISTA"); setShowAddModal(true); }}
+            onClick={() => setShowAddModal(true)}
             className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition"
           >
             <Plus className="w-4 h-4" />
@@ -184,7 +203,33 @@ export default function UsersPage() {
             Nessun membro del team trovato. Clicca su "Aggiungi autista" per creare credenziali e accesso PWA.
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          <div className="space-y-3 md:hidden">
+            {users.map((u) => (
+              <div key={u.id} className="ops-card p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-100">{u.nome} {u.cognome}</p>
+                    <p className="truncate font-mono text-[11px] text-slate-400">{u.email}</p>
+                  </div>
+                  <span className="chip chip-brand">{label(u.role)}</span>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-3 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
+                  <span className="text-[11px] font-semibold text-emerald-400">Attivo</span>
+                  <button
+                    type="button"
+                    onClick={() => resetPassword(u)}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                  >
+                    <KeyRound className="h-3.5 w-3.5" /> Reset password
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
                 <tr>
@@ -193,6 +238,7 @@ export default function UsersPage() {
                   <th className="px-6 py-4">Telefono</th>
                   <th className="px-6 py-4">Ruolo Aziendale</th>
                   <th className="px-6 py-4">Stato Account</th>
+                  <th className="px-6 py-4 text-right">Azioni</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80">
@@ -214,7 +260,7 @@ export default function UsersPage() {
                             : "bg-blue-950 text-blue-300 border border-blue-800/60"
                         }`}
                       >
-                        {u.role}
+                        {label(u.role)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -222,13 +268,57 @@ export default function UsersPage() {
                         ATTIVO
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => resetPassword(u)}
+                        disabled={saving}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                        title="Reimposta password"
+                      >
+                        <KeyRound className="h-3.5 w-3.5" /> Reset
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
+
+      {resetResult && (
+        <div className="mb-5 rounded-xl border border-amber-800/60 bg-amber-950/30 p-4">
+          <p className="text-sm font-semibold text-amber-100">
+            Password temporanea per {resetResult.email}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <code className="rounded-lg border border-amber-800/60 bg-slate-950 px-3 py-2 font-mono text-sm text-amber-100">
+              {resetResult.tempPassword}
+            </code>
+            <button
+              type="button"
+              onClick={() => {
+                if (navigator.clipboard) navigator.clipboard.writeText(resetResult.tempPassword);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-700/60 px-2.5 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-900/30"
+            >
+              <Copy className="h-3.5 w-3.5" /> Copia
+            </button>
+            <button
+              type="button"
+              onClick={() => setResetResult(null)}
+              className="rounded-lg border border-slate-700 px-2.5 py-2 text-xs font-semibold text-slate-300"
+            >
+              Chiudi
+            </button>
+          </div>
+          <p className="mt-2 text-[11px] text-amber-200/70">
+            Comunicala all’utente solo una volta. Al primo accesso può cambiarla da “Account e password”.
+          </p>
+        </div>
+      )}
 
       {/* Add User Modal */}
       {showAddModal && (
@@ -306,16 +396,11 @@ export default function UsersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
-                    Ruolo *
+                    Ruolo
                   </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as any)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
-                  >
-                    <option value="AUTISTA">AUTISTA</option>
-                    <option value="COMMITTENTE">COMMITTENTE</option>
-                  </select>
+                  <div className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-slate-300">
+                    AUTISTA
+                  </div>
                 </div>
 
                 <div>

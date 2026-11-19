@@ -25,6 +25,7 @@ import {
   Check,
   Link2,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface SubSuggestion {
   companyId: string;
@@ -408,7 +409,7 @@ export default function TripDetailPage() {
           <p className="text-sm text-slate-400 mt-1">{trip.tipoMerce}</p>
         </div>
         <span className={`text-xs font-bold px-4 py-2 rounded-full ${statusStyles[trip.status]}`}>
-          {trip.status.replace("_", " ")}
+          {label(trip.status)}
         </span>
       </div>
 
@@ -500,7 +501,7 @@ export default function TripDetailPage() {
                   <option value="">-- Nessun mezzo --</option>
                   {vehicles.map((v) => (
                     <option key={v.id} value={v.id}>
-                      {v.targa} · {v.categoria}
+                      {v.targa} · {label(v.categoria)}
                     </option>
                   ))}
                 </select>
@@ -637,7 +638,7 @@ export default function TripDetailPage() {
                     <div className="flex items-center space-x-3 min-w-0">
                       <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-100 capitalize">{doc.tipo}</p>
+                        <p className="text-sm font-semibold text-slate-100 capitalize">{label(doc.tipo)}</p>
                         {doc.note && <p className="text-xs text-slate-400 truncate">{doc.note}</p>}
                         <p className="text-[11px] font-mono text-slate-500 mt-0.5">
                           {new Date(doc.createdAt).toLocaleString("it-IT")}
@@ -835,7 +836,7 @@ Apri
                                 : "bg-amber-950 text-amber-300"
                           }`}
                         >
-                          {p.status}
+                          {label(p.status)}
                         </span>
                         {p.status === "PROPOSTO" && (
                           <>
@@ -942,11 +943,11 @@ Apri
                   <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                   <div className="flex items-center space-x-2 text-xs">
                     <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
-                      {ev.fromStatus.replace("_", " ")}
+                      {label(ev.fromStatus)}
                     </span>
                     <ArrowRight className="w-3 h-3 text-slate-500" />
                     <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
-                      {ev.toStatus.replace("_", " ")}
+                      {label(ev.toStatus)}
                     </span>
                   </div>
                   {ev.note && <p className="text-xs text-slate-400 mt-1">{ev.note}</p>}

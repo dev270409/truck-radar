@@ -6,6 +6,7 @@ import {
   setMaintenanceStatus,
   deleteMaintenance,
 } from "@/lib/maintenance";
+import { vehicleBelongsToCompany } from "@/lib/tenant-refs";
 
 const MANUTENZIONE_TIPI = ["TAGLIANDO", "FUNGHIOLO", "OLIO", "USURA_PNEUMATICI", "ALTRO"] as const;
 
@@ -78,6 +79,9 @@ export async function POST(req: Request) {
   }
   if (costo != null && (isNaN(costo) || costo < 0)) {
     return NextResponse.json({ error: "Costo non valido." }, { status: 400 });
+  }
+  if (!(await vehicleBelongsToCompany(session.user.companyId, vehicleId))) {
+    return NextResponse.json({ error: "Mezzo non trovato." }, { status: 404 });
   }
 
   try {

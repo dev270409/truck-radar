@@ -33,15 +33,13 @@ export default function DashboardShell({
           />
         )}
 
-        {/* Sidebar vetro 252px (desktop) / drawer (mobile) */}
+        {/* Sidebar (desktop) / drawer (mobile) */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 flex w-[252px] transform flex-col overflow-y-auto p-4 transition-transform duration-200 md:sticky md:top-[68px] md:z-auto md:h-[calc(100vh-68px)] md:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 flex w-[252px] transform flex-col overflow-y-auto p-4 transition-transform duration-200 md:sticky md:top-16 md:z-auto md:h-[calc(100vh-64px)] md:translate-x-0 ${
             open ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{
             background: "var(--glass-sidebar)",
-            backdropFilter: "blur(24px) saturate(150%)",
-            WebkitBackdropFilter: "blur(24px) saturate(150%)",
             borderRight: "1px solid var(--glass-border)",
           }}
         >

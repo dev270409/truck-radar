@@ -9,6 +9,9 @@ export async function GET() {
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
+  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
+    return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
+  }
 
   const tenantDb = getTenantDb(session.user.companyId);
   const users = await tenantDb.users.findMany({
@@ -35,7 +38,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  // Only ADMIN can create AUTISTA or COMMITTENTE users
   if (session.user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Accesso negato: solo gli amministratori possono creare nuovi utenti." },
@@ -54,9 +56,9 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!["AUTISTA", "COMMITTENTE", "UFFICIO"].includes(role)) {
+    if (role !== "AUTISTA") {
       return NextResponse.json(
-        { error: "L'admin può creare unicamente utenti con ruolo AUTISTA, COMMITTENTE o UFFICIO." },
+        { error: "Per ora l'admin può creare unicamente utenti AUTISTA." },
         { status: 400 }
       );
     }

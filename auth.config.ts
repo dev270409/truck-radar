@@ -24,6 +24,10 @@ declare module "next-auth" {
       vehicleLimit: number;
       /** Maximum number of drivers allowed for this plan. */
       driverLimit: number;
+      /** Self-hosted: licenza valida. */
+      licensed?: boolean;
+      /** Self-hosted: intestatario della licenza. */
+      licensee?: string;
     };
   }
 }
@@ -47,6 +51,8 @@ export const authConfig = {
         token.subscriptionPlan = (user as any)?.subscriptionPlan || "TRIAL";
         token.vehicleLimit = (user as any)?.vehicleLimit ?? 15;
         token.driverLimit = (user as any)?.driverLimit ?? 15;
+        token.licensed = (user as any)?.licensed ?? false;
+        token.licensee = (user as any)?.licensee;
       }
       return token;
     },
@@ -64,6 +70,8 @@ export const authConfig = {
         session.user.subscriptionPlan = token.subscriptionPlan as string;
         session.user.vehicleLimit = token.vehicleLimit as number;
         session.user.driverLimit = token.driverLimit as number;
+        session.user.licensed = token.licensed as boolean | undefined;
+        session.user.licensee = token.licensee as string | undefined;
       }
       return session;
     },

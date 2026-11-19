@@ -14,6 +14,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import StripeCheckoutCard from "@/components/StripeCheckoutCard";
+import { label } from "@/lib/labels";
 
 const eur = (v: number) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(v);
@@ -178,7 +179,7 @@ export default async function AbbonamentiPage() {
                     <td className="py-3 pr-4 text-slate-200 font-medium">{t.type}</td>
                     <td className="py-3 pr-4">
                       <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/60">
-                        {t.status}
+                        {label(t.status)}
                       </span>
                     </td>
                     <td className="py-3 text-right font-semibold text-slate-100">{eur(t.amount)}</td>

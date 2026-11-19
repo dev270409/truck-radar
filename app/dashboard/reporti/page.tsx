@@ -14,6 +14,7 @@ import {
   Building2,
   CalendarDays,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface ReportData {
   totali: {
@@ -219,7 +220,7 @@ function Original_ReportiPage() {
                 <div className="space-y-2.5">
                   {data.byStatus.map((s) => (
                     <div key={s.status} className="flex items-center space-x-3 text-sm">
-                      <span className="w-32 text-xs font-semibold text-slate-300">{s.status}</span>
+                      <span className="w-32 text-xs font-semibold text-slate-300">{label(s.status)}</span>
                       <div className="flex-1 bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
                         <div
                           className={`h-full ${STATUS_COLORS[s.status] ?? "bg-slate-500"}`}

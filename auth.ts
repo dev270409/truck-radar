@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { comparePassword } from "@/lib/hash";
 import { rateLimit } from "@/lib/rate-limit";
 import { getPlanLimits } from "@/lib/plans";
+import { getLicenseState } from "@/lib/license";
 
 /**
  * In produzione gli account demo (email @demo.com) sono bloccati per evitare
@@ -54,6 +55,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user || !user.isActive) {
           return null;
         }
+        if (user.role !== "ADMIN" && user.role !== "AUTISTA") {
+          return null;
+        }
 
         const isValid = await comparePassword(password, user.passwordHash);
         if (!isValid) {
@@ -61,6 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const planLimits = getPlanLimits(user.company?.subscriptionPlan);
+        const license = getLicenseState();
 
         return {
           id: user.id,
@@ -70,9 +75,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           companyId: user.companyId,
           vehicleId: user.vehicleId,
-          subscriptionPlan: user.company?.subscriptionPlan || "BASE",
+          subscriptionPlan: license.valid && license.payload
+            ? license.payload.plan
+            : user.company?.subscriptionPlan || "BASE",
           vehicleLimit: planLimits.vehicleLimit,
           driverLimit: planLimits.driverLimit,
+          licensed: license.valid,
+          licensee: license.payload?.licensee,
         };
       },
     }),

@@ -39,8 +39,6 @@ const securityHeaders = [
   },
 ];
 
-const BUILD_ID = "20260923.7";
-
 const nextConfig: NextConfig = {
   async headers() {
     return [
@@ -50,7 +48,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  generateBuildId: () => BUILD_ID,
 };
 
 export default nextConfig;

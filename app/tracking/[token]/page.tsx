@@ -50,7 +50,7 @@ export default async function TrackingPage({
 
   // Vista committente: SOLO i dati autorizzati del viaggio condiviso, con isolamento tenant.
   const trip = await db.trip.findFirst({
-    where: { id: share.tripId },
+    where: { id: share.tripId, companyId: share.companyId },
     include: { vehicle: true, driver: true },
   });
 
@@ -131,6 +131,29 @@ export default async function TrackingPage({
               {trip.driver ? ` · Autista: ${trip.driver.nome} ${trip.driver.cognome}` : ""}
             </p>
           )}
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {last?.lat != null && last?.lng != null && (
+              <a
+                href={`https://www.google.com/maps?q=${last.lat},${last.lng}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-blue-500"
+              >
+                <MapPin className="h-3.5 w-3.5" /> Ultima posizione su mappa
+              </a>
+            )}
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `Tracking spedizione ${trip.luogoRitiro} → ${trip.luogoConsegna}: ${last?.posizione || "in preparazione"} · stato ${trip.status} · https://truck-radar.it/tracking/${token}`
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-emerald-500"
+            >
+              <Clock className="h-3.5 w-3.5" /> Condividi su WhatsApp
+            </a>
+          </div>
         </div>
 
         {tracking.length > 0 && (

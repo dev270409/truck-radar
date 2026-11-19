@@ -5,7 +5,7 @@ import { getTenantDb } from "@/lib/tenant";
 // Endpoint di test del multi-tenancy. ESPOSTO SOLO IN SVILUPPO: in produzione
 // non deve essere raggiungibile (crea/elimina dati reali e non ha auth).
 export async function GET() {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Non disponibile." }, { status: 404 });
   }
 

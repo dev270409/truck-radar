@@ -1,4 +1,4 @@
-const CACHE_NAME = "logiflow-v1";
+const CACHE_NAME = "truck-radar-v2";
 const PRECACHE_URLS = [
   "/icons/icon-192.png",
   "/icons/icon-512.png",
@@ -32,6 +32,15 @@ self.addEventListener("fetch", (event) => {
       const sameOrigin = origin === self.location.origin;
 
       if (sameOrigin && event.request.mode === "navigate") {
+        const pathname = new URL(event.request.url).pathname;
+        if (
+          pathname.startsWith("/dashboard") ||
+          pathname.startsWith("/portale") ||
+          pathname.startsWith("/tracking") ||
+          pathname.startsWith("/api")
+        ) {
+          return fetch(event.request);
+        }
         try {
           const res = await fetch(event.request);
           if (res.ok) {

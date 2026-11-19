@@ -4,435 +4,467 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   BarChart3,
+  Boxes,
   Building2,
-  CalendarClock,
-  FileCheck2,
+  Check,
+  FileText,
   Fuel,
-  Leaf,
-  Lock,
+  Handshake,
   MapPin,
+  Radar,
   Route,
-  Search,
-  Server,
   ShieldCheck,
-  Sparkles,
   Truck,
-  Wrench,
 } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
 import Logo from "@/components/Logo";
+
+function AppFrame() {
+  const rows = [
+    ["Arredi Carpigiani", "Carpi → Verona", "Da confermare"],
+    ["Edil Tricolore", "Reggio Emilia → Brescia", "Preventivo"],
+    ["Cantina Neri", "Modena → Bologna", "In viaggio"],
+  ];
+  return (
+    <div className="app-frame w-full min-w-0 max-w-full overflow-hidden" data-theme="dark">
+      <div className="app-frame__bar">
+        <span className="app-frame__dot app-frame__dot--accent" />
+        <span className="app-frame__dot" />
+        <span className="app-frame__dot" />
+        <span className="ml-3 text-[11px]" style={{ color: "var(--text-label)" }}>Truck Radar · Oggi</span>
+        <span className="ml-auto chip chip-success">Live</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-[88px_1fr]">
+        <div className="app-frame__side hidden p-3 sm:block">
+          {["Oggi", "Viaggi", "Carico", "Preventivi", "Ordini", "Scadenze"].map((label, i) => (
+            <div
+              key={label}
+              className="mb-1 rounded-[6px] px-2 py-1.5 text-[10px]"
+              style={{
+                background: i === 0 ? "color-mix(in oklab, var(--brand) 16%, transparent)" : "transparent",
+                color: i === 0 ? "var(--brand)" : "var(--text-label)",
+              }}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+        <div className="min-w-0 overflow-hidden p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold" style={{ color: "var(--text-label)" }}>Piano di carico</p>
+              <p className="font-display text-[18px] font-bold" style={{ color: "var(--text)" }}>Motrice · 7,50 m</p>
+            </div>
+            <span className="chip chip-brand">Ci sta</span>
+          </div>
+
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {[
+              ["Metri lineari", "4,8 m"],
+              ["Peso", "5.880 kg"],
+              ["Costo/km", "0,71 €"],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-[8px] p-2" style={{ background: "var(--surface-soft)" }}>
+                <p className="text-[9px]" style={{ color: "var(--text-label)" }}>{label}</p>
+                <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 rounded-[10px] p-2" style={{ background: "var(--surface-soft)" }}>
+            <svg viewBox="0 0 360 150" className="w-full max-w-full" style={{ minWidth: 0 }} role="img" aria-label="Anteprima piano di carico con bancali sistemati sul camion">
+              <rect x="12" y="30" width="300" height="92" rx="6" fill="none" stroke="var(--text-label-soft)" strokeDasharray="5 4" />
+              {[
+                [20, 38, 44, 76, "#e8541f"],
+                [70, 38, 44, 76, "#6bb6ff"],
+                [120, 38, 62, 36, "#35c2a0"],
+                [120, 80, 62, 34, "#f0b429"],
+                [188, 38, 52, 76, "#e8541f"],
+                [246, 38, 46, 76, "#6bb6ff"],
+              ].map(([x, y, w, h, c], i) => (
+                <rect key={i} x={x} y={y} width={w} height={h} rx="4" fill={String(c)} opacity="0.85" stroke="#121417" />
+              ))}
+              <circle cx="322" cy="52" r="12" fill="none" stroke="var(--text-label-soft)" />
+              <circle cx="322" cy="100" r="12" fill="none" stroke="var(--text-label-soft)" />
+            </svg>
+          </div>
+
+          <div className="mt-3 space-y-1.5">
+            {rows.map(([name, route, status], i) => (
+              <div key={name} className="flex items-center justify-between gap-2 rounded-[8px] px-2 py-1.5" style={{ background: i === 2 ? "color-mix(in oklab, var(--success) 10%, transparent)" : "var(--surface)" }}>
+                <div className="min-w-0">
+                  <p className="truncate text-[11px] font-semibold" style={{ color: "var(--text)" }}>{name}</p>
+                  <p className="truncate text-[9px]" style={{ color: "var(--text-label)" }}>{route}</p>
+                </div>
+                <span className={`chip ${i === 2 ? "chip-success" : i === 1 ? "chip-info" : "chip-warning"}`}>{status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default async function HomePage() {
   const session = await auth();
   if (session?.user) redirect("/dashboard");
 
-  const pillars = [
-    {
-      icon: Truck,
-      title: "Flotta sotto controllo",
-      text: "Mezzi, tachigrafo, revisioni, bollo, assicurazioni e scadenze in un unico ambiente, con alert automatici.",
-    },
-    {
-      icon: Route,
-      title: "Viaggi senza frammenti",
-      text: "Assegna mezzo e autista, monitora lo stato e raccogli DDT e aggiornamenti direttamente dall'app dell'autista.",
-    },
-    {
-      icon: BarChart3,
-      title: "Margini reali, non solo grafici",
-      text: "Costi €/km, ricavi, km a vuoto e margine per mezzo, autista e viaggio. Export CSV per il tuo commercialista.",
-    },
-  ];
-
-  const aiBenefits = [
-    {
-      icon: Route,
-      title: "Smart Return",
-      metric: "-12 km a vuoto",
-      text: "Il sistema propone carichi di ritorno compatibili con percorso, data e capacitè  del mezzo, prima nella rete interna e poi sulle borse carichi collegate.",
-    },
-    {
-      icon: Wrench,
-      title: "Manutenzione predittiva",
-      metric: "Km/ore, non calendario",
-      text: "Tagliandi e revisioni pianificati su chilometraggio e ore di utilizzo del mezzo: meno fermi macchina imprevisti, costo del fermo sotto controllo.",
-    },
-    {
-      icon: Fuel,
-      title: "Consumi & carburante",
-      metric: "€/km e km/l",
-      text: "Registro rifornimenti e consumi per mezzo, così individui derive, anomalie e mezzi che ti costano più di quanto rendono.",
-    },
-    {
-      icon: Sparkles,
-      title: "Efficienza autista",
-      metric: "Puntualitè  e stile di guida",
-      text: "Indicatori per autista su puntualitè , viaggi completati ed eventi rilevanti, con suggerimenti di miglioramento misurabili.",
-    },
-  ];
-
-  const segments = [
-    {
-      icon: Building2,
-      title: "Micro-flotte (2–5 mezzi)",
-      text: "Parti dal gestionale e dal DDT digitale senza stravolgere i tuoi processi. Trial 21 giorni, nessuna carta.",
-    },
-    {
-      icon: Truck,
-      title: "PMI del trasporto (6–20 mezzi)",
-      text: "Controllo di margine per viaggio, scadenze e subappalto: le sezioni del Network si attivano dopo la verifica.",
-    },
-    {
-      icon: BarChart3,
-      title: "Flotte strutturate (20–50+)",
-      text: "Analytics per mezzo e autista, API verso GPS/TMS/ERP esistenti e piani su misura per flotte più grandi.",
-    },
-  ];
-
-  const integrations = [
-    "GPS e telematica giè  installati (API, hardware-agnostic)",
-    "TMS, ERP e sistemi di fatturazione",
-    "Tachigrafo e carte carburante",
-    "Borse carichi esterne collegate dal cliente",
+  const features = [
+    { icon: Truck, title: "Flotta e scadenze", text: "Revisioni, bollo, assicurazione, tachigrafo e patenti. Un avviso prima che scada." },
+    { icon: Route, title: "Viaggi e DDT", text: "Assegna mezzo e autista, traccia la consegna, raccogli DDT e firme dall'app." },
+    { icon: Boxes, title: "Piano di carico", text: "Colli, metri lineari, peso sugli assi e vista 3D. Sai prima di partire se ci sta." },
+    { icon: FileText, title: "Preventivi e ordini", text: "Prezzo, costo e margine. Il cliente ordina dalla sua pagina, tu confermi con un clic." },
+    { icon: BarChart3, title: "Giri e costi", text: "Meno chilometri, pedaggi e gasolio calcolati. Prezzo consigliato per ogni viaggio." },
+    { icon: Fuel, title: "Carburante e accise", text: "Cisterne, consumi reali e prospetto accise trimestrale, senza fogli Excel." },
   ];
 
   return (
-    <main className="min-h-screen">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="flex items-center gap-2 font-bold" style={{ color: "var(--text)" }}>
-          <Logo />
-        </Link>
-        <div className="flex items-center gap-4 text-sm">
-          <Link href="/prezzi" className="hidden sm:block" style={{ color: "var(--text-soft)" }}>
-            Prezzi
+    <main className="min-h-screen overflow-x-hidden">
+      <header className="sticky top-0 z-30 border-b" style={{ background: "var(--bg-grad-a)", borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
+          <Link href="/" aria-label="Truck Radar — home">
+            <Logo />
           </Link>
-          <Link href="/login" style={{ color: "var(--text-soft)" }}>
-            Accedi
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-xl px-4 py-2 font-semibold text-white"
-            style={{ background: "var(--brand)" }}
-          >
-            Registra la tua azienda
-          </Link>
+          <nav className="hidden items-center gap-7 text-[13px] font-medium md:flex" style={{ color: "var(--text-soft)" }}>
+            <a href="#funzioni" className="hover:opacity-70">Funzioni</a>
+            <a href="#network" className="hover:opacity-70">Network</a>
+            <a href="#prezzi" className="hover:opacity-70">Prezzi</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="hidden px-2 py-2 text-[13px] font-medium sm:block" style={{ color: "var(--text-soft)" }}>
+              Accedi
+            </Link>
+            <Link href="/register" className="ops-btn ops-btn--primary ops-btn--sm">
+              Prova gratis
+            </Link>
+          </div>
         </div>
-      </nav>
+      </header>
 
-      {/* HERO */}
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-14 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
-        <div>
-          <p
-            className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-            style={{
-              background: "color-mix(in oklch, var(--brand) 10%, transparent)",
-              color: "var(--brand)",
-              border: "1px solid var(--glass-border)",
-            }}
-          >
-            <Truck className="h-3.5 w-3.5" /> Per aziende di trasporto e logistica
+      <section className="mx-auto grid min-h-[calc(100vh-64px)] max-w-6xl gap-12 px-5 pb-24 pt-16 lg:grid-cols-[1.02fr_.98fr] lg:items-center lg:pt-24">
+        <div className="min-w-0">
+          <p className="ops-eyebrow">
+            <Radar className="h-4 w-4" /> Gestionale per autotrasporto
           </p>
-          <h1
-            className="font-display max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl"
-            style={{ color: "var(--text)" }}
-          >
-            Il sistema operativo della tua flotta: mezzi, autisti, viaggi e margini in un unico posto
+          <h1 className="ops-title mt-4 text-[42px] leading-[1.02] sm:text-5xl md:text-[68px]">
+            Il gestionale per chi muove merci.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: "var(--text-soft)" }}>
-            Truck Radar riunisce gestione flotta, DDT digitale, tracking, analytics e Smart Return.
-            Collegati ai tuoi sistemi esistenti e trasforma i dati in decisioni: meno km a vuoto, meno
-            scadenze dimenticate, margini sotto controllo.
+          <p className="ops-subtitle mt-6 max-w-xl text-[17px] leading-8">
+            Flotta, viaggi, DDT, piano di carico, preventivi e margini.
+            In un unico posto, senza cambiare il modo in cui lavori.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-lg"
-              style={{ background: "var(--brand)", boxShadow: "0 14px 40px color-mix(in oklch, var(--brand) 22%, transparent)" }}
-            >
+            <Link href="/register" className="ops-btn ops-btn--primary">
               Prova gratis 21 giorni <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/cerca-un-vettore"
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold"
-              style={{
-                border: "1px solid color-mix(in oklch, var(--accent) 45%, transparent)",
-                background: "color-mix(in oklch, var(--accent) 10%, transparent)",
-                color: "var(--accent)",
-              }}
-            >
-              <Search className="h-4 w-4" /> Cerca un vettore
-            </Link>
+            <a href="#funzioni" className="ops-btn ops-btn--secondary">
+              Guarda le funzioni
+            </a>
           </div>
-          <p className="mt-4 text-sm" style={{ color: "var(--text-label)" }}>
-            Nessuna carta di credito · Dati in UE · Il Network è riservato alle aziende verificate.
-          </p>
+          <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[12px]" style={{ color: "var(--text-label)" }}>
+            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5" style={{ color: "var(--success)" }} /> Nessuna carta di credito</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" style={{ color: "var(--success)" }} /> Dati in UE</span>
+            <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" style={{ color: "var(--success)" }} /> Supporto in italiano</span>
+          </div>
         </div>
-
-        {/* Mockup dashboard (anteprima con dati di esempio) */}
-        <div className="glass-strong p-4">
-          <div className="flex items-center gap-1.5 px-2 pb-3">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--danger)" }} />
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--warning)" }} />
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--success)" }} />
-            <span className="ml-3 text-[11px] font-medium" style={{ color: "var(--text-label)" }}>
-              Anteprima dashboard
-            </span>
-            <span
-              className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider"
-              style={{ background: "color-mix(in oklch, var(--warning) 16%, transparent)", color: "var(--accent)" }}
-            >
-              Dati di esempio
-            </span>
-          </div>
-          <div className="glass-panel overflow-hidden">
-            <img
-              src="/dashboard-preview.svg"
-              alt="Anteprima della dashboard Truck Radar con mappa dei mezzi e indicatori (dati di esempio)"
-              className="h-auto w-full"
-            />
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            <div className="glass p-3">
-              <p className="ops-label flex items-center">
-                <MapPin className="mr-1 h-3.5 w-3.5" style={{ color: "var(--info)" }} /> Mezzi in viaggio
-              </p>
-              <p className="font-display mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>18 / 24</p>
-            </div>
-            <div className="glass p-3">
-              <p className="ops-label flex items-center">
-                <Route className="mr-1 h-3.5 w-3.5" style={{ color: "var(--success)" }} /> Km a vuoto
-              </p>
-              <p className="font-display mt-1 text-lg font-bold" style={{ color: "var(--success)" }}>-12%</p>
-            </div>
-            <div className="glass p-3">
-              <p className="ops-label flex items-center">
-                <CalendarClock className="mr-1 h-3.5 w-3.5" style={{ color: "var(--warning)" }} /> Scadenze 30gg
-              </p>
-              <p className="font-display mt-1 text-lg font-bold" style={{ color: "var(--warning)" }}>3</p>
-            </div>
-          </div>
-          <p className="mt-2 text-center text-[10px]" style={{ color: "var(--text-label-soft)" }}>
-            Valori dimostrativi per mostrare la dashboard. I tuoi dati reali appariranno dopo la registrazione.
-          </p>
-        </div>
+        <AppFrame />
       </section>
 
-      {/* PILASTRI */}
-      <section className="border-y" style={{ borderColor: "var(--glass-border)", background: "var(--surface-soft)" }}>
-        <div className="mx-auto grid max-w-6xl gap-5 px-6 py-16 md:grid-cols-3">
-          {pillars.map(({ icon: Icon, title, text }) => (
-            <article key={title} className="glass p-6">
-              <Icon className="h-6 w-6" style={{ color: "var(--brand)" }} />
-              <h2 className="font-display mt-4 text-lg font-bold" style={{ color: "var(--text)" }}>{title}</h2>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* BENEFICI AI */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="max-w-2xl">
-          <p
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-            style={{
-              background: "color-mix(in oklch, var(--brand) 10%, transparent)",
-              color: "var(--brand)",
-              border: "1px solid var(--glass-border)",
-            }}
-          >
-            <Sparkles className="h-3.5 w-3.5" /> Intelligenza operativa
-          </p>
-          <h2 className="font-display mt-4 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            Meno km a vuoto, meno fermi, più margine
-          </h2>
-          <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Truck Radar non è una raccolta di grafici: incrocia mezzi, autisti, viaggi, km, consumi e
-            costi per darti indicazioni operative concrete, basate sui tuoi dati.
-          </p>
-        </div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {aiBenefits.map(({ icon: Icon, title, metric, text }) => (
-            <article key={title} className="glass p-6">
-              <Icon className="h-6 w-6" style={{ color: "var(--brand)" }} />
-              <p className="mt-4 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--brand)" }}>{metric}</p>
-              <h3 className="font-display mt-1 text-base font-bold" style={{ color: "var(--text)" }}>{title}</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* PER CHI èˆ */}
-      <section className="border-y" style={{ borderColor: "var(--glass-border)", background: "var(--surface-soft)" }}>
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            Pensato per ogni dimensione di flotta
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Dai primi 2 camion alle flotte strutturate: le funzioni crescono con te, i limiti sono chiari
-            fin dall'inizio.
-          </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {segments.map(({ icon: Icon, title, text }) => (
-              <article key={title} className="glass p-6">
-                <Icon className="h-6 w-6" style={{ color: "var(--brand)" }} />
-                <h3 className="font-display mt-4 text-lg font-bold" style={{ color: "var(--text)" }}>{title}</h3>
-                <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
-              </article>
-            ))}
-          </div>
-          <div className="mt-8">
-            <Link
-              href="/prezzi"
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
-              style={{ border: "1px solid var(--glass-border)", color: "var(--text)" }}
-            >
-              Vedi prezzi e limiti dei piani <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* INTEGRAZIONI / HARDWARE-AGNOSTIC */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="glass grid items-center gap-10 p-8 md:grid-cols-2">
-          <div>
-            <p
-              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ background: "var(--surface-soft)", color: "var(--text-soft)", border: "1px solid var(--glass-border)" }}
-            >
-              <Server className="h-3.5 w-3.5" /> Hardware-agnostic · API-first
-            </p>
-            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              Collegati a ciò che la tua azienda ha giè 
-            </h2>
-            <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-              Non devi comprare nuovo hardware. Truck Radar si collega tramite API ai sistemi che usi
-              giè , così riduci costi, installazioni e complessitè . Le credenziali delle integrazioni sono
-              cifrate (AES-256-GCM) e mai esposte.
-            </p>
-          </div>
-          <ul className="space-y-3">
-            {integrations.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-3 rounded-xl p-4 text-sm"
-                style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)", color: "var(--text)" }}
-              >
-                <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--success)" }} />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* TRUST & COMPLIANCE */}
-      <section className="border-y" style={{ borderColor: "var(--glass-border)", background: "color-mix(in oklch, var(--success) 6%, transparent)" }}>
-        <div className="mx-auto max-w-6xl px-6 py-20">
+      <section id="funzioni" className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <p
-              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ background: "color-mix(in oklch, var(--success) 10%, transparent)", color: "var(--success)", border: "1px solid var(--glass-border)" }}
-            >
-              <Lock className="h-3.5 w-3.5" /> Sicurezza e conformitè 
-            </p>
-            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-              Fiducia verificabile, non promesse
-            </h2>
-            <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-              Gestiamo dati aziendali, documenti e tracciamento dei mezzi: per questo sicurezza e privacy
-              sono progettate dall'inizio.
+            <p className="ops-eyebrow">Ogni giorno, in un posto</p>
+            <h2 className="ops-title mt-3 text-4xl md:text-5xl">Meno telefono. Meno Excel. Più controllo.</h2>
+            <p className="ops-subtitle mt-4">
+              Le cose che fai ogni giorno con la flotta, finalmente collegate tra loro.
             </p>
           </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <article className="glass p-6">
-              <Server className="h-6 w-6" style={{ color: "var(--success)" }} />
-              <h3 className="font-display mt-4 text-base font-bold" style={{ color: "var(--text)" }}>Dati in UE</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-                Dati ospitati in Unione Europea, cifrati in transito (TLS) e a riposo.
-              </p>
-            </article>
-            <article className="glass p-6">
-              <ShieldCheck className="h-6 w-6" style={{ color: "var(--success)" }} />
-              <h3 className="font-display mt-4 text-base font-bold" style={{ color: "var(--text)" }}>Conforme al GDPR</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-                Basi giuridiche, conservazione e diritti degli interessati documentati nella privacy policy.
-              </p>
-            </article>
-            <article className="glass p-6">
-              <FileCheck2 className="h-6 w-6" style={{ color: "var(--success)" }} />
-              <h3 className="font-display mt-4 text-base font-bold" style={{ color: "var(--text)" }}>Tracking conducenti conforme</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-                Tracciamento mezzi e conducenti gestito nel rispetto dell'art. 4 dello Statuto dei
-                Lavoratori (L. 300/70).
-              </p>
-            </article>
-            <article className="glass p-6">
-              <Leaf className="h-6 w-6" style={{ color: "var(--success)" }} />
-              <h3 className="font-display mt-4 text-base font-bold" style={{ color: "var(--text)" }}>Report ESG</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-                Km, km a vuoto evitati e stima COâ‚‚ per i tuoi report di sostenibilitè .
-              </p>
-            </article>
+          <div className="mt-10 grid gap-10 lg:grid-cols-[.72fr_1.28fr]">
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <div className="ops-card ops-card--soft p-5">
+                <p className="ops-label">Nato in un&apos;azienda di trasporti</p>
+                <p className="mt-3 font-display text-[20px] font-bold leading-tight" style={{ color: "var(--text)" }}>
+                  Non in un ufficio marketing.
+                </p>
+                <p className="mt-2 text-[13px] leading-6" style={{ color: "var(--text-soft)" }}>
+                  Le funzioni nascono dai problemi di ogni giorno: il camion che si carica male, il preventivo fatto a occhio, la revisione scoperta tardi.
+                </p>
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t pt-4" style={{ borderColor: "var(--surface-border)" }}>
+                  <div>
+                    <p className="font-display text-[24px] font-bold" style={{ color: "var(--text)" }}>2–50+</p>
+                    <p className="text-[11px]" style={{ color: "var(--text-label)" }}>mezzi gestiti</p>
+                  </div>
+                  <div>
+                    <p className="font-display text-[24px] font-bold" style={{ color: "var(--text)" }}>UE</p>
+                    <p className="text-[11px]" style={{ color: "var(--text-label)" }}>dati e infrastruttura</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="divide-y" style={{ borderColor: "var(--surface-border)" }}>
+              {features.map(({ icon: Icon, title, text }, index) => (
+                <article key={title} className="group grid grid-cols-[32px_1fr_auto] items-start gap-4 py-6 transition hover:pl-1">
+                  <span className="font-mono text-[11px]" style={{ color: "var(--text-label-soft)" }}>0{index + 1}</span>
+                  <div>
+                    <h3 className="font-display text-[18px] font-bold" style={{ color: "var(--text)" }}>{title}</h3>
+                    <p className="mt-1 max-w-xl text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
+                  </div>
+                  <Icon className="mt-1 h-5 w-5 opacity-40 transition group-hover:opacity-100" style={{ color: "var(--brand)" }} />
+                </article>
+              ))}
+            </div>
           </div>
-          <p className="mt-6 text-xs" style={{ color: "var(--text-label)" }}>
-            Dettagli in <Link href="/privacy" className="hover:underline" style={{ color: "var(--brand)" }}>Privacy</Link> e{" "}
-            <Link href="/informativa-autisti" className="hover:underline" style={{ color: "var(--brand)" }}>
-              informativa conducenti
-            </Link>
-            .
-          </p>
         </div>
       </section>
 
-      {/* COME FUNZIONA / NETWORK VERIFICATO */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="glass grid gap-10 p-8 md:grid-cols-2">
+      <section className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[.72fr_1.28fr]">
           <div>
-            <FileCheck2 className="h-7 w-7" style={{ color: "var(--brand)" }} />
-            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              Gestionale subito, Network dopo la verifica
-            </h2>
+            <p className="ops-eyebrow">Per chi è</p>
+            <h2 className="ops-title mt-3 text-4xl md:text-5xl">Non per tutte le flotte. Per quelle che vogliono vedere i numeri.</h2>
+            <p className="ops-subtitle mt-4">
+              Dal titolare che guida ancora al commerciale che gestisce cinquanta mezzi: ogni ruolo ha la sua vista, senza fogli paralleli.
+            </p>
           </div>
-          <div className="text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Puoi usare il gestionale immediatamente, senza attestazioni. Per pubblicare carichi,
-            subappaltare e accedere alle opportunitè  del Network, l'azienda completa una verifica con
-            documenti societari e identitè  del rappresentante. I dati sensibili sono gestiti tramite
-            fornitori specializzati e non vengono ceduti a terzi.
+          <div className="divide-y" style={{ borderColor: "var(--surface-border)" }}>
+            {[
+              ["2–5 mezzi", "Il titolare usa il gestionale e l'app autista. DDT, scadenze e costi in un posto solo."],
+              ["6–20 mezzi", "Ufficio e autisti lavorano sugli stessi viaggi. Preventivi, carico e margini per viaggio."],
+              ["20–50+ mezzi", "Analytics, API, ruoli e integrazioni. La flotta entra nel network e nei subappalti verificati."],
+            ].map(([title, text]) => (
+              <div key={title} className="grid gap-2 py-6 md:grid-cols-[160px_1fr]">
+                <p className="font-display text-[17px] font-bold" style={{ color: "var(--text)" }}>{title}</p>
+                <p className="text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA FINALE */}
-      <section
-        className="border-t"
-        style={{ borderColor: "var(--glass-border)", background: "color-mix(in oklch, var(--brand) 8%, transparent)" }}
-      >
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-6 py-20 text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            Inizia a guidare i dati della tua flotta
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7" style={{ color: "var(--text-soft)" }}>
-            Prova Truck Radar gratis per 21 giorni. Nessuna carta di credito, nessun hardware da
-            installare. Preferisci parlare con noi? Prenota una demo.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-semibold text-white shadow-lg"
-              style={{ background: "var(--brand)", boxShadow: "0 14px 40px color-mix(in oklch, var(--brand) 22%, transparent)" }}
-            >
-              Registra la tua azienda <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/contatti"
-              className="inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-semibold"
-              style={{ border: "1px solid var(--glass-border)", color: "var(--text)" }}
-            >
-              <CalendarClock className="h-4 w-4" /> Prenota una demo
-            </Link>
+      <section className="px-5 py-24" data-theme="dark" style={{ background: "var(--bg-grad-a)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <div>
+            <p className="ops-eyebrow">Dal carico al margine</p>
+            <h2 className="ops-title mt-3 text-4xl text-[var(--text)] md:text-5xl">Un viaggio, un prezzo, un margine. Senza rifare i conti.</h2>
+            <p className="ops-subtitle mt-4 text-[var(--text-soft)]">
+              Dal packing list al preventivo, dal giro al DDT: i dati restano collegati.
+            </p>
+            <div className="mt-8 space-y-4">
+              {[
+                ["01", "Carica", "Fotografa il packing list, scegli il mezzo, controlla peso e ingombro."],
+                ["02", "Preventiva", "Calcola peso tassato, costo viaggio e prezzo con margine."],
+                ["03", "Controlla", "DDT, POD, incassi e costo/km restano sullo stesso viaggio."],
+              ].map(([n, title, text]) => (
+                <div key={n} className="flex gap-4">
+                  <span className="font-mono text-[12px]" style={{ color: "var(--brand)" }}>{n}</span>
+                  <div>
+                    <p className="font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>{title}</p>
+                    <p className="mt-1 text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 grid grid-cols-3 gap-4 border-t pt-5" style={{ borderColor: "var(--surface-border)" }}>
+              <div>
+                <p className="font-display text-[30px] font-bold leading-none" style={{ color: "var(--text)" }}>4,8 m</p>
+                <p className="mt-1 text-[11px]" style={{ color: "var(--text-label)" }}>metri lineari</p>
+              </div>
+              <div>
+                <p className="font-display text-[30px] font-bold leading-none" style={{ color: "var(--text)" }}>5.880 kg</p>
+                <p className="mt-1 text-[11px]" style={{ color: "var(--text-label)" }}>peso caricato</p>
+              </div>
+              <div>
+                <p className="font-display text-[30px] font-bold leading-none" style={{ color: "var(--text)" }}>0,71 €</p>
+                <p className="mt-1 text-[11px]" style={{ color: "var(--text-label)" }}>costo al km</p>
+              </div>
+            </div>
+          </div>
+          <div className="ops-card p-4">
+            <div className="flex items-center justify-between">
+              <p className="font-display text-[18px] font-bold" style={{ color: "var(--text)" }}>Preventivo · Carpi → Verona</p>
+              <span className="chip chip-success">Margine 22%</span>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {[
+                ["Prezzo", "540 €"],
+                ["Costo", "421 €"],
+                ["Margine", "119 €"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-[8px] p-3" style={{ background: "var(--surface-soft)" }}>
+                  <p className="text-[10px]" style={{ color: "var(--text-label)" }}>{label}</p>
+                  <p className="font-display text-[18px] font-bold" style={{ color: "var(--text)" }}>{value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 space-y-2">
+              {[
+                ["6 bancali · 2.800 kg tassati", "Peso"],
+                ["4,8 m lineari · motrice 7,50 m", "Carico"],
+                ["Pedaggi A22 · 38 €", "Costo"],
+                ["Consegna entro 14:30", "Tempo"],
+              ].map(([text, tag]) => (
+                <div key={text} className="flex items-center justify-between gap-3 rounded-[8px] px-3 py-2" style={{ background: "var(--surface-soft)" }}>
+                  <span className="text-[13px]" style={{ color: "var(--text-soft)" }}>{text}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: "var(--text-label)" }}>{tag}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="network" className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center">
+          <div>
+            <p className="ops-eyebrow">Network</p>
+            <h2 className="ops-title mt-3 text-4xl md:text-5xl">Non sei solo. Sei in rete.</h2>
+            <p className="ops-subtitle mt-4">
+              Le aziende verificate possono pubblicare carichi, subappaltare e trovare ritorni compatibili.
+              La reputazione resta pubblica, i dati restano tuoi.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["Borsa carichi", "Subappalto", "Smart Return", "Recensioni verificate"].map((tag) => (
+                <span key={tag} className="chip chip-brand">{tag}</span>
+              ))}
+            </div>
+          </div>
+          <div className="ops-card p-6">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+              <div className="space-y-3">
+                {["Azienda A", "Azienda B", "Azienda C"].map((name) => (
+                  <div key={name} className="flex items-center gap-2 rounded-[8px] border px-3 py-2" style={{ borderColor: "var(--surface-border)" }}>
+                    <Building2 className="h-4 w-4" style={{ color: "var(--brand)" }} />
+                    <span className="text-[12px] font-semibold" style={{ color: "var(--text)" }}>{name}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <span className="h-10 w-px" style={{ background: "var(--surface-border)" }} />
+                <span className="grid h-12 w-12 place-items-center rounded-full" style={{ background: "var(--brand)", color: "#fff" }}>
+                  <Handshake className="h-5 w-5" />
+                </span>
+                <span className="h-10 w-px" style={{ background: "var(--surface-border)" }} />
+              </div>
+              <div className="space-y-3">
+                {["Ritorno Milano → Roma", "Carico Verona → Bari", "Subappalto 12 t"].map((name) => (
+                  <div key={name} className="flex items-center gap-2 rounded-[8px] border px-3 py-2" style={{ borderColor: "var(--surface-border)" }}>
+                    <Route className="h-4 w-4" style={{ color: "var(--success)" }} />
+                    <span className="text-[12px] font-semibold" style={{ color: "var(--text)" }}>{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="mt-6 text-center text-[12px]" style={{ color: "var(--text-label)" }}>
+              Match interno prima, borse esterne collegate dopo.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="ops-eyebrow">Integrazioni</p>
+            <h2 className="ops-title mt-3 text-4xl md:text-5xl">Si collega a quello che hai già.</h2>
+            <p className="ops-subtitle mt-4">
+              Non devi cambiare GPS, TMS o carte carburante. Truck Radar orchestra i dati e li rende utili.
+            </p>
+          </div>
+          <div className="mt-8 divide-y border-y" style={{ borderColor: "var(--surface-border)" }}>
+            {[
+              ["Geotab e GPS", "Posizioni, viaggi e km reali dalla telematica già installata.", "Read-only"],
+              ["TMS, ERP e fatturazione", "API e import CSV per far dialogare i sistemi esistenti.", "API + CSV"],
+              ["Carte carburante", "Rifornimenti, consumi e costo/km senza doppio inserimento.", "Import"],
+            ].map(([title, text, tag]) => (
+              <div key={title} className="grid gap-2 py-5 md:grid-cols-[220px_1fr_auto] md:items-center">
+                <h3 className="font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>{title}</h3>
+                <p className="text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{text}</p>
+                <span className="chip chip-brand">{tag}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="prezzi" className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="ops-eyebrow">Prezzi</p>
+            <h2 className="ops-title mt-3 text-4xl md:text-5xl">Un prezzo chiaro, per ogni fase.</h2>
+            <p className="ops-subtitle mt-4">Prova 21 giorni senza carta. Poi scegli il piano che serve alla tua flotta.</p>
+          </div>
+          <div className="mt-10 divide-y border-y" style={{ borderColor: "var(--surface-border)" }}>
+            {[
+              {
+                name: "BASE",
+                price: "59 €",
+                desc: "Per iniziare: flotta, viaggi, DDT, scadenze e analytics di base.",
+                features: ["Fino a 15 mezzi e 15 autisti", "DDT digitale e scadenze", "Piano di carico e preventivi", "Supporto in italiano"],
+                cta: "Inizia con BASE",
+                primary: false,
+              },
+              {
+                name: "PRO",
+                price: "199 €",
+                desc: "Per flotte strutturate: network, analytics avanzate e integrazioni.",
+                features: ["Fino a 50 mezzi e 50 autisti", "Network, marketplace e subappalto", "Analytics, API e integrazioni", "Supporto prioritario"],
+                cta: "Prova PRO gratis",
+                primary: true,
+              },
+            ].map((plan) => (
+              <div key={plan.name} className="grid gap-5 py-8 md:grid-cols-[220px_1fr_1.2fr_auto] md:items-start">
+                <div>
+                  <p className="ops-label" style={{ color: plan.primary ? "var(--brand)" : undefined }}>{plan.name}</p>
+                  <p className="mt-1 font-display text-4xl font-bold" style={{ color: "var(--text)" }}>
+                    {plan.price}<span className="text-[13px] font-medium" style={{ color: "var(--text-label)" }}> / mese</span>
+                  </p>
+                </div>
+                <p className="text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{plan.desc}</p>
+                <ul className="grid gap-2 text-[13px] sm:grid-cols-2" style={{ color: "var(--text-soft)" }}>
+                  {plan.features.map((x) => (
+                    <li key={x} className="flex items-center gap-2"><Check className="h-4 w-4 flex-none" style={{ color: "var(--success)" }} /> {x}</li>
+                  ))}
+                </ul>
+                <Link href="/register" className={`ops-btn ${plan.primary ? "ops-btn--primary" : "ops-btn--secondary"} md:self-center`}>{plan.cta}</Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t px-5 py-24" style={{ borderColor: "var(--surface-border)" }}>
+        <div className="mx-auto max-w-3xl">
+          <p className="ops-eyebrow">Domande</p>
+          <h2 className="ops-title mt-3 text-4xl">Le cose che chiedono tutti.</h2>
+          <div className="mt-8 divide-y" style={{ borderColor: "var(--surface-border)" }}>
+            {[
+              ["Devo cambiare il gestionale che uso già?", "No. Puoi importare mezzi, clienti e viaggi da CSV e continuare a usare i tuoi sistemi."],
+              ["I miei dati sono al sicuro?", "Dati in UE, accessi separati per azienda, cifratura in transito e a riposo, export quando vuoi."],
+              ["Quanto dura la prova?", "21 giorni, senza carta di credito. Alla fine decidi tu se attivare un piano."],
+              ["Funziona da telefono?", "Sì. La dashboard e l'app autista funzionano da browser e come PWA."],
+            ].map(([q, a]) => (
+              <details key={q} className="py-5">
+                <summary className="cursor-pointer font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>{q}</summary>
+                <p className="mt-2 text-[14px] leading-6" style={{ color: "var(--text-soft)" }}>{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5" data-theme="dark" style={{ background: "var(--bg-grad-a)" }}>
+        <div className="mx-auto max-w-6xl py-20">
+          <div className="flex flex-wrap items-end justify-between gap-8 border-t pt-10" style={{ borderColor: "var(--surface-border)" }}>
+            <div className="max-w-xl">
+              <p className="ops-eyebrow">Inizia oggi</p>
+              <h2 className="ops-title mt-3 text-4xl text-[var(--text)] md:text-5xl">Porta la tua flotta sotto controllo.</h2>
+              <p className="ops-subtitle mt-4 text-[var(--text-soft)]">Prova con i tuoi mezzi, i tuoi clienti e i tuoi viaggi. 21 giorni, senza carta.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/register" className="ops-btn ops-btn--primary">Prova gratis <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/login" className="ops-btn ops-btn--secondary">Accedi</Link>
+            </div>
           </div>
         </div>
       </section>

@@ -26,16 +26,27 @@ export async function POST(req: Request) {
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
+  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
+    return NextResponse.json({ error: "Solo Admin o Ufficio possono creare mezzi." }, { status: 403 });
+  }
 
   try {
     const body = await req.json();
     const { targa, categoria, portataMaxKg, volumeMaxM3, status } = body;
 
-    if (!targa || !categoria || !portataMaxKg || !volumeMaxM3) {
+    if (typeof targa !== "string" || !targa.trim() || !categoria || !portataMaxKg || !volumeMaxM3) {
       return NextResponse.json(
         { error: "Tutti i campi del veicolo sono obbligatori." },
         { status: 400 }
       );
+    }
+
+    const portata = Number(portataMaxKg);
+    const volume = Number(volumeMaxM3);
+    const validCategory = ["FRIGO", "TELONATO", "SPONDA_IDRAULICA", "CISTERNA", "ADR"].includes(String(categoria));
+    const validStatus = ["DISPONIBILE", "IN_VIAGGIO", "IN_MANUTENZIONE", "NON_IDONEO"].includes(String(status || "DISPONIBILE"));
+    if (!validCategory || !validStatus || !Number.isFinite(portata) || portata <= 0 || !Number.isFinite(volume) || volume <= 0) {
+      return NextResponse.json({ error: "Categoria, stato, portata o volume non validi." }, { status: 400 });
     }
 
     const tenantDb = getTenantDb(session.user.companyId);
@@ -65,8 +76,8 @@ export async function POST(req: Request) {
       data: {
         targa: targa.toUpperCase().trim(),
         categoria,
-        portataMaxKg: parseFloat(portataMaxKg),
-        volumeMaxM3: parseFloat(volumeMaxM3),
+        portataMaxKg: portata,
+        volumeMaxM3: volume,
         status: status || "DISPONIBILE",
       },
     });

@@ -29,6 +29,9 @@ export async function GET(
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
+  if (!isAdminRole(session.user.role as string)) {
+    return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
+  }
 
   const { id } = await params;
   const tenantDb = getTenantDb(session.user.companyId);

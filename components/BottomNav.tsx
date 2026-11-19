@@ -2,28 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Car, Route, MapPin, Users } from "lucide-react";
+import { LayoutDashboard, Route, Boxes, FileText, PackageCheck } from "lucide-react";
 
 const items = [
-  { href: "/dashboard", label: "Panoramica", icon: LayoutDashboard },
-  { href: "/dashboard/vehicles", label: "Mezzi", icon: Car },
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/dashboard/trips", label: "Viaggi", icon: Route },
-  { href: "/dashboard/flotta", label: "Mappa", icon: MapPin },
-  { href: "/dashboard/users", label: "Team", icon: Users },
+  { href: "/dashboard/carico", label: "Carico", icon: Boxes },
+  { href: "/dashboard/preventivi", label: "Preventivi", icon: FileText },
+  { href: "/dashboard/ordini", label: "Ordini", icon: PackageCheck },
 ];
 
-/** Bottom-nav flottante in vetro per mobile (5 voci a pillola). */
 export default function BottomNav() {
   const pathname = usePathname();
   return (
     <nav
-      className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-between gap-1 rounded-[var(--radius-pill)] px-2 py-2 md:hidden"
+      className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-between gap-1 rounded-[14px] px-2 py-2 md:hidden"
       style={{
-        background: "var(--glass-topbar)",
-        backdropFilter: "blur(24px) saturate(150%)",
-        WebkitBackdropFilter: "blur(24px) saturate(150%)",
-        border: "1px solid var(--glass-border)",
-        boxShadow: "0 14px 40px color-mix(in oklch, var(--brand) 18%, transparent)",
+        background: "var(--surface)",
+        border: "1px solid var(--surface-border)",
+        boxShadow: "var(--surface-shadow)",
       }}
     >
       {items.map(({ href, label, icon: Icon }) => {
@@ -32,10 +29,11 @@ export default function BottomNav() {
           <Link
             key={href}
             href={href}
-            className="flex flex-1 flex-col items-center gap-0.5 rounded-[var(--radius-pill)] px-1 py-1.5 text-[9px] font-bold uppercase tracking-wide transition"
+            aria-current={active ? "page" : undefined}
+            className="flex flex-1 flex-col items-center gap-1 rounded-[10px] px-1 py-1.5 text-[9px] font-semibold transition"
             style={
               active
-                ? { background: "var(--brand)", color: "#fff" }
+                ? { background: "color-mix(in oklab, var(--brand) 14%, transparent)", color: "var(--brand)" }
                 : { color: "var(--text-label)" }
             }
           >

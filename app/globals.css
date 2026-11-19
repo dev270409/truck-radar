@@ -1,51 +1,45 @@
 @import "tailwindcss";
 
 /* =========================================================================
-   Truck Radar — "Frosted Ops Console"
-   Design tokens semantici (oklch). Mai colori hardcoded nei componenti.
-   Tema chiaro di default; dark via [data-theme="dark"].
+   Truck Radar â€” "Radar Ops"
+   Un solo sistema: carta calda, inchiostro, un accento arancio.
+   Pubblico chiaro; dashboard scura. Niente vetro, gradienti o viola.
    ========================================================================= */
 
 :root {
-  /* ---- Brand & accent ---- */
   --brand: oklch(0.29 0.08 250);
   --brand-strong: oklch(0.24 0.08 250);
   --accent: oklch(0.68 0.19 42);
 
-  /* ---- Stati ---- */
   --success: oklch(0.64 0.16 158);
   --warning: oklch(0.78 0.17 78);
   --danger: oklch(0.62 0.2 28);
   --info: oklch(0.76 0.14 226);
 
-  /* ---- Superfici (vetro) ---- */
   --bg-grad-a: oklch(0.985 0.006 246);
   --bg-grad-b: oklch(0.955 0.012 236);
   --bg-grad-c: oklch(0.94 0.016 230);
 
-  --surface: oklch(1 0 0 / 0.7);
-  --surface-strong: oklch(1 0 0 / 0.82);
-  --surface-soft: oklch(1 0 0 / 0.55);
-  --surface-border: oklch(1 0 0 / 0.78);
+  --surface: oklch(0.995 0.004 246);
+  --surface-strong: oklch(1 0 0);
+  --surface-soft: oklch(0.965 0.01 240);
+  --surface-border: oklch(0.9 0.012 240);
   --surface-shadow: 0 14px 40px oklch(0.29 0.08 250 / 0.07);
 
-  --glass-sidebar: oklch(1 0 0 / 0.72);
-  --glass-topbar: oklch(1 0 0 / 0.66);
-  --glass-border: oklch(1 0 0 / 0.7);
+  --glass-sidebar: oklch(0.975 0.006 246);
+  --glass-topbar: oklch(0.975 0.006 246);
+  --glass-border: oklch(0.9 0.012 240);
 
-  /* ---- Testo ---- */
   --text: oklch(0.26 0.03 250);
   --text-soft: oklch(0.46 0.03 250);
   --text-label: oklch(0.29 0.08 250 / 0.62);
   --text-label-soft: oklch(0.29 0.08 250 / 0.43);
 
-  /* ---- Mappa ---- */
   --map-bg: oklch(0.96 0.02 226);
   --map-grid: oklch(0.29 0.08 250 / 0.12);
 
-  /* ---- radius ---- */
   --radius-base: 10px;
-  --radius-card: 12px;
+  --radius-card: 14px;
   --radius-pill: 999px;
 
   color-scheme: light;
@@ -56,18 +50,23 @@
   --brand-strong: oklch(0.8 0.09 250);
   --accent: oklch(0.72 0.18 45);
 
+  --success: oklch(0.68 0.16 158);
+  --warning: oklch(0.8 0.16 78);
+  --danger: oklch(0.68 0.19 28);
+  --info: oklch(0.78 0.13 226);
+
   --bg-grad-a: oklch(0.16 0.02 250);
   --bg-grad-b: oklch(0.2 0.025 244);
   --bg-grad-c: oklch(0.24 0.03 238);
 
-  --surface: oklch(0.26 0.02 248 / 0.62);
-  --surface-strong: oklch(0.3 0.02 248 / 0.78);
-  --surface-soft: oklch(0.24 0.02 248 / 0.5);
+  --surface: oklch(0.24 0.02 248);
+  --surface-strong: oklch(0.28 0.02 248);
+  --surface-soft: oklch(0.2 0.02 248);
   --surface-border: oklch(1 0 0 / 0.12);
   --surface-shadow: 0 14px 40px oklch(0 0 0 / 0.35);
 
-  --glass-sidebar: oklch(0.22 0.02 248 / 0.72);
-  --glass-topbar: oklch(0.22 0.02 248 / 0.66);
+  --glass-sidebar: oklch(0.2 0.02 248);
+  --glass-topbar: oklch(0.2 0.02 248);
   --glass-border: oklch(1 0 0 / 0.12);
 
   --text: oklch(0.95 0.01 250);
@@ -82,9 +81,9 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-manrope);
-  --font-display: var(--font-space-grotesk);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-archivo);
+  --font-mono: var(--font-jetbrains);
 
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
@@ -117,85 +116,399 @@ body {
   min-height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--text);
-  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
-  background:
-    linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 52%, var(--bg-grad-c) 100%);
-  background-attachment: fixed;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  background: var(--bg-grad-a);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .font-display {
-  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-family: var(--font-archivo), system-ui, sans-serif;
 }
 
-/* ============================ Vetro (frosted) ============================ */
-.glass {
-  background: var(--surface);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--surface-shadow);
+.font-mono {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
 }
 
-.glass-strong {
-  background: var(--surface-strong);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--surface-shadow);
+::selection {
+  background: color-mix(in oklab, var(--brand) 28%, transparent);
 }
 
+/* ============================ Superfici ============================ */
+.glass,
+.glass-strong,
 .glass-panel {
   background: var(--surface);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-card);
   box-shadow: var(--surface-shadow);
 }
 
-/* ============================ Chips di stato ============================ */
+.ops-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--surface-shadow);
+}
+
+.ops-card--flat {
+  box-shadow: none;
+}
+
+.ops-card--soft {
+  background: var(--surface-soft);
+  box-shadow: none;
+}
+
+.ops-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--surface-border);
+}
+
+/* ============================ Bottoni ============================ */
+.ops-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.ops-btn:hover {
+  transform: translateY(-1px);
+}
+.ops-btn:active {
+  transform: translateY(0);
+}
+.ops-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ops-btn--primary {
+  background: var(--brand);
+  color: #fff;
+}
+.ops-btn--primary:hover {
+  background: var(--brand-strong);
+}
+[data-theme="dark"] .ops-btn--primary {
+  color: var(--bg-grad-a);
+}
+
+.ops-btn--secondary {
+  background: transparent;
+  border-color: var(--surface-border);
+  color: var(--text);
+}
+.ops-btn--secondary:hover {
+  background: var(--surface-soft);
+}
+
+.ops-btn--ghost {
+  background: transparent;
+  color: var(--text-soft);
+}
+.ops-btn--ghost:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.ops-btn--sm {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.ops-btn--block {
+  width: 100%;
+}
+
+/* ============================ Form ============================ */
+.ops-input,
+.ops-select,
+.ops-textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ops-input::placeholder,
+.ops-textarea::placeholder {
+  color: var(--text-label-soft);
+}
+
+.ops-input:focus,
+.ops-select:focus,
+.ops-textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 18%, transparent);
+}
+
+.ops-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.ops-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-label);
+}
+
+/* ============================ Tipografia ============================ */
+.ops-title {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text);
+}
+
+.ops-subtitle {
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.ops-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+}
+
+.ops-meta {
+  font-size: 12px;
+  color: var(--text-label);
+}
+
+/* ============================ Layout ============================ */
+.ops-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.ops-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ops-kpi {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  padding: 16px;
+}
+
+.ops-kpi__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+.ops-kpi__value {
+  margin-top: 4px;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.ops-empty {
+  border: 1px dashed var(--surface-border);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  text-align: center;
+  color: var(--text-label);
+  font-size: 14px;
+}
+
+.ops-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ops-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-label);
+  border-bottom: 1px solid var(--surface-border);
+}
+.ops-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--text-soft);
+}
+.ops-table tr:last-child td {
+  border-bottom: 0;
+}
+.ops-table tbody tr:hover {
+  background: var(--surface-soft);
+}
+
+/* ============================ Chips ============================ */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   border-radius: var(--radius-pill);
-  padding: 3px 9px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  padding: 4px 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   line-height: 1;
 }
 .chip::before {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
   background: currentColor;
 }
-.chip-success { color: var(--success); background: color-mix(in oklch, var(--success) 12%, transparent); }
-.chip-warning { color: var(--warning); background: color-mix(in oklch, var(--warning) 14%, transparent); }
-.chip-danger  { color: var(--danger);  background: color-mix(in oklch, var(--danger) 12%, transparent); }
-.chip-info    { color: var(--info);    background: color-mix(in oklch, var(--info) 12%, transparent); }
-.chip-brand   { color: var(--brand);   background: color-mix(in oklch, var(--brand) 10%, transparent); }
-.chip-accent  { color: var(--accent);  background: color-mix(in oklch, var(--accent) 14%, transparent); }
+.chip-success { color: var(--success); background: color-mix(in oklab, var(--success) 12%, transparent); }
+.chip-warning { color: var(--warning); background: color-mix(in oklab, var(--warning) 14%, transparent); }
+.chip-danger  { color: var(--danger);  background: color-mix(in oklab, var(--danger) 12%, transparent); }
+.chip-info    { color: var(--info);    background: color-mix(in oklab, var(--info) 12%, transparent); }
+.chip-brand   { color: var(--brand);   background: color-mix(in oklab, var(--brand) 10%, transparent); }
+.chip-accent  { color: var(--accent);  background: color-mix(in oklab, var(--accent) 14%, transparent); }
 
-/* Etichette tecniche */
-.ops-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-label);
+/* ============================ App frame (landing) ============================ */
+.app-frame {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 18px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 24px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  color: var(--text);
+}
+.app-frame__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-strong);
+}
+.app-frame__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--text-label-soft);
+}
+.app-frame__dot--accent {
+  background: var(--brand);
+}
+.app-frame__side {
+  background: var(--surface-soft);
+  border-right: 1px solid var(--surface-border);
 }
 
-/* ============================ Animazioni ============================ */
+/* ============================ Dashboard ============================ */
+.dashboard-dark {
+  min-height: 100vh;
+  background: var(--bg-grad-a);
+  color: var(--text);
+}
+
+.register-dark {
+  color: var(--text);
+}
+
+/* Armonizza le pagine dashboard che usano la vecchia scala slate. */
+.dashboard-dark .bg-slate-900,
+.register-dark .bg-slate-900 {
+  background: var(--surface) !important;
+}
+.dashboard-dark .bg-slate-950,
+.register-dark .bg-slate-950 {
+  background: var(--bg-grad-a) !important;
+}
+.dashboard-dark .bg-slate-800,
+.register-dark .bg-slate-800 {
+  background: var(--surface-soft) !important;
+}
+.dashboard-dark .border-slate-800,
+.dashboard-dark .border-slate-700,
+.register-dark .border-slate-800,
+.register-dark .border-slate-700 {
+  border-color: var(--surface-border) !important;
+}
+.dashboard-dark .text-slate-100,
+.dashboard-dark .text-slate-200,
+.register-dark .text-slate-100,
+.register-dark .text-slate-200 {
+  color: var(--text) !important;
+}
+.dashboard-dark .text-slate-300,
+.register-dark .text-slate-300 {
+  color: var(--text-soft) !important;
+}
+.dashboard-dark .text-slate-400,
+.dashboard-dark .text-slate-500,
+.dashboard-dark .text-slate-600,
+.register-dark .text-slate-400,
+.register-dark .text-slate-500,
+.register-dark .text-slate-600 {
+  color: var(--text-label) !important;
+}
+.dashboard-dark .bg-blue-600,
+.dashboard-dark .bg-indigo-600,
+.register-dark .bg-blue-600,
+.register-dark .bg-indigo-600 {
+  background: var(--brand) !important;
+}
+.dashboard-dark .text-indigo-300,
+.dashboard-dark .text-blue-400,
+.register-dark .text-indigo-300,
+.register-dark .text-blue-400 {
+  color: var(--brand) !important;
+}
+
+/* ============================ Motion ============================ */
 @keyframes enter-up {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .enter-up { animation: enter-up 0.45s ease both; }
@@ -216,3 +529,4 @@ body {
     scroll-behavior: auto !important;
   }
 }
+

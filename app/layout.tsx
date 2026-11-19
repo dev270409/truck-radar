@@ -1,51 +1,56 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope, Geist_Mono } from "next/font/google";
+import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
   display: "swap",
 });
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Truck Radar — Transport Operating System",
+  title: "Truck Radar — Gestionale per aziende di trasporto",
   description:
-    "Gestione flotta, autisti, viaggi e Network per aziende di trasporto. Analytics, DDT digitale e Smart Return in un unico sistema.",
+    "Flotta, viaggi, DDT, piano di carico, preventivi, scadenze e costi in un unico gestionale per aziende di trasporto. Prova gratis 21 giorni.",
   applicationName: "Truck Radar",
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "https://www.truck-radar.it"),
   openGraph: {
     type: "website",
     locale: "it_IT",
     siteName: "Truck Radar",
-    title: "Truck Radar — Il sistema operativo della tua flotta",
+    title: "Truck Radar — Il gestionale per chi muove merci",
     description:
-      "Mezzi, autisti, viaggi, DDT e margini in un unico posto. Meno km a vuoto, meno scadenze dimenticate. Prova gratis 21 giorni.",
+      "Flotta, viaggi, DDT, piano di carico, preventivi e margini in un unico posto. Prova gratis 21 giorni, senza carta.",
     images: [{ url: "/dashboard-preview.svg", width: 720, height: 440, alt: "Dashboard Truck Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Truck Radar — Il sistema operativo della tua flotta",
+    title: "Truck Radar — Il gestionale per chi muove merci",
     description:
-      "Mezzi, autisti, viaggi, DDT e margini in un unico posto. Meno km a vuoto, meno scadenze dimenticate.",
+      "Flotta, viaggi, DDT, piano di carico, preventivi e margini in un unico posto.",
     images: ["/dashboard-preview.svg"],
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    icon: [
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: [{ url: "/favicon.ico" }],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   appleWebApp: {
@@ -61,29 +66,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
-  colorScheme: "dark",
+  themeColor: "#f7f3ea",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="it"
-      className={`${spaceGrotesk.variable} ${manrope.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${archivo.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        {/* Anti-FOUC: applica il tema salvato prima del primo paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('tr-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();`,
-          }}
-        />
-      </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        {children}
         <ServiceWorkerRegister />
       </body>
     </html>

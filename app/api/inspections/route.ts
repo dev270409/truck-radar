@@ -6,6 +6,7 @@ import {
   createInspection,
   listInspectionsEnriched,
 } from "@/lib/inspections";
+import { tripBelongsToCompany, vehicleBelongsToCompany } from "@/lib/tenant-refs";
 
 async function requireSession() {
   const session = await auth();
@@ -116,12 +117,19 @@ export async function POST(req: Request) {
   });
   const lat = body.lat != null && body.lat !== "" ? Number(body.lat) : null;
   const lng = body.lng != null && body.lng !== "" ? Number(body.lng) : null;
+  if (!(await vehicleBelongsToCompany(session.user.companyId, vehicleId))) {
+    return NextResponse.json({ error: "Mezzo non trovato." }, { status: 404 });
+  }
+  const tripId = body.tripId ? String(body.tripId) : null;
+  if (tripId && !(await tripBelongsToCompany(session.user.companyId, tripId))) {
+    return NextResponse.json({ error: "Viaggio non trovato." }, { status: 404 });
+  }
 
   try {
     const inspection = await createInspection({
       vehicleId,
       companyId: session.user.companyId,
-      tripId: body.tripId ? String(body.tripId) : null,
+      tripId,
       templateId: body.templateId ? String(body.templateId) : null,
       templateName: "Check-list pre-partenza",
       items,

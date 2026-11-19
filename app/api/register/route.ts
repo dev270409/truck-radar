@@ -4,6 +4,8 @@ import { hashPassword } from "@/lib/hash";
 import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
 import { safeLog } from "@/lib/safe-log";
 
+const TAX_ID_REGEX = /^\d{11}$|^[A-Z0-9]{16}$/;
+
 export async function POST(req: Request) {
   try {
     const rl = rateLimit(rateLimitKeyFromRequest(req, "register"), 10, 60_000);
@@ -16,58 +18,57 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const {
-      // Step A: Company
       ragioneSociale,
       partitaIva,
       indirizzo,
       telefono,
-
-      // Step B: Admin User
       email,
       password,
       nome,
       cognome,
-
-      // Step C: KYC Files
-      kycFiles, // Array of { tipo: 'PARTITA_IVA'|'LICENZA_CONTO_TERZI'|'ALBO_TRASPORTATORI', fileUrl: string, fileName: string }
-
-      // Step KYB Zero-Form (opzionale): estrazione AI + verifica ufficiale
-      kybExtraction, // { provider, mode, extraction, verification } | null
     } = body;
 
-    // Validation
     if (!ragioneSociale || !partitaIva || !email || !password || !nome || !cognome) {
       return NextResponse.json(
-        { error: "Tutti i campi obbligatori dell'azienda e dell'admin devono essere compilati." },
+        { error: "Compila tutti i campi obbligatori dell'azienda e dell'amministratore." },
         { status: 400 }
       );
     }
 
     const cleanEmail = String(email).toLowerCase().trim();
-    const cleanPiva = String(partitaIva).trim();
-    // Livello 1 (SaaS Interno): PARTITA_IVA + DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE
-    // Livello 2 (Borsa Carichi): LICENZA_CONTO_TERZI + ALBO_TRASPORTATORI + LICENZA_REN + POLIZZA_ASSICURATIVA_CMR + DURC + DELEGA_POTERI_FIRMA
-    const requiredKycTypesLevel1 = ["PARTITA_IVA", "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE"];
-    if (!Array.isArray(kycFiles) || requiredKycTypesLevel1.some((tipo) => !kycFiles.some((file: { tipo?: string; fileUrl?: string }) => file.tipo === tipo && file.fileUrl))) {
-      return NextResponse.json({ error: "Carica i documenti KYC di Livello 1 (Partita IVA + Documento identità legale rappresentante) tramite il flusso protetto." }, { status: 400 });
+    const cleanTaxId = String(partitaIva).replace(/\s/g, "").toUpperCase();
+    const passwordText = String(password);
+    const companyName = String(ragioneSociale).trim();
+    const address = String(indirizzo ?? "").trim();
+    const phone = String(telefono ?? "").trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return NextResponse.json({ error: "Email non valida." }, { status: 400 });
+    }
+    if (!TAX_ID_REGEX.test(cleanTaxId)) {
+      return NextResponse.json(
+        { error: "Inserisci una Partita IVA (11 cifre) o un Codice Fiscale (16 caratteri)." },
+        { status: 400 }
+      );
+    }
+    if (passwordText.length < 8 || passwordText.length > 72) {
+      return NextResponse.json({ error: "La password deve avere tra 8 e 72 caratteri." }, { status: 400 });
+    }
+    if (!companyName || !address || !phone) {
+      return NextResponse.json({ error: "Sede legale e telefono sono obbligatori." }, { status: 400 });
     }
 
-    // Check if email or partitaIva already exists
     const existingCompany = await db.company.findUnique({
-      where: { partitaIva: cleanPiva },
+      where: { partitaIva: cleanTaxId },
     });
-
     if (existingCompany) {
       return NextResponse.json(
-        { error: "Un'azienda con questa Partita IVA risulta già registrata." },
+        { error: "Un'azienda con questa Partita IVA o Codice Fiscale risulta già registrata." },
         { status: 400 }
       );
     }
 
-    const existingUser = await db.user.findUnique({
-      where: { email: cleanEmail },
-    });
-
+    const existingUser = await db.user.findUnique({ where: { email: cleanEmail } });
     if (existingUser) {
       return NextResponse.json(
         { error: "Un utente con questa email risulta già registrato." },
@@ -75,85 +76,44 @@ export async function POST(req: Request) {
       );
     }
 
-    // Trial di 21 giorni
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 21);
+    const hashedPassword = await hashPassword(passwordText);
 
-    const hashedPassword = await hashPassword(password);
-
-    // Create Company, Admin User and KYC Documents in a transaction
     const result = await db.$transaction(async (tx) => {
-      // 1. Create Company with TRIAL status
       const company = await tx.company.create({
         data: {
-          ragioneSociale,
-          partitaIva: cleanPiva,
-          indirizzo,
-          telefono,
+          ragioneSociale: companyName,
+          partitaIva: cleanTaxId,
+          indirizzo: address,
+          telefono: phone,
           subscriptionStatus: "TRIAL",
           subscriptionPlan: "BASE",
           trialEndsAt,
         },
       });
 
-      // 2. Create Admin User
       const adminUser = await tx.user.create({
         data: {
           email: cleanEmail,
           passwordHash: hashedPassword,
-          nome,
-          cognome,
-          telefono,
+          nome: String(nome).trim(),
+          cognome: String(cognome).trim(),
+          telefono: phone,
           role: "ADMIN",
           companyId: company.id,
           isActive: true,
         },
       });
 
-      // 3. Create initial KYC Documents (Livello 1 - SaaS Interno)
-      const level1Docs = [
-        { tipo: "PARTITA_IVA" as const, name: "Certificato Partita IVA" },
-        { tipo: "DOCUMENTO_IDENTITA_LEGALE_RAPPRESENTANTE" as const, name: "Documento Identità Legale Rappresentante" },
-      ];
-
-      const kycRecordsToCreate = level1Docs.map((docDef) => {
-        const provided = (kycFiles || []).find((f: any) => f.tipo === docDef.tipo);
-        return {
-          companyId: company.id,
-          tipo: docDef.tipo,
-          fileUrl: provided.fileUrl,
-          fileName: provided.fileName || `${docDef.name}.pdf`,
-          status: "IN_ATTESA" as const,
-        };
-      });
-
-      await tx.kycDocument.createMany({
-        data: kycRecordsToCreate,
-      });
-
-      // KYB Zero-Form: salva l'estrazione AI + verifica ufficiale se disponibile
-      if (kybExtraction && kybExtraction.extraction && kybExtraction.verification) {
-        await tx.$executeRawUnsafe(
-          `INSERT INTO "KybExtraction" ("companyId", "provider", "mode", "extraction", "verification", "documenti", "createdAt")
-           VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, now())`,
-          company.id,
-          String(kybExtraction.provider ?? "manual"),
-          String(kybExtraction.mode ?? "manual"),
-          JSON.stringify(kybExtraction.extraction),
-          JSON.stringify(kybExtraction.verification),
-          JSON.stringify(kybExtraction.documenti ?? [])
-        );
-      }
-
-      // Audit Log
       await tx.auditLog.create({
         data: {
           userId: adminUser.id,
           companyId: company.id,
-          action: "COMPANY_REGISTERED",
+          action: "COMPANY_REGISTERED_TRIAL",
           entity: "Company",
           entityId: company.id,
-          payload: { ragioneSociale, email: cleanEmail, trialEndsAt },
+          payload: { ragioneSociale: companyName, email: cleanEmail, trialEndsAt },
         },
       });
 
@@ -162,14 +122,17 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Registrazione completata con successo! Account in periodo di prova (21 giorni).",
+      message: "Account creato. Prova gratuita di 21 giorni attiva.",
       companyId: result.company.id,
       email: result.adminUser.email,
+      trialEndsAt: result.company.trialEndsAt,
     });
-  } catch (error: any) {
-    safeLog("error", "Registration failed", { message: error?.message });
+  } catch (error) {
+    safeLog("error", "Registration failed", {
+      message: error instanceof Error ? error.message : "errore",
+    });
     return NextResponse.json(
-      { error: "Errore durante la registrazione: " + (error.message || "Errore del server") },
+      { error: "Errore durante la registrazione. Riprova tra qualche istante." },
       { status: 500 }
     );
   }

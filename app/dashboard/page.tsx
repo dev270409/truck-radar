@@ -11,10 +11,8 @@ import {
   CheckCircle2,
   FileWarning,
   CalendarClock,
-  Boxes,
   Plug,
   ArrowRight,
-  Sparkles,
   Route,
   Gauge,
 } from "lucide-react";
@@ -22,6 +20,7 @@ import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
 import { getFleetMap } from "@/lib/fleet";
+import { label, fileNameLabel } from "@/lib/labels";
 
 const daysUntil = (iso: Date) => Math.ceil((iso.getTime() - Date.now()) / 86400000);
 
@@ -29,7 +28,6 @@ const BRAND = "var(--brand)";
 const GREEN = "var(--success)";
 const AMBER = "var(--warning)";
 const INFO = "var(--info)";
-const ACCENT = "var(--accent)";
 const DANGER = "var(--danger)";
 
 export default async function DashboardPage() {
@@ -60,11 +58,34 @@ export default async function DashboardPage() {
 
   // Viaggi attivi (reali, tenant-scoped)
   let activeTrips = 0;
+  let unassignedTrips = 0;
   try {
     const trips = await tenantDb.trips.findMany({ select: { status: true } });
     activeTrips = trips.filter((t) => t.status === "IN_CORSO" || t.status === "ASSEGNATO").length;
+    unassignedTrips = trips.filter((t) => t.status === "DA_ASSEGNARE").length;
   } catch {
     activeTrips = 0;
+    unassignedTrips = 0;
+  }
+
+  let pendingQuotes = 0;
+  let pendingOrders = 0;
+  try {
+    const [quotes, orders] = await Promise.all([
+      db.$queryRawUnsafe(
+        `SELECT COUNT(*)::int AS n FROM "Quote" WHERE "companyId" = $1 AND status IN ('BOZZA','INVIATO')`,
+        session.user.companyId
+      ) as Promise<Array<{ n: number }>>,
+      db.$queryRawUnsafe(
+        `SELECT COUNT(*)::int AS n FROM "CustomerOrder" WHERE "companyId" = $1 AND status = 'RICEVUTO'`,
+        session.user.companyId
+      ) as Promise<Array<{ n: number }>>,
+    ]);
+    pendingQuotes = Number(quotes[0]?.n ?? 0);
+    pendingOrders = Number(orders[0]?.n ?? 0);
+  } catch {
+    pendingQuotes = 0;
+    pendingOrders = 0;
   }
 
   // Km reali Geotab ultimi 30 giorni (se collegato)
@@ -119,6 +140,32 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {/* Da fare oggi */}
+      <section className="enter-up" style={{ animationDelay: "40ms" }}>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="ops-label">Da fare oggi</h2>
+          <Link href="/dashboard/trips" className="text-[11px] font-semibold" style={{ color: "var(--brand)" }}>
+            Apri operatività <ArrowRight className="inline h-3 w-3" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {[
+            { label: "Viaggi da assegnare", value: unassignedTrips, href: "/dashboard/trips", tone: unassignedTrips > 0 ? AMBER : GREEN },
+            { label: "Preventivi da inviare", value: pendingQuotes, href: "/dashboard/preventivi", tone: pendingQuotes > 0 ? AMBER : GREEN },
+            { label: "Ordini da confermare", value: pendingOrders, href: "/dashboard/ordini", tone: pendingOrders > 0 ? AMBER : GREEN },
+            { label: "Scadenze entro 30gg", value: expiring.length + kycPending, href: "/dashboard/scadenze", tone: expiring.length + kycPending > 0 ? DANGER : GREEN },
+          ].map((item) => (
+            <Link key={item.label} href={item.href} className="ops-card flex items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5">
+              <div>
+                <p className="text-[10px] font-semibold" style={{ color: "var(--text-label)" }}>{item.label}</p>
+                <p className="font-display mt-1 text-[24px] font-bold leading-none" style={{ color: item.tone }}>{item.value}</p>
+              </div>
+              <ArrowRight className="h-4 w-4" style={{ color: "var(--text-label-soft)" }} />
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Riga di 4 metric-card */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
@@ -147,7 +194,7 @@ export default async function DashboardPage() {
         />
         <MetricCard
           label="Stato abbonamento"
-          value={(company?.subscriptionStatus ?? "TRIAL").toString()}
+          value={label(company?.subscriptionStatus ?? "TRIAL")}
           hint="21 giorni di prova"
           tone={AMBER}
           icon={<Clock className="h-[18px] w-[18px]" />}
@@ -165,73 +212,6 @@ export default async function DashboardPage() {
           emptyMessage="Nessun mezzo con categoria registrata. Aggiungi mezzi in “Mezzi” per vedere il grafico."
         />
       </div>
-
-      {/* Banner borsa carichi (promo, non attiva) */}
-      <section
-        className="enter-up relative overflow-hidden rounded-[var(--radius-card)] p-6"
-        style={{ background: "var(--brand)", color: "#fff", animationDelay: "300ms" }}
-      >
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
-          <div className="max-w-xl">
-            <span
-              className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide"
-              style={{ background: "rgba(255,255,255,0.1)" }}
-            >
-              <Sparkles className="h-3 w-3" /> Presto disponibile
-            </span>
-            <h2 className="font-display mt-3 text-[20px] font-bold">Borsa Carichi</h2>
-            <p className="mt-1.5 text-[13px] opacity-85">
-              Pubblica, cerca e affida carichi solo ad aziende verificate. Il Network sarè  attivato
-              gradualmente: nel frattempo puoi giè  usare il gestionale completo.
-            </p>
-          </div>
-          <Link
-            href="/dashboard/marketplace"
-            className="inline-flex items-center gap-2 rounded-[var(--radius-base)] px-4 py-2.5 text-[13px] font-semibold"
-            style={{ background: "rgba(255,255,255,0.14)" }}
-          >
-            Scopri di più <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <svg className="absolute -right-6 -top-8 h-48 w-48 opacity-20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="0.6" />
-          <circle cx="12" cy="12" r="5.5" stroke="white" strokeWidth="0.6" />
-          <circle cx="12" cy="12" r="2" fill="white" />
-        </svg>
-      </section>
-
-      {/* Sezioni in arrivo (SOON) */}
-      <section className="enter-up" style={{ animationDelay: "320ms" }}>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
-            Sezioni in arrivo
-          </h2>
-          <span className="text-[11px]" style={{ color: "var(--text-label)" }}>
-            Anteprima di esempio · non ancora attive
-          </span>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { href: "/dashboard/marketplace", label: "Borsa Carichi", desc: "Pubblica e trova carichi." },
-            { href: "/dashboard/smart-return", label: "Smart Return", desc: "Carichi di ritorno, meno km a vuoto." },
-            { href: "/dashboard/network", label: "Network", desc: "Aziende verificate e reputazione." },
-            { href: "/dashboard/esg", label: "ESG", desc: "Km, emissioni e sostenibilità." },
-          ].map((s) => (
-            <Link
-              key={s.href}
-              href={s.href}
-              className="glass group p-4 transition hover:-translate-y-0.5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="chip chip-warning" style={{ fontSize: 8 }}>Soon</span>
-                <ArrowRight className="h-4 w-4" style={{ color: "var(--text-label)" }} />
-              </div>
-              <p className="font-display mt-3 text-[14px] font-bold" style={{ color: "var(--text)" }}>{s.label}</p>
-              <p className="text-[11px]" style={{ color: "var(--text-soft)" }}>{s.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* Flotta + Alert */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -263,7 +243,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <span className={`chip ${v.status === "DISPONIBILE" ? "chip-success" : "chip-warning"}`}>
-                    {v.status === "DISPONIBILE" ? "Disponibile" : v.status}
+                    {label(v.status)}
                   </span>
                 </div>
               ))}
@@ -298,7 +278,7 @@ export default async function DashboardPage() {
                     style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)" }}
                   >
                     <span className="font-display text-[12px] font-bold" style={{ color: "var(--text)" }}>{d.targa}</span>
-                    <span className="text-[12px]" style={{ color: "var(--text-soft)" }}>{d.tipo}</span>
+                    <span className="text-[12px]" style={{ color: "var(--text-soft)" }}>{label(d.tipo)}</span>
                     <span className="flex items-center gap-1 text-[11px]" style={{ color: "var(--text-label)" }}>
                       <CalendarClock className="h-3 w-3" />
                       {new Date(d.dataScadenza).toLocaleDateString("it-IT")}
@@ -329,8 +309,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* KYC + Verifica */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div className="glass enter-up p-5" style={{ animationDelay: "420ms" }}>
+      <div className="grid gap-5">
+        <div className="glass enter-up min-w-0 p-5" style={{ animationDelay: "420ms" }}>
           <h2 className="font-display mb-4 flex items-center gap-2 text-[15px] font-bold" style={{ color: "var(--text)" }}>
             <ShieldCheck className="h-4 w-4" style={{ color: BRAND }} /> Documenti legali & KYC
           </h2>
@@ -345,31 +325,16 @@ export default async function DashboardPage() {
                   style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)" }}
                 >
                   <div className="min-w-0">
-                    <p className="text-[12px] font-bold" style={{ color: "var(--text)" }}>{doc.tipo}</p>
-                    <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>{doc.fileName}</p>
+                    <p className="text-[12px] font-bold" style={{ color: "var(--text)" }}>{label(doc.tipo)}</p>
+                    <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>{fileNameLabel(doc.fileName)}</p>
                   </div>
                   <span className={`chip ${doc.status === "VERIFICATO" ? "chip-success" : doc.status === "RIFIUTATO" ? "chip-danger" : "chip-info"}`}>
-                    {doc.status}
+                    {label(doc.status)}
                   </span>
                 </div>
               ))}
             </div>
           )}
-        </div>
-
-        {/* Borsa carichi teaser (pannello) */}
-        <div className="glass enter-up p-5" style={{ animationDelay: "460ms" }}>
-          <h2 className="font-display mb-2 flex items-center gap-2 text-[15px] font-bold" style={{ color: "var(--text)" }}>
-            <Boxes className="h-4 w-4" style={{ color: ACCENT }} /> Borsa Carichi & Smart Return
-          </h2>
-          <p className="text-[12px]" style={{ color: "var(--text-soft)" }}>
-            Riduci i km a vuoto trovando carichi di ritorno compatibili con percorso, data e capacitè  del
-            mezzo. Funzione del Network, in attivazione graduale.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="chip chip-accent">Presto disponibile</span>
-            <span className="chip chip-brand">Solo aziende verificate</span>
-          </div>
         </div>
       </div>
     </div>

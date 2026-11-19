@@ -46,3 +46,10 @@ next-env.d.ts
 
 .vercel
 .env*
+!.env.example
+
+# chiavi di firma licenza (mai committare la privata)
+license-keys/
+
+# artefatti di review/AI generati localmente
+.review-aifuel/

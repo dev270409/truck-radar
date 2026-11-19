@@ -12,6 +12,7 @@ import {
   Euro,
   TrendingDown,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface TripOption {
   id: string;
@@ -160,7 +161,7 @@ function Original_SmartReturnPage() {
           >
             {trips.map((t) => (
               <option key={t.id} value={t.id}>
-                {t.luogoRitiro} → {t.luogoConsegna} · {new Date(t.dataRitiro).toLocaleDateString("it-IT")} · {t.status}
+                  {t.luogoRitiro} → {t.luogoConsegna} · {new Date(t.dataRitiro).toLocaleDateString("it-IT")} · {label(t.status)}
               </option>
             ))}
           </select>

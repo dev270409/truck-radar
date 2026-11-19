@@ -13,6 +13,9 @@ export async function GET() {
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
+  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
+    return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
+  }
 
   const tenantDb = getTenantDb(session.user.companyId);
   const trips = await tenantDb.trips.findMany({

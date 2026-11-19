@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { createFuelLog, listFuelLogs, deleteFuelLog, getFuelStats, estimateFuelForCompany } from "@/lib/fuel";
+import { tripBelongsToCompany, vehicleBelongsToCompany } from "@/lib/tenant-refs";
 
 async function requireSession() {
   const session = await auth();
@@ -61,7 +62,14 @@ export async function POST(req: Request) {
   const odometerKm = Number(body.odometerKm);
 
   if (!vehicleId || !isFinite(litri) || litri <= 0 || !isFinite(costo) || costo <= 0 || !isFinite(odometerKm) || odometerKm < 0) {
-    return NextResponse.json({ error: "Dati rifornimento non validi (litri e costo > 0, odometro ≥ 0)." }, { status: 400 });
+    return NextResponse.json({ error: "Dati rifornimento non validi (litri e costo > 0, odometro �%� 0)." }, { status: 400 });
+  }
+  if (!(await vehicleBelongsToCompany(session.user.companyId, vehicleId))) {
+    return NextResponse.json({ error: "Mezzo non trovato." }, { status: 404 });
+  }
+  const tripId = body.tripId ? String(body.tripId) : null;
+  if (tripId && !(await tripBelongsToCompany(session.user.companyId, tripId))) {
+    return NextResponse.json({ error: "Viaggio non trovato." }, { status: 404 });
   }
 
   try {
@@ -69,7 +77,7 @@ export async function POST(req: Request) {
       session.user.companyId,
       {
         vehicleId,
-        tripId: body.tripId ? String(body.tripId) : null,
+        tripId,
         litri,
         costo,
         odometerKm,

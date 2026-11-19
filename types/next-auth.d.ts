@@ -10,6 +10,8 @@ declare module "next-auth" {
     role: UserRole;
     companyId: string;
     vehicleId?: string | null;
+    licensed?: boolean;
+    licensee?: string;
   }
 
   interface Session {
@@ -21,6 +23,8 @@ declare module "next-auth" {
       role: UserRole;
       companyId: string;
       vehicleId?: string | null;
+      licensed?: boolean;
+      licensee?: string;
     } & DefaultSession["user"];
   }
 }
@@ -34,5 +38,7 @@ declare module "next-auth/jwt" {
     role: UserRole;
     companyId: string;
     vehicleId?: string | null;
+    licensed?: boolean;
+    licensee?: string;
   }
 }

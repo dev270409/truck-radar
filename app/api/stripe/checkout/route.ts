@@ -49,6 +49,12 @@ export async function POST(req: Request) {
     );
   }
 
+  const appUrl = process.env.NEXTAUTH_URL ?? process.env.AUTH_URL ?? null;
+  if (!appUrl && process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "URL applicazione non configurato." }, { status: 500 });
+  }
+  const baseUrl = appUrl ?? "http://localhost:3000";
+
   try {
     const company = await db.company.findUnique({
       where: { id: companyId },
@@ -78,8 +84,8 @@ export async function POST(req: Request) {
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata: { companyId, plan },
-      success_url: `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/dashboard?paid=1`,
-      cancel_url: `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/dashboard?cancel=1`,
+      success_url: `${baseUrl}/dashboard?paid=1`,
+      cancel_url: `${baseUrl}/dashboard?cancel=1`,
       subscription_data: { metadata: { companyId, plan } },
     });
 

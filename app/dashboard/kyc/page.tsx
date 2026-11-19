@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { label, fileNameLabel } from "@/lib/labels";
 import {
   ShieldCheck,
   Loader2,
   CheckCircle2,
-  XCircle,
   FileText,
   ExternalLink,
   RefreshCcw,
-  PartyPopper,
   ShieldAlert,
   Sparkles,
   ScanText,
@@ -66,9 +65,7 @@ export default function KycReviewPage() {
   const [documents, setDocuments] = useState<KycDocument[]>([]);
   const [kyb, setKyb] = useState<KybInfo | null>(null);
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [activated, setActivated] = useState(false);
 
   const fetchDocs = async () => {
     try {
@@ -86,26 +83,6 @@ export default function KycReviewPage() {
   useEffect(() => {
     fetchDocs();
   }, []);
-
-  const review = async (doc: KycDocument, status: "VERIFICATO" | "RIFIUTATO") => {
-    setBusyId(doc.id);
-    setError("");
-    try {
-      const res = await fetch(`/api/kyc/${doc.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Errore nella verifica");
-      if (data.subscriptionActivated) setActivated(true);
-      fetchDocs();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusyId(null);
-    }
-  };
 
   const getLevel1Docs = () => documents.filter(d => LEVEL1_TYPES.includes(d.tipo));
   const getLevel2Docs = () => documents.filter(d => LEVEL2_TYPES.includes(d.tipo));
@@ -152,20 +129,7 @@ export default function KycReviewPage() {
         )}
       </div>
 
-      {activated && (
-        <div className="p-4 rounded-2xl border border-emerald-800/60 bg-emerald-950/60 flex items-start space-x-3">
-          <PartyPopper className="w-5 h-5 flex-shrink-0 text-emerald-300 mt-0.5" />
-          <div className="text-sm text-emerald-200">
-            <p className="font-bold">Compliance Livello 1 completata!</p>
-            <p>
-              Tutti i documenti Livello 1 verificati: il piano aziendale è ora{" "}
-              <span className="font-bold">ATTIVO</span>.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {level1Complete && !activated && (
+      {level1Complete && (
         <div className="p-4 rounded-2xl border border-emerald-800/60 bg-emerald-950/60 flex items-center space-x-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-300" />
           <p className="text-sm text-emerald-200 font-semibold">
@@ -202,6 +166,13 @@ export default function KycReviewPage() {
             {level2Complete ? "Completo" : level2Pending > 0 ? "In Attesa" : "Da Caricare"}
           </span>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sky-800/60 bg-sky-950/30 p-4 text-xs text-sky-100">
+        <span>La verifica identità e azienda è gestita dal provider KYC. I pulsanti manuali sono disattivati.</span>
+        <a href="/onboarding/verifica" className="font-semibold text-sky-300 hover:text-sky-200">
+          Apri verifica
+        </a>
       </div>
 
       {error && (
@@ -307,27 +278,18 @@ export default function KycReviewPage() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || doc.tipo}</p>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{doc.fileName}</p>
+                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
                     <p className="text-[11px] text-slate-500 mt-0.5">
                       Caricato il {new Date(doc.createdAt).toLocaleDateString("it-IT")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 flex-shrink-0">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{doc.status}</span>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
                   <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 p-2 rounded-lg transition" title="Apri documento"><ExternalLink className="w-4 h-4" /></a>
                   {doc.status === "IN_ATTESA" && (
-                    <>
-                      <button onClick={() => review(doc, "VERIFICATO")} disabled={busyId === doc.id} className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50">
-                        {busyId === doc.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                        <span>Approva</span>
-                      </button>
-                      <button onClick={() => review(doc, "RIFIUTATO")} disabled={busyId === doc.id} className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50">
-                        {busyId === doc.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
-                        <span>Rifiuta</span>
-                      </button>
-                    </>
+                    <span className="text-[10px] font-semibold text-slate-500">In verifica</span>
                   )}
                 </div>
               </div>
@@ -350,27 +312,18 @@ export default function KycReviewPage() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || doc.tipo}</p>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{doc.fileName}</p>
+                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
                     <p className="text-[11px] text-slate-500 mt-0.5">
                       Caricato il {new Date(doc.createdAt).toLocaleDateString("it-IT")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 flex-shrink-0">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{doc.status}</span>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
                   <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 p-2 rounded-lg transition" title="Apri documento"><ExternalLink className="w-4 h-4" /></a>
                   {doc.status === "IN_ATTESA" && (
-                    <>
-                      <button onClick={() => review(doc, "VERIFICATO")} disabled={busyId === doc.id} className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50">
-                        {busyId === doc.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                        <span>Approva</span>
-                      </button>
-                      <button onClick={() => review(doc, "RIFIUTATO")} disabled={busyId === doc.id} className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50">
-                        {busyId === doc.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
-                        <span>Rifiuta</span>
-                      </button>
-                    </>
+                    <span className="text-[10px] font-semibold text-slate-500">In verifica</span>
                   )}
                 </div>
               </div>

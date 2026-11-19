@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Plus } from "lucide-react";
 import Logo from "./Logo";
-import ThemeToggle from "./ThemeToggle";
 
 interface SearchResult {
   type: string;
@@ -14,7 +13,6 @@ interface SearchResult {
   href: string;
 }
 
-/** Topbar sticky 68px: logo · ricerca funzionante · tema. */
 export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
   const router = useRouter();
   const [q, setQ] = useState("");
@@ -63,11 +61,9 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
 
   return (
     <header
-      className="sticky top-0 z-40 flex h-[68px] items-center gap-3 px-4 md:px-6"
+      className="sticky top-0 z-40 flex h-16 items-center gap-3 px-4 md:px-6"
       style={{
         background: "var(--glass-topbar)",
-        backdropFilter: "blur(24px) saturate(150%)",
-        WebkitBackdropFilter: "blur(24px) saturate(150%)",
         borderBottom: "1px solid var(--glass-border)",
       }}
     >
@@ -75,7 +71,7 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
         type="button"
         onClick={onMenu}
         aria-label="Apri il menu"
-        className="grid h-9 w-9 place-items-center rounded-[var(--radius-pill)] border md:hidden"
+        className="grid h-9 w-9 place-items-center rounded-[10px] border md:hidden"
         style={{ borderColor: "var(--glass-border)", color: "var(--text)", background: "var(--surface-soft)" }}
       >
         <span className="flex flex-col gap-[3px]">
@@ -99,12 +95,12 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Cerca mezzi (targa), autisti, viaggi…"
+          placeholder="Cerca targa, autista, viaggio…"
           aria-label="Cerca nella flotta"
-          className="h-[38px] w-full rounded-[var(--radius-pill)] pl-10 pr-9 text-[13px] outline-none transition"
+          className="h-10 w-full rounded-[10px] pl-10 pr-9 text-[13px] outline-none transition"
           style={{
             background: "var(--surface-soft)",
-            border: "1px solid var(--glass-border)",
+            border: "1px solid var(--surface-border)",
             color: "var(--text)",
           }}
         />
@@ -116,8 +112,8 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
         )}
         {open && q.trim().length >= 2 && (
           <div
-            className="absolute left-0 right-0 top-[46px] z-50 overflow-hidden rounded-[var(--radius-card)]"
-            style={{ background: "var(--glass-topbar)", border: "1px solid var(--glass-border)", backdropFilter: "blur(24px)" }}
+            className="absolute left-0 right-0 top-[46px] z-50 overflow-hidden rounded-[12px]"
+            style={{ background: "var(--surface)", border: "1px solid var(--surface-border)", boxShadow: "var(--surface-shadow)" }}
           >
             {results.length === 0 && !loading ? (
               <p className="px-4 py-3 text-[12px]" style={{ color: "var(--text-label)" }}>
@@ -147,8 +143,10 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
         )}
       </div>
 
-      <div className="ml-auto flex items-center gap-2.5 md:ml-3">
-        <ThemeToggle />
+      <div className="ml-auto flex items-center gap-2 md:ml-3">
+        <Link href="/dashboard/trips" className="ops-btn ops-btn--primary ops-btn--sm hidden md:inline-flex">
+          <Plus className="h-4 w-4" /> Nuovo viaggio
+        </Link>
       </div>
     </header>
   );

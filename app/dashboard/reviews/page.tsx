@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface Recensione {
   id: string;
@@ -151,7 +152,7 @@ export default function ReviewsPage() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-slate-100">{t.route ?? "Trasporto"}</span>
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-950 text-indigo-300">
-                    Tu: {t.role}
+                    Tu: {label(t.role)}
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-1">
@@ -203,7 +204,7 @@ export default function ReviewsPage() {
                     </div>
                     <span className="text-sm font-semibold text-slate-100">{r.reviewerName}</span>
                     <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-                      {r.role}
+                      {label(r.role)}
                     </span>
                   </div>
                   <span className="text-[11px] text-slate-500">

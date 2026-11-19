@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2, Map as MapIcon, Car, Satellite, Navigation, Wrench, PlayCircle, RefreshCw } from "lucide-react";
 import type { FleetVehicleRow } from "@/lib/fleet";
 import FleetMapLazy from "@/components/FleetMapLazy";
+import { label } from "@/lib/labels";
 
 type FleetVehicle = FleetVehicleRow;
 
@@ -200,11 +201,11 @@ export default function FlottaPage() {
                       <td className="px-6 py-4 font-mono font-bold text-slate-100">{v.targa}</td>
                       <td className="px-6 py-4">
                         <span className="bg-slate-800 text-slate-200 px-2.5 py-1 rounded-md text-xs font-semibold">
-                          {v.categoria}
+                          {label(v.categoria)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-xs font-bold ${meta.cls}`}>{meta.label ?? v.status}</span>
+                        <span className={`text-xs font-bold ${meta.cls}`}>{meta.label ?? label(v.status)}</span>
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-400">
                         {v.lat != null && v.lng != null ? (

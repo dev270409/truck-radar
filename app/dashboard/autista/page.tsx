@@ -13,6 +13,7 @@ import {
   Play,
   Flag,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface Trip {
   id: string;
@@ -121,7 +122,7 @@ export default function AutistaTripsPage() {
               <span
                 className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}
               >
-                {t.status.replace("_", " ")}
+                {label(t.status)}
               </span>
               {t.vehicle && (
                 <span className="text-xs font-mono text-slate-400 flex items-center">

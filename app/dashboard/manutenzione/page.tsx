@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Wrench, Plus, Trash2, CheckCircle2, XCircle, CalendarClock, Gauge, Coins, AlertTriangle } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface VehicleLite {
   id: string;
@@ -205,7 +206,7 @@ export default function ManutenzionePage() {
               <div key={i.id} className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm">
                 <div className="flex items-center space-x-3">
                   <span className="font-mono font-bold text-slate-100">{targaOf(i.vehicleId)}</span>
-                  <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold">{i.tipo}</span>
+                    <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold">{label(i.tipo)}</span>
                 </div>
                 <div className="text-right text-xs text-slate-400 space-y-0.5">
                   {i.kmProssimo != null && (
@@ -256,7 +257,7 @@ export default function ManutenzionePage() {
                     <tr key={i.id} className="hover:bg-slate-800/40 transition">
                       <td className="px-6 py-4 font-mono font-bold text-slate-100">{targaOf(i.vehicleId)}</td>
                       <td className="px-6 py-4">
-                        <span className="bg-slate-800 text-white px-2.5 py-1 rounded-md text-xs font-bold">{i.tipo}</span>
+                        <span className="bg-slate-800 text-white px-2.5 py-1 rounded-md text-xs font-bold">{label(i.tipo)}</span>
                       </td>
                       <td className="px-6 py-4">
                         {i.kmProssimo != null ? (

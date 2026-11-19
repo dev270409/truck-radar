@@ -16,6 +16,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
+import { label } from "@/lib/labels";
 
 interface VehicleDocument {
   id: string;
@@ -258,7 +259,7 @@ export default function VehiclesPage() {
 
   const handleDeleteDoc = async (doc: VehicleDocument) => {
     if (!docVehicle) return;
-    if (!window.confirm(`Eliminare il documento ${doc.tipo}?`)) return;
+    if (!window.confirm(`Eliminare il documento ${label(doc.tipo)}?`)) return;
     try {
       const res = await fetch(`/api/vehicles/${docVehicle.id}/documents/${doc.id}`, {
         method: "DELETE",
@@ -320,7 +321,7 @@ export default function VehiclesPage() {
                 const b = docBadge(d.dataScadenza);
                 return (
                   <li key={d.id} className="text-slate-300">
-                    <span className="font-mono font-bold">{d.targa}</span> · {d.tipo} ·{" "}
+                    <span className="font-mono font-bold">{d.targa}</span> · {label(d.tipo)} ·{" "}
                     {new Date(d.dataScadenza).toLocaleDateString("it-IT")}{" "}
                     <span className={`ml-1 px-1.5 py-0.5 rounded font-semibold ${b.cls}`}>{b.label}</span>
                   </li>
@@ -399,7 +400,7 @@ export default function VehiclesPage() {
                     <td className="px-6 py-4 font-mono font-bold text-slate-100">{v.targa}</td>
                     <td className="px-6 py-4">
                       <span className="bg-slate-800 text-slate-200 px-2.5 py-1 rounded-md text-xs font-semibold">
-                        {v.categoria}
+                        {label(v.categoria)}
                       </span>
                     </td>
                     <td className="px-6 py-4">{v.portataMaxKg} kg</td>
@@ -414,7 +415,7 @@ export default function VehiclesPage() {
                             : "bg-amber-950 text-amber-300 border border-amber-800/60"
                         }`}
                       >
-                        {v.status}
+                        {label(v.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs">
@@ -685,7 +686,7 @@ export default function VehiclesPage() {
                     >
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold text-slate-200">{d.tipo}</span>
+                          <span className="text-sm font-bold text-slate-200">{label(d.tipo)}</span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${b.cls}`}>{b.label}</span>
                         </div>
                         <p className="text-xs font-mono text-slate-400 mt-0.5">

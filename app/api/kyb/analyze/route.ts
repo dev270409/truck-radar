@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { analyzeKyb } from "@/lib/kyb";
 import type { KybInputFile } from "@/lib/kyb/types";
 import { rateLimit, rateLimitKeyFromRequest } from "@/lib/rate-limit";
+import { isAllowedUploadUrl } from "@/lib/url-safety";
 
 // L'estrazione AI (download documenti + chiamata vision a Gemini) può richiedere
 // più dei 10s di default di Vercel: alziamo il limite per evitare timeout 504.
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
     if (files.some((f) => !ALLOWED_TIPI.has(f.tipo) || !f.fileUrl)) {
       return NextResponse.json({ error: "Tipi documento non validi o URL mancante." }, { status: 400 });
     }
-    if (body.files.some((f: KybInputFile) => !(f.fileUrl as string).startsWith("https://"))) {
+    if (body.files.some((f: KybInputFile) => !isAllowedUploadUrl(f.fileUrl))) {
       return NextResponse.json({ error: "URL documento non valido." }, { status: 400 });
     }
 

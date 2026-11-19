@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Cloud, Loader2, Plug, Zap, RefreshCw, Unplug, Plus, CheckCircle2, BookOpen, ExternalLink, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface Integration {
   id: string;
@@ -247,7 +248,7 @@ export default function IntegrazioniPage() {
                     <div className="flex items-center space-x-2">
                       <p className="text-sm font-bold text-slate-100">{c.name}</p>
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusStyles[c.status]}`}>
-                        {c.status}
+                              {label(c.status)}
                       </span>
                       {isGeotab ? (
                         <span className="chip chip-success" style={{ fontSize: 8 }}>Live · reale</span>

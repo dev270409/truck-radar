@@ -437,6 +437,283 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "GeotabTripSnapshot_company_start_idx" ON "GeotabTripSnapshot"("companyId", "startAt");
   CREATE INDEX IF NOT EXISTS "GeotabTripSnapshot_company_plate_idx" ON "GeotabTripSnapshot"("companyId", "licensePlate");
   `,
+
+  // Ops Suite — anagrafica clienti per preventivi, ordini e analisi commerciale
+  `
+  CREATE TABLE IF NOT EXISTS "Customer" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    vat TEXT,
+    notes TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "Customer_companyId_idx" ON "Customer"("companyId");
+  CREATE INDEX IF NOT EXISTS "Customer_name_idx" ON "Customer"("companyId", name);
+  `,
+
+  // Ops Suite — piani di carico 2D/3D e calcolatore trasporto
+  `
+  CREATE TABLE IF NOT EXISTS "LoadPlan" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "tripId" TEXT,
+    "vehicleId" TEXT,
+    name TEXT NOT NULL DEFAULT 'Piano di carico',
+    "vehicleType" TEXT NOT NULL DEFAULT 'MOTRICE',
+    "containerType" TEXT,
+    "items" JSONB NOT NULL DEFAULT '[]',
+    "totals" JSONB NOT NULL DEFAULT '{}',
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "LoadPlan_companyId_idx" ON "LoadPlan"("companyId");
+  CREATE INDEX IF NOT EXISTS "LoadPlan_tripId_idx" ON "LoadPlan"("tripId");
+  `,
+
+  // Ops Suite — preventivi con margine e registro prezzi
+  `
+  CREATE TABLE IF NOT EXISTS "Quote" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "customerId" TEXT,
+    "customerName" TEXT NOT NULL,
+    "customerEmail" TEXT,
+    "customerPhone" TEXT,
+    "pickup" TEXT NOT NULL,
+    "delivery" TEXT NOT NULL,
+    goods TEXT,
+    "weightKg" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "volumeM3" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "linearM" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    price DOUBLE PRECISION NOT NULL DEFAULT 0,
+    cost DOUBLE PRECISION NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'BOZZA',
+    "validUntil" TIMESTAMPTZ,
+    notes TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "Quote_companyId_idx" ON "Quote"("companyId");
+  CREATE INDEX IF NOT EXISTS "Quote_status_idx" ON "Quote"("companyId", status);
+  `,
+
+  // Ops Suite — ordini ricevuti dal portale cliente
+  `
+  CREATE TABLE IF NOT EXISTS "CustomerOrder" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "quoteId" TEXT,
+    "tripId" TEXT,
+    "customerId" TEXT,
+    "customerName" TEXT NOT NULL,
+    "customerEmail" TEXT,
+    "pickup" TEXT NOT NULL,
+    "delivery" TEXT NOT NULL,
+    goods TEXT,
+    "weightKg" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "volumeM3" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    price DOUBLE PRECISION NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'RICEVUTO',
+    notes TEXT,
+    "attachmentUrl" TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "CustomerOrder_companyId_idx" ON "CustomerOrder"("companyId");
+  CREATE INDEX IF NOT EXISTS "CustomerOrder_status_idx" ON "CustomerOrder"("companyId", status);
+  `,
+
+  // Ops Suite — portale ordini pubblico per azienda (token)
+  `
+  CREATE TABLE IF NOT EXISTS "CustomerPortal" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL UNIQUE,
+    token TEXT NOT NULL UNIQUE,
+    enabled BOOLEAN NOT NULL DEFAULT true,
+    "brandName" TEXT,
+    "brandColor" TEXT NOT NULL DEFAULT '#F5B800',
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "CustomerPortal_token_idx" ON "CustomerPortal"(token);
+  `,
+
+  // Ops Suite — ottimizzazione giri e costi viaggio
+  `
+  CREATE TABLE IF NOT EXISTS "RoutePlan" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT 'Giro',
+    stops JSONB NOT NULL DEFAULT '[]',
+    optimized JSONB NOT NULL DEFAULT '[]',
+    "totalKm" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "totalCost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "suggestedPrice" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "RoutePlan_companyId_idx" ON "RoutePlan"("companyId");
+  `,
+
+  // Ops Suite — costi mezzi (gomme, officina, tagliandi, assicurazione)
+  `
+  CREATE TABLE IF NOT EXISTS "VehicleCost" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "vehicleId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    descrizione TEXT,
+    importo DOUBLE PRECISION NOT NULL,
+    "data" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    fornitore TEXT,
+    note TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "VehicleCost_companyId_idx" ON "VehicleCost"("companyId");
+  CREATE INDEX IF NOT EXISTS "VehicleCost_vehicleId_idx" ON "VehicleCost"("vehicleId");
+  `,
+
+  // Ops Suite — scadenze autisti
+  `
+  CREATE TABLE IF NOT EXISTS "DriverDocument" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    "dataScadenza" TIMESTAMPTZ NOT NULL,
+    "fileUrl" TEXT,
+    note TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "DriverDocument_companyId_idx" ON "DriverDocument"("companyId");
+  CREATE INDEX IF NOT EXISTS "DriverDocument_userId_idx" ON "DriverDocument"("userId");
+  `,
+
+  // Ops Suite — scadenze aziendali (DURC, polizza merci, Albo, ecc.)
+  `
+  CREATE TABLE IF NOT EXISTS "CompanyDeadline" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    "dataScadenza" TIMESTAMPTZ NOT NULL,
+    note TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "CompanyDeadline_companyId_idx" ON "CompanyDeadline"("companyId");
+  `,
+
+  // Ops Suite — calendario divieti mezzi pesanti
+  `
+  CREATE TABLE IF NOT EXISTS "HeavyVehicleBan" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "data" TIMESTAMPTZ NOT NULL,
+    regione TEXT,
+    descrizione TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "HeavyVehicleBan_companyId_idx" ON "HeavyVehicleBan"("companyId");
+  CREATE INDEX IF NOT EXISTS "HeavyVehicleBan_data_idx" ON "HeavyVehicleBan"("companyId", "data");
+  `,
+
+  // Ops Suite — cisterne gasolio e movimenti contalitri
+  `
+  CREATE TABLE IF NOT EXISTS "FuelTank" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    name TEXT NOT NULL,
+    "capacitaLitri" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "contalitri" TEXT,
+    note TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "FuelTank_companyId_idx" ON "FuelTank"("companyId");
+  CREATE TABLE IF NOT EXISTS "FuelTankMovement" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "tankId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    litri DOUBLE PRECISION NOT NULL,
+    "contalitri" DOUBLE PRECISION,
+    note TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "FuelTankMovement_companyId_idx" ON "FuelTankMovement"("companyId");
+  CREATE INDEX IF NOT EXISTS "FuelTankMovement_tankId_idx" ON "FuelTankMovement"("tankId");
+  `,
+
+  // Ops Suite — prova di consegna (foto/firma POD) per viaggio
+  `
+  CREATE TABLE IF NOT EXISTS "TripPod" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "tripId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    "fileUrl" TEXT,
+    "firmaData" TEXT,
+    note TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "TripPod_tripId_idx" ON "TripPod"("tripId");
+  CREATE INDEX IF NOT EXISTS "TripPod_companyId_idx" ON "TripPod"("companyId");
+  `,
+
+  // Documenti in arrivo - coda unica manuale (email/WhatsApp/AI in fasi successive)
+  `
+  CREATE TABLE IF NOT EXISTS "DocumentInbox" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    source TEXT NOT NULL DEFAULT 'UPLOAD',
+    "fileName" TEXT NOT NULL,
+    "fileUrl" TEXT NOT NULL,
+    "mimeType" TEXT,
+    "fileSize" INTEGER,
+    status TEXT NOT NULL DEFAULT 'DA_CLASSIFICARE',
+    "docType" TEXT,
+    "docNumber" TEXT,
+    "docDate" TIMESTAMPTZ,
+    amount DOUBLE PRECISION,
+    "customerName" TEXT,
+    "tripId" TEXT,
+    "vehicleId" TEXT,
+    notes TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "DocumentInbox_companyId_idx" ON "DocumentInbox"("companyId");
+  CREATE INDEX IF NOT EXISTS "DocumentInbox_status_idx" ON "DocumentInbox"("companyId", status);
+  CREATE INDEX IF NOT EXISTS "DocumentInbox_createdAt_idx" ON "DocumentInbox"("companyId", "createdAt");
+  `,
+
+  // Verifica identita delegata al provider KYC (Stripe Identity o equivalente)
+  `
+  CREATE TABLE IF NOT EXISTS "IdentityVerification" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    provider TEXT NOT NULL DEFAULT 'stripe_identity',
+    "sessionId" TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'created',
+    "lastError" TEXT,
+    "verifiedAt" TIMESTAMPTZ,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "IdentityVerification_companyId_idx" ON "IdentityVerification"("companyId");
+  CREATE INDEX IF NOT EXISTS "IdentityVerification_status_idx" ON "IdentityVerification"("companyId", status);
+  `,
 ];
 
 async function main() {

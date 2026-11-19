@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -20,7 +20,13 @@ import {
   Upload,
   ClipboardCheck,
   Send,
+  Navigation,
+  PenLine,
+  Camera,
+  CheckCircle2,
+  Eraser,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 import { UploadButton } from "@/lib/uploadthing";
 
 interface TripEvent {
@@ -52,6 +58,15 @@ interface DdtDocument {
   tipo: string;
   fileUrl: string;
   note?: string | null;
+  createdAt: string;
+}
+
+interface PodDocument {
+  id: string;
+  tipo: string;
+  fileUrl: string | null;
+  firmaData: string | null;
+  note: string | null;
   createdAt: string;
 }
 
@@ -88,6 +103,16 @@ export default function AutistaTripDetailPage() {
   const [ddtFileUrl, setDdtFileUrl] = useState("");
   const [ddtUploading, setDdtUploading] = useState(false);
 
+  // POD state
+  const [pods, setPods] = useState<PodDocument[]>([]);
+  const [podTipo, setPodTipo] = useState<"FOTO" | "FIRMA">("FIRMA");
+  const [podNote, setPodNote] = useState("");
+  const [podFileUrl, setPodFileUrl] = useState("");
+  const [podSaving, setPodSaving] = useState(false);
+  const [signing, setSigning] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const drawingRef = useRef(false);
+
   // Tracking state
   const [trackEvents, setTrackEvents] = useState<TrackEvent[]>([]);
   const [trackTipo, setTrackTipo] = useState("POSIZIONE");
@@ -111,6 +136,9 @@ export default function AutistaTripDetailPage() {
       const resDocs = await fetch(`/api/trips/${id}/documents`);
       const dataDocs = await resDocs.json();
       if (dataDocs.documents) setDocuments(dataDocs.documents);
+      const resPods = await fetch(`/api/trips/${id}/pod`);
+      const dataPods = await resPods.json();
+      if (dataPods.items) setPods(dataPods.items);
       const resTrack = await fetch(`/api/trips/${id}/tracking`);
       const dataTrack = await resTrack.json();
       if (dataTrack.events) setTrackEvents(dataTrack.events);
@@ -189,8 +217,88 @@ export default function AutistaTripDetailPage() {
     }
   };
 
-  const handleTrackSend = async () => {
+  const submitPod = async (payload: { tipo: string; fileUrl?: string | null; firmaData?: string | null }) => {
+    setPodSaving(true);
     setError("");
+    setSuccess("");
+    try {
+      const res = await fetch(`/api/trips/${id}/pod`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, note: podNote || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nel salvataggio POD");
+      setPods((prev) => [data.item, ...prev]);
+      setPodFileUrl("");
+      setPodNote("");
+      setSuccess("Prova di consegna salvata.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPodSaving(false);
+    }
+  };
+
+  const saveSignature = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const firmaData = canvas.toDataURL("image/png");
+    if (firmaData.length < 5000) {
+      setError("La firma è vuota: firma nel riquadro prima di salvare.");
+      return;
+    }
+    await submitPod({ tipo: "FIRMA", firmaData });
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setSigning(false);
+  };
+
+  const pointFromEvent = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((e.clientX - rect.left) / rect.width) * canvas.width,
+      y: ((e.clientY - rect.top) / rect.height) * canvas.height,
+    };
+  };
+
+  const startSignature = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const p = pointFromEvent(e);
+    drawingRef.current = true;
+    setSigning(true);
+    ctx.strokeStyle = "#0f172a";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  };
+
+  const moveSignature = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawingRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const p = pointFromEvent(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  };
+
+  const endSignature = () => {
+    drawingRef.current = false;
+  };
+
+  const handleTrackSend = async () => {    setError("");
     setSuccess("");
     if (trackTipo === "POSIZIONE" && (!trackPosizione || trackPosizione.length < 2)) {
       setError("Indica la posizione (es. Autogrill Roma Nord).");
@@ -290,7 +398,7 @@ export default function AutistaTripDetailPage() {
             {trip.luogoRitiro} → {trip.luogoConsegna}
           </h1>
           <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusStyles[trip.status]}`}>
-            {trip.status.replace("_", " ")}
+            {label(trip.status)}
           </span>
         </div>
       </div>
@@ -386,7 +494,7 @@ export default function AutistaTripDetailPage() {
                 <>
                   <p className="text-slate-200 font-mono text-xs">{trip.vehicle.targa}</p>
                   <p className="text-xs text-slate-400">
-                    {trip.vehicle.categoria} · {trip.vehicle.portataMaxKg} kg max
+                    {label(trip.vehicle.categoria)} · {trip.vehicle.portataMaxKg} kg max
                   </p>
                 </>
               ) : (
@@ -486,7 +594,7 @@ export default function AutistaTripDetailPage() {
                 <div className="flex items-center space-x-3 min-w-0">
                   <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-100 capitalize">{doc.tipo}</p>
+                    <p className="text-sm font-semibold text-slate-100 capitalize">{label(doc.tipo)}</p>
                     {doc.note && <p className="text-xs text-slate-400 truncate">{doc.note}</p>}
                   </div>
                 </div>
@@ -502,6 +610,131 @@ export default function AutistaTripDetailPage() {
                   >
                     Apri
                   </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Navigazione e POD */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <h3 className="text-base font-bold text-slate-100 flex items-center">
+          <Navigation className="w-5 h-5 mr-2 text-sky-400" /> Navigazione e prova di consegna
+        </h3>
+
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(trip.luogoConsegna)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-center space-x-2 bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-3 rounded-xl transition"
+          >
+            <Navigation className="w-4 h-4" />
+            <span>Google Maps</span>
+          </a>
+          <a
+            href={`https://waze.com/ul?q=${encodeURIComponent(trip.luogoConsegna)}&navigate=yes`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-100 text-sm font-semibold py-3 rounded-xl transition"
+          >
+            <Navigation className="w-4 h-4" />
+            <span>Waze</span>
+          </a>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(["FIRMA", "FOTO"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setPodTipo(t)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                podTipo === t ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              {t === "FIRMA" ? "Firma destinatario" : "Foto consegna"}
+            </button>
+          ))}
+        </div>
+
+        {podTipo === "FIRMA" ? (
+          <div className="space-y-2">
+            <canvas
+              ref={canvasRef}
+              width={600}
+              height={180}
+              onPointerDown={startSignature}
+              onPointerMove={moveSignature}
+              onPointerUp={endSignature}
+              onPointerLeave={endSignature}
+              className="w-full touch-none rounded-xl border border-slate-700 bg-white"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={saveSignature}
+                disabled={podSaving || !signing}
+                className="flex-1 flex items-center justify-center space-x-2 bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-2.5 rounded-xl transition disabled:opacity-50"
+              >
+                {podSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <PenLine className="w-4 h-4" />}
+                <span>Salva firma</span>
+              </button>
+              <button type="button" onClick={clearSignature} className="px-3 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800">
+                <Eraser className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <UploadButton
+              endpoint="ddtPhoto"
+              onClientUploadComplete={(res) => {
+                const url = res?.[0]?.url;
+                if (url) setPodFileUrl(url);
+                setSuccess("Foto caricata. Conferma per salvare la prova di consegna.");
+              }}
+              onUploadError={(err: Error) => setError(`Upload fallito: ${err.message}`)}
+            />
+            <button
+              type="button"
+              onClick={() => podFileUrl && submitPod({ tipo: "FOTO", fileUrl: podFileUrl })}
+              disabled={podSaving || !podFileUrl}
+              className="w-full flex items-center justify-center space-x-2 bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-2.5 rounded-xl transition disabled:opacity-50"
+            >
+              {podSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+              <span>Salva foto consegna</span>
+            </button>
+          </div>
+        )}
+
+        <input
+          type="text"
+          value={podNote}
+          onChange={(e) => setPodNote(e.target.value)}
+          placeholder="Nota consegna (nome destinatario, ora, anomalia)"
+          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+        />
+
+        {pods.length > 0 && (
+          <ul className="space-y-2">
+            {pods.map((p) => (
+              <li key={p.id} className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-100">{p.tipo}</p>
+                    {p.note && <p className="text-xs text-slate-400 truncate">{p.note}</p>}
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 shrink-0">
+                  <span className="text-[11px] font-mono text-slate-500">{new Date(p.createdAt).toLocaleDateString("it-IT")}</span>
+                  {(p.fileUrl || p.firmaData) && (
+                    <a href={p.fileUrl || p.firmaData || "#"} target="_blank" rel="noreferrer" className="text-xs font-semibold text-sky-300 hover:underline">
+                      Apri
+                    </a>
+                  )}
                 </div>
               </li>
             ))}
@@ -653,11 +886,11 @@ export default function AutistaTripDetailPage() {
                 <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <div className="flex items-center space-x-2 text-xs">
                   <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
-                    {ev.fromStatus.replace("_", " ")}
+                      {label(ev.fromStatus)}
                   </span>
                   <ArrowRight className="w-3 h-3 text-slate-500" />
                   <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
-                    {ev.toStatus.replace("_", " ")}
+                      {label(ev.toStatus)}
                   </span>
                 </div>
                 {ev.note && <p className="text-xs text-slate-400 mt-1">{ev.note}</p>}

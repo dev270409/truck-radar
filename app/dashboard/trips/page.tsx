@@ -13,6 +13,7 @@ import {
   User,
   Pencil,
 } from "lucide-react";
+import { label } from "@/lib/labels";
 
 interface Driver {
   id: string;
@@ -243,7 +244,7 @@ export default function TripsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}>
-                        {t.status.replace("_", " ")}
+                        {label(t.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -423,7 +424,7 @@ export default function TripsPage() {
                     <option value="">-- Nessun mezzo --</option>
                     {vehicles.map((v) => (
                       <option key={v.id} value={v.id}>
-                        {v.targa} · {v.categoria}
+                        {v.targa} · {label(v.categoria)}
                       </option>
                     ))}
                   </select>
