@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Loader2, Plus } from "lucide-react";
+import { Search, Loader2, Plus, Inbox } from "lucide-react";
 import Logo from "./Logo";
 
 interface SearchResult {
@@ -144,9 +144,19 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:ml-3">
-        <Link href="/dashboard/trips" className="ops-btn ops-btn--primary ops-btn--sm hidden md:inline-flex">
-          <Plus className="h-4 w-4" /> Nuovo viaggio
+        <Link
+          href="/dashboard/documenti"
+          aria-label="Documenti in arrivo"
+          className="ops-btn ops-btn--secondary ops-btn--sm inline-flex"
+        >
+          <Inbox className="h-4 w-4" />
+          <span className="hidden sm:inline">Documenti</span>
         </Link>
+        <div className="hidden md:block">
+          <Link href="/dashboard/trips" className="ops-btn ops-btn--primary ops-btn--sm">
+            <Plus className="h-4 w-4" /> Nuovo viaggio
+          </Link>
+        </div>
       </div>
     </header>
   );

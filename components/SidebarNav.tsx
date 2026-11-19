@@ -15,7 +15,6 @@ import {
   CreditCard,
   KeyRound,
   FileText,
-  Inbox,
   PackageCheck,
   FileSpreadsheet,
   CalendarDays,
@@ -99,9 +98,7 @@ export default function SidebarNav({ role, fullAccess }: { role: string; fullAcc
           <Item href="/dashboard/flotta" label="Flotta live" fullAccess icon={<NavIcon tone="var(--info)"><Radar className="h-3.5 w-3.5" /></NavIcon>} />
           <Item href="/dashboard/users" label="Autisti e team" fullAccess icon={<NavIcon tone="var(--accent)"><Users className="h-3.5 w-3.5" /></NavIcon>} />
           <Item href="/dashboard/trips" label="Viaggi" fullAccess icon={<NavIcon tone="var(--brand)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/documenti" label="Documenti" fullAccess icon={<NavIcon tone="var(--info)"><Inbox className="h-3.5 w-3.5" /></NavIcon>} />
           <Item href="/dashboard/carico" label="Piano di carico" fullAccess icon={<NavIcon tone="var(--warning)"><Boxes className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/giri" label="Giri e costi" fullAccess icon={<NavIcon tone="var(--info)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
 
           <Group>Commerciale</Group>
           <Item href="/dashboard/preventivi" label="Preventivi" fullAccess icon={<NavIcon tone="var(--success)"><FileText className="h-3.5 w-3.5" /></NavIcon>} />

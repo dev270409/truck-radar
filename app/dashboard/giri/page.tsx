@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Calculator, Download, Loader2, MapPin, Navigation, Plus, Route, Save, Trash2, Wand2 } from "lucide-react";
 import { calculateTripCost } from "@/lib/routes";
+import TripSubnav from "@/components/TripSubnav";
 
 interface Stop {
   name: string;
@@ -224,6 +225,8 @@ export default function GiriPage() {
         </h1>
         <p className="mt-1 text-sm text-slate-400">Incolla le tappe, ottimizza i chilometri e calcola costo reale e prezzo consigliato.</p>
       </div>
+
+      <TripSubnav active="giri" />
 
       {error && <div className="rounded-xl border border-amber-800/60 bg-amber-950/40 p-3 text-sm text-amber-200">{error}</div>}
       {success && <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/40 p-3 text-sm text-emerald-200">{success}</div>}

@@ -14,6 +14,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { label } from "@/lib/labels";
+import TripSubnav from "@/components/TripSubnav";
 
 interface Driver {
   id: string;
@@ -178,6 +179,8 @@ export default function TripsPage() {
           <span>Aggiungi Viaggio</span>
         </button>
       </div>
+
+      <TripSubnav active="trips" />
 
       {/* Trips Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
