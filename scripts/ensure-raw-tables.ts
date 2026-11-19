@@ -714,6 +714,27 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "IdentityVerification_companyId_idx" ON "IdentityVerification"("companyId");
   CREATE INDEX IF NOT EXISTS "IdentityVerification_status_idx" ON "IdentityVerification"("companyId", status);
   `,
+
+  // Costi analitici del viaggio (gasolio, pedaggi, autista, traghetto, ecc.)
+  `
+  CREATE TABLE IF NOT EXISTS "TripCostItem" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "tripId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    label TEXT,
+    quantity DOUBLE PRECISION NOT NULL DEFAULT 0,
+    unit TEXT,
+    "unitCost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'MANUAL',
+    note TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "TripCostItem_companyId_idx" ON "TripCostItem"("companyId");
+  CREATE INDEX IF NOT EXISTS "TripCostItem_tripId_idx" ON "TripCostItem"("tripId");
+  `,
 ];
 
 async function main() {

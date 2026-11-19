@@ -26,6 +26,7 @@ import {
   Link2,
 } from "lucide-react";
 import { label } from "@/lib/labels";
+import TripCostBreakdown from "@/components/TripCostBreakdown";
 
 interface SubSuggestion {
   companyId: string;
@@ -482,6 +483,15 @@ export default function TripDetailPage() {
               </div>
             </div>
           </div>
+
+          <TripCostBreakdown
+            tripId={trip.id}
+            prezzo={trip.prezzo}
+            vehicleCategory={trip.vehicle?.categoria}
+            onTotalChange={(total) =>
+              setTrip((prev) => (prev ? { ...prev, costo: total } : prev))
+            }
+          />
 
           {/* Assegnazione */}
           <form onSubmit={handleAssign} className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">

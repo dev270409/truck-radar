@@ -23,6 +23,7 @@ import {
   ArrowLeftRight,
   Wallet,
   Droplets,
+  BadgePercent,
 } from "lucide-react";
 
 function NavIcon({ tone, children }: { tone: string; children: React.ReactNode }) {
@@ -117,6 +118,7 @@ export default function SidebarNav({ role, fullAccess }: { role: string; fullAcc
 
           <Group>Fatturazione</Group>
           <Item href="/dashboard/abbonamenti" label="Abbonamento" fullAccess icon={<NavIcon tone="var(--info)"><CreditCard className="h-3.5 w-3.5" /></NavIcon>} />
+          <Item href="/dashboard/agevolazioni" label="Agevolazioni" fullAccess icon={<NavIcon tone="var(--warning)"><BadgePercent className="h-3.5 w-3.5" /></NavIcon>} />
 
           <Group>Configurazione</Group>
           {admin && <Item href="/dashboard/integrazioni" label="Integrazioni" fullAccess icon={<NavIcon tone="var(--brand)"><Cloud className="h-3.5 w-3.5" /></NavIcon>} />}

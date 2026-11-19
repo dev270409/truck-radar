@@ -21,6 +21,7 @@ const pagesAdmin = [
   "/dashboard/analisi-clienti",
   "/dashboard/flotta",
   "/dashboard/abbonamenti",
+  "/dashboard/agevolazioni",
   "/dashboard/integrazioni",
 ];
 
