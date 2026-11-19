@@ -9,6 +9,7 @@ const OUT = "C:\\Users\\Asus\\AppData\\Local\\Temp\\opencode\\ui-audit";
 const pagesAdmin = [
   "/dashboard",
   "/dashboard/trips",
+  "/dashboard/giri",
   "/dashboard/documenti",
   "/dashboard/vehicles",
   "/dashboard/users",
@@ -22,6 +23,7 @@ const pagesAdmin = [
   "/dashboard/flotta",
   "/dashboard/abbonamenti",
   "/dashboard/agevolazioni",
+  "/dashboard/impostazioni",
   "/dashboard/integrazioni",
 ];
 

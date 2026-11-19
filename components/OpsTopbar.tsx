@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, Plus, Inbox } from "lucide-react";
 import Logo from "./Logo";
+import UserMenu from "./UserMenu";
 
 interface SearchResult {
   type: string;
@@ -13,7 +14,13 @@ interface SearchResult {
   href: string;
 }
 
-export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
+export default function OpsTopbar({
+  onMenu,
+  user,
+}: {
+  onMenu?: () => void;
+  user: { nome: string; cognome: string; email: string; role: string };
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -157,6 +164,7 @@ export default function OpsTopbar({ onMenu }: { onMenu?: () => void }) {
             <Plus className="h-4 w-4" /> Nuovo viaggio
           </Link>
         </div>
+        <UserMenu user={user} />
       </div>
     </header>
   );

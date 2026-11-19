@@ -13,15 +13,17 @@ import BottomNav from "./BottomNav";
 export default function DashboardShell({
   sidebar,
   children,
+  user,
 }: {
   sidebar: React.ReactNode;
   children: React.ReactNode;
+  user: { nome: string; cognome: string; email: string; role: string };
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="min-h-screen">
-      <OpsTopbar onMenu={() => setOpen(true)} />
+      <OpsTopbar onMenu={() => setOpen(true)} user={user} />
 
       <div className="flex">
         {/* Backdrop mobile */}

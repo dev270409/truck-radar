@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getPlanLimits, hasFullSectionAccess } from "@/lib/plans";
-import { Lock, KeyRound } from "lucide-react";
-import LogoutButton from "@/components/LogoutButton";
+import { Lock } from "lucide-react";
 import NotificationsBadge from "@/components/NotificationsBadge";
 import DashboardShell from "@/components/DashboardShell";
 import SidebarNav from "@/components/SidebarNav";
@@ -71,7 +70,6 @@ export default async function DashboardLayout({
     accountVerificato = false;
   }
 
-  const BRAND = "var(--brand)";
   const INK = "var(--text)";
 
   const sidebar = (
@@ -126,30 +124,22 @@ export default async function DashboardLayout({
       </div>
 
       <SidebarNav role={session.user.role} fullAccess={fullSectionAccess} />
-
-      <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--glass-border)" }}>
-        <div className="mb-3 flex items-center gap-3 px-1">
-          <span className="grid h-9 w-9 place-items-center rounded-[10px] font-display text-[12px] font-bold text-white" style={{ background: BRAND }}>
-            {(session.user.nome?.[0] ?? "U").toUpperCase()}{(session.user.cognome?.[0] ?? "").toUpperCase()}
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-[12px] font-semibold" style={{ color: INK }}>
-              {session.user.nome} {session.user.cognome}
-            </p>
-            <span className="chip chip-brand mt-0.5">{session.user.role}</span>
-            <Link href="/dashboard/account" className="mt-2 flex items-center gap-1 text-[11px] font-semibold" style={{ color: "var(--brand)" }}>
-              <KeyRound className="h-3 w-3" /> Account e password
-            </Link>
-          </div>
-        </div>
-        <LogoutButton />
-      </div>
     </>
   );
 
   return (
     <div data-theme="dark" className="dashboard-dark">
-      <DashboardShell sidebar={sidebar}>{children}</DashboardShell>
+      <DashboardShell
+        sidebar={sidebar}
+        user={{
+          nome: session.user.nome ?? "",
+          cognome: session.user.cognome ?? "",
+          email: session.user.email ?? "",
+          role: session.user.role,
+        }}
+      >
+        {children}
+      </DashboardShell>
     </div>
   );
 }

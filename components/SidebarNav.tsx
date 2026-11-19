@@ -1,7 +1,9 @@
 ﻿"use client";
 
+import { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { readHiddenSidebarItems, SIDEBAR_PREFS_EVENT } from "@/lib/nav-prefs";
 import {
   LayoutDashboard,
   Users,
@@ -43,6 +45,8 @@ function Badge({ blocked }: { blocked: boolean }) {
   return null;
 }
 
+const HiddenSidebarContext = createContext<string[]>([]);
+
 function Item({
   href,
   label,
@@ -56,7 +60,9 @@ function Item({
   premium?: boolean;
   fullAccess: boolean;
 }) {
+  const hidden = useContext(HiddenSidebarContext);
   const pathname = usePathname();
+  if (hidden.includes(href) && href !== "/dashboard") return null;
   const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
   const blocked = premium && !fullAccess;
   return (
@@ -86,7 +92,21 @@ function Group({ children }: { children: React.ReactNode }) {
 
 export default function SidebarNav({ role, fullAccess }: { role: string; fullAccess: boolean }) {
   const admin = role === "ADMIN";
+  const [hidden, setHidden] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sync = () => setHidden(readHiddenSidebarItems());
+    sync();
+    window.addEventListener(SIDEBAR_PREFS_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(SIDEBAR_PREFS_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
   return (
+    <HiddenSidebarContext.Provider value={hidden}>
     <nav className="flex-1 text-[13px]">
       {role === "AUTISTA" ? (
         <Item href="/dashboard/autista" label="I miei viaggi" fullAccess icon={<NavIcon tone="var(--info)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
@@ -124,6 +144,7 @@ export default function SidebarNav({ role, fullAccess }: { role: string; fullAcc
         </>
       )}
     </nav>
+    </HiddenSidebarContext.Provider>
   );
 }
 
