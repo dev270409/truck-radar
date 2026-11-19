@@ -24,7 +24,7 @@ Riferimenti: OWASP ASVS 5.0 (Level 2 come target), checklist production-readines
 | Onboarding trial | OK | 21 giorni senza KYC/KYB; verifica alla scadenza |
 | Ruoli | OK | attivi ADMIN e AUTISTA; COMMITTENTE/UFFICIO bloccati |
 | KYC self-approval | RISOLTO | verifica gestita dal provider; endpoint manuale disattivato |
-| Stripe Identity | DA ATTIVARE | codice pronto; manca flag/provider/webhook in produzione |
+| Stripe Identity | ATTIVO | API access verificato; webhook produzione con 5 eventi identity; deploy produzione eseguito |
 | Lint | APERTO | ~1995 problemi preesistenti; i file nuovi passano ESLint |
 | MFA / verifica email | APERTO | da decidere prima del go-live |
 | Rate limit distribuito | APERTO | in-memory, non affidabile su più istanze |
@@ -70,13 +70,8 @@ Riferimenti: OWASP ASVS 5.0 (Level 2 come target), checklist production-readines
 
 ## 4. Aperti prima del go-live
 
-### ALTO - Attivare Stripe Identity
-Il codice è pronto, ma servono:
-1. attivazione Stripe Identity nell'account Stripe;
-2. `STRIPE_IDENTITY_ENABLED=true` in produzione;
-3. eventi webhook `identity.verification_session.*`;
-4. test con documento reale in sandbox/test mode.
-Senza questi passi la pagina di verifica mostra il provider come non disponibile.
+### FATTO - Stripe Identity
+Attivato in produzione: accesso API verificato, webhook con i 5 eventi identity.verification_session.*, deploy produzione eseguito. Identity si abilita automaticamente con STRIPE_SECRET_KEY; STRIPE_IDENTITY_ENABLED=false la disattiva.
 
 ### ALTO - Gate trial anche sulle API
 La dashboard reindirizza i trial scaduti, ma le API non controllano ancora il trial a ogni chiamata. Un utente con sessione valida potrebbe chiamare direttamente le API. Serve un controllo server-side condiviso (o token/session aggiornato dopo la verifica).
