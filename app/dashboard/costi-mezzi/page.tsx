@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Camera, Car, Download, Fuel, Loader2, Plus, ScanLine, Trash2, Wrench } from "lucide-react";
 import { label } from "@/lib/labels";
+import { COST_CATEGORIES, costCategoryLabel } from "@/lib/cost-catalog";
 
 interface Vehicle {
   id: string;
@@ -86,7 +87,8 @@ export default function CostiMezziPage() {
   };
 
   useEffect(() => {
-    load();
+    const timer = setTimeout(() => { void load(); }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const targaOf = (id: string) => vehicles.find((v) => v.id === id)?.targa ?? id;
@@ -336,7 +338,9 @@ export default function CostiMezziPage() {
             </select>
             <div className="grid grid-cols-2 gap-2">
               <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
-                {["GOMME", "OFFICINA", "TAGLIANDO", "ASSICURAZIONE", "BOLLO", "PEDAGGIO", "ALTRO"].map((t) => <option key={t}>{t}</option>)}
+                {COST_CATEGORIES.filter((category) => category.ambito === "mezzo" || category.code === "ALTRO").map((category) => (
+                  <option key={category.code} value={category.code}>{category.label}</option>
+                ))}
               </select>
               <input required type="number" placeholder="Importo € *" value={importo} onChange={(e) => setImporto(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             </div>
@@ -361,7 +365,7 @@ export default function CostiMezziPage() {
               {costs.map((c) => (
                 <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-100">{targaOf(c.vehicleId)} · {label(c.tipo)}</p>
+                    <p className="truncate text-sm font-semibold text-slate-100">{targaOf(c.vehicleId)} · {costCategoryLabel(c.tipo)}</p>
                     <p className="truncate text-xs text-slate-500">{new Date(c.data).toLocaleDateString("it-IT")} · {c.descrizione || c.fornitore || "—"}</p>
                   </div>
                   <div className="flex items-center gap-2">

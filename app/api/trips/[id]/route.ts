@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { TripStatus } from "@prisma/client";
-import { auth } from "@/auth";
+import { requireFeature } from "@/lib/api-guard";
 import { getTenantDb } from "@/lib/tenant";
 import { db } from "@/lib/db";
 
@@ -25,10 +25,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("trips");
+  if (guard.error) return guard.error;
+  const session = guard.session;
   if (!isAdminRole(session.user.role as string)) {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
   }
@@ -51,10 +50,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("trips");
+  if (guard.error) return guard.error;
+  const session = guard.session;
   if (!isAdminRole(session.user.role as string)) {
     return NextResponse.json(
       { error: "Solo l'Admin (o Ufficio) può modificare i viaggi." },

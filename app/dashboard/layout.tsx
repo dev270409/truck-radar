@@ -8,7 +8,8 @@ import NotificationsBadge from "@/components/NotificationsBadge";
 import DashboardShell from "@/components/DashboardShell";
 import SidebarNav from "@/components/SidebarNav";
 import { listApiConnections } from "@/lib/raw-tables";
-import { getOnboardingStatus, isTrialActive } from "@/lib/onboarding";
+import { getOnboardingStatus, isTrialActive, trialDaysLeft } from "@/lib/onboarding";
+import { getPermissionsForUser } from "@/lib/permissions";
 
 export default async function DashboardLayout({
   children,
@@ -20,7 +21,7 @@ export default async function DashboardLayout({
   if (!session?.user?.companyId) {
     redirect("/login");
   }
-  if (session.user.role !== "ADMIN" && session.user.role !== "AUTISTA") {
+  if (!["ADMIN", "UFFICIO", "AUTISTA"].includes(session.user.role)) {
     redirect("/login?error=role-disabled");
   }
 
@@ -44,6 +45,8 @@ export default async function DashboardLayout({
   const planLimits = getPlanLimits(company?.subscriptionPlan || session.user.subscriptionPlan);
   const fullSectionAccess = hasFullSectionAccess(company?.subscriptionStatus, company?.trialEndsAt);
   const autoRole = session.user.role === "AUTISTA";
+  const access = await getPermissionsForUser(session.user.companyId, session.user.id);
+  const permissions = access?.permissions ?? {};
 
   let accountVerificato = false;
   let vehicleCount = 0;
@@ -123,7 +126,11 @@ export default async function DashboardLayout({
         <NotificationsBadge />
       </div>
 
-      <SidebarNav role={session.user.role} fullAccess={fullSectionAccess} />
+      <SidebarNav
+        role={session.user.role}
+        fullAccess={fullSectionAccess}
+        permissions={permissions}
+      />
     </>
   );
 
@@ -137,6 +144,11 @@ export default async function DashboardLayout({
           email: session.user.email ?? "",
           role: session.user.role,
         }}
+        trial={{
+          active: trialActive,
+          daysLeft: company?.subscriptionStatus === "TRIAL" ? trialDaysLeft(company?.trialEndsAt) : null,
+        }}
+        permissions={permissions}
       >
         {children}
       </DashboardShell>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireFeature } from "@/lib/api-guard";
 import { db } from "@/lib/db";
 import { getTenantDb } from "@/lib/tenant";
 import { optionalHttpUrl } from "@/lib/url-safety";
@@ -13,10 +13,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   const { id } = await params;
   const tenantDb = getTenantDb(session.user.companyId);
@@ -37,10 +36,9 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
   if (!isAdminRole(session.user.role as string)) {
     return NextResponse.json(
       { error: "Solo l'Admin (o Ufficio) può gestire i documenti." },

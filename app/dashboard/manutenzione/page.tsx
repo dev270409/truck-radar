@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Wrench, Plus, Trash2, CheckCircle2, XCircle, CalendarClock, Gauge, Coins, AlertTriangle } from "lucide-react";
 import { label } from "@/lib/labels";
+import { MAINTENANCE_CATALOG } from "@/lib/maintenance-catalog";
 
 interface VehicleLite {
   id: string;
@@ -14,6 +15,7 @@ interface MaintenanceItem {
   vehicleId: string;
   tipo: string;
   descrizione?: string | null;
+  voce?: string | null;
   kmProssimo?: number | null;
   dataProssima?: string | null;
   kmEseguito?: number | null;
@@ -26,6 +28,21 @@ interface MaintenanceItem {
 }
 
 const TIPI = ["TAGLIANDO", "FUNGHIOLO", "OLIO", "USURA_PNEUMATICI", "ALTRO"];
+const PAGE_LOADED_AT = Date.now();
+
+interface ScheduleRow {
+  vehicleId: string;
+  targa: string;
+  voce: string;
+  label: string;
+  intervalloKm: number | null;
+  intervalloMesi: number | null;
+  prossimaData: string | null;
+  prossimiKm: number | null;
+  giorni: number | null;
+  kmMancanti: number | null;
+  stato: "SCADUTA" | "VICINA" | "OK" | "MAI" | "NESSUNA";
+}
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   PROGRAMMATO: { label: "Programmato", cls: "bg-amber-950 text-amber-300 border border-amber-800/60" },
   IN_CORSO: { label: "In corso", cls: "bg-blue-950 text-blue-300 border border-blue-800/60" },
@@ -35,6 +52,7 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
 
 export default function ManutenzionePage() {
   const [items, setItems] = useState<MaintenanceItem[]>([]);
+  const [schedule, setSchedule] = useState<ScheduleRow[]>([]);
   const [vehicles, setVehicles] = useState<VehicleLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,6 +60,7 @@ export default function ManutenzionePage() {
 
   const [vehicleId, setVehicleId] = useState("");
   const [tipo, setTipo] = useState("TAGLIANDO");
+  const [voce, setVoce] = useState("olio_motore");
   const [descrizione, setDescrizione] = useState("");
   const [kmProssimo, setKmProssimo] = useState("");
   const [dataProssima, setDataProssima] = useState("");
@@ -56,6 +75,7 @@ export default function ManutenzionePage() {
       const mData = await mRes.json();
       const vData = await vRes.json();
       if (mData.items) setItems(mData.items);
+      if (mData.schedule) setSchedule(mData.schedule);
       if (vData.vehicles) {
         setVehicles(vData.vehicles.map((v: { id: string; targa: string }) => ({ id: v.id, targa: v.targa })));
       }
@@ -67,7 +87,8 @@ export default function ManutenzionePage() {
   };
 
   useEffect(() => {
-    fetchAll();
+    const timer = setTimeout(() => { void fetchAll(); }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const targaOf = (id: string) => vehicles.find((v) => v.id === id)?.targa ?? id;
@@ -83,6 +104,7 @@ export default function ManutenzionePage() {
         body: JSON.stringify({
           vehicleId,
           tipo,
+          voce,
           descrizione,
           kmProssimo: kmProssimo || null,
           dataProssima: dataProssima ? new Date(dataProssima).toISOString() : null,
@@ -106,6 +128,7 @@ export default function ManutenzionePage() {
   const setTargaReset = () => {
     setVehicleId("");
     setTipo("TAGLIANDO");
+    setVoce("olio_motore");
     setDescrizione("");
     setKmProssimo("");
     setDataProssima("");
@@ -144,7 +167,7 @@ export default function ManutenzionePage() {
   const scheduled = items.filter((i) => i.status === "PROGRAMMATO" || i.status === "IN_CORSO");
   const completed = items.filter((i) => i.status === "ESEGUITO");
 
-  const daysUntil = (d: string) => Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
+  const daysUntil = (d: string) => Math.ceil((new Date(d).getTime() - PAGE_LOADED_AT) / 86400000);
   const proactive = scheduled.filter(
     (i) =>
       (i.dataProssima && daysUntil(i.dataProssima) <= 30) || (i.kmProssimo != null && i.kmProssimo > 0)
@@ -173,6 +196,55 @@ export default function ManutenzionePage() {
 
       {error && (
         <div className="p-4 bg-red-950/60 border border-red-800 text-red-200 text-sm rounded-2xl">{error}</div>
+      )}
+
+      {schedule.length > 0 && (
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="flex items-center font-semibold text-slate-100"><Gauge className="mr-2 h-4 w-4 text-amber-400" /> Scadenzario manutenzione</h2>
+              <p className="mt-1 text-xs text-slate-400">Calcolato dal catalogo, dall&apos;ultimo intervento e dai km registrati. La soglia km usa il 10% dell&apos;intervallo, minimo 2.000 km.</p>
+            </div>
+            <span className="rounded-full border border-amber-700/60 bg-amber-950/40 px-2.5 py-1 text-[10px] font-bold uppercase text-amber-200">
+              {schedule.filter((row) => row.stato === "SCADUTA" || row.stato === "VICINA").length} da controllare
+            </span>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            {schedule
+              .filter((row) => row.stato !== "OK")
+              .slice(0, 9)
+              .map((row) => (
+                <div
+                  key={`${row.vehicleId}-${row.voce}`}
+                  className={`rounded-xl border p-3 ${
+                    row.stato === "SCADUTA"
+                      ? "border-red-800 bg-red-950/40 text-red-100"
+                      : row.stato === "VICINA"
+                        ? "border-amber-800 bg-amber-950/40 text-amber-100"
+                        : "border-slate-800 bg-slate-950/60 text-slate-300"
+                  }`}
+                >
+                  <p className="text-xs font-bold">{row.targa} · {row.label}</p>
+                  <p className="mt-1 text-[11px] opacity-80">
+                    {row.stato === "MAI"
+                      ? "Nessun intervento registrato"
+                      : row.stato === "SCADUTA"
+                        ? "Scaduta"
+                        : row.stato === "VICINA"
+                          ? "In scadenza"
+                          : "Programmata"}
+                    {row.prossimaData ? ` · ${new Date(row.prossimaData).toLocaleDateString("it-IT")}` : ""}
+                    {row.prossimiKm != null ? ` · ${row.prossimiKm.toLocaleString("it-IT")} km` : ""}
+                  </p>
+                  <p className="mt-1 text-[10px] opacity-70">
+                    Intervallo: {row.intervalloKm ? `${row.intervalloKm.toLocaleString("it-IT")} km` : ""}
+                    {row.intervalloKm && row.intervalloMesi ? " oppure " : ""}
+                    {row.intervalloMesi ? `${row.intervalloMesi} mesi` : ""}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </section>
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -372,6 +444,18 @@ export default function ManutenzionePage() {
                 >
                   {TIPI.map((t) => (
                     <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Voce del tagliando</label>
+                <select
+                  value={voce}
+                  onChange={(e) => setVoce(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                >
+                  {MAINTENANCE_CATALOG.map((item) => (
+                    <option key={item.id} value={item.id}>{item.label}</option>
                   ))}
                 </select>
               </div>

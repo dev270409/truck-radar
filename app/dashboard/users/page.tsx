@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3, KeyRound, Copy } from "lucide-react";
 import { label } from "@/lib/labels";
+import { PERMISSION_GROUPS, type PermissionKey } from "@/lib/permissions-catalog";
 
 interface UserItem {
   id: string;
@@ -12,6 +13,7 @@ interface UserItem {
   cognome: string;
   telefono?: string;
   role: string;
+  permissions?: Partial<Record<PermissionKey, boolean>>;
   isActive: boolean;
   vehicleId?: string;
   createdAt: string;
@@ -20,6 +22,11 @@ interface UserItem {
 interface VehicleItem {
   id: string;
   targa: string;
+}
+
+interface GeotabConnection {
+  provider?: string;
+  geotabSnapshot?: { drivers?: ExternalGeotabDriver[]; snapshotAt?: string | null };
 }
 
 interface ExternalGeotabDriver {
@@ -37,6 +44,9 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [resetResult, setResetResult] = useState<{ email: string; tempPassword: string } | null>(null);
+  const [permissionUser, setPermissionUser] = useState<UserItem | null>(null);
+  const [permissionDraft, setPermissionDraft] = useState<Partial<Record<PermissionKey, boolean>>>({});
+  const [permissionSaving, setPermissionSaving] = useState(false);
 
   // Form State
   const [nome, setNome] = useState("");
@@ -44,7 +54,7 @@ export default function UsersPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [telefono, setTelefono] = useState("");
-  const role = "AUTISTA" as const;
+  const [role, setRole] = useState<"AUTISTA" | "UFFICIO">("AUTISTA");
   const [vehicleId, setVehicleId] = useState("");
 
   const [saving, setSaving] = useState(false);
@@ -72,7 +82,7 @@ export default function UsersPage() {
       const res = await fetch("/api/integrazioni");
       if (!res.ok) return;
       const data = await res.json();
-      const geotab = (data.connessioni ?? []).find((connection: any) => connection.provider === "GEOTAB");
+      const geotab = (data.connessioni ?? []).find((connection: GeotabConnection) => connection.provider === "GEOTAB");
       setGeotabDrivers(geotab?.geotabSnapshot?.drivers ?? []);
       setGeotabSnapshotAt(geotab?.geotabSnapshot?.snapshotAt ?? null);
     } catch {
@@ -81,7 +91,8 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    const timer = setTimeout(() => { void fetchData(); }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const resetPassword = async (u: UserItem) => {
@@ -98,6 +109,33 @@ export default function UsersPage() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openPermissions = (u: UserItem) => {
+    setPermissionUser(u);
+    setPermissionDraft(u.permissions ?? {});
+    setError("");
+  };
+
+  const savePermissions = async () => {
+    if (!permissionUser) return;
+    setPermissionSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/users/${permissionUser.id}/permissions`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ permissions: permissionDraft }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nel salvataggio permessi");
+      setPermissionUser(null);
+      fetchData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPermissionSaving(false);
     }
   };
 
@@ -131,8 +169,8 @@ export default function UsersPage() {
       setTelefono("");
       setShowAddModal(false);
       fetchData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
     }
@@ -160,7 +198,7 @@ export default function UsersPage() {
             className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition"
           >
             <Plus className="w-4 h-4" />
-            <span>Aggiungi autista</span>
+            <span>Aggiungi utente</span>
           </button>
         </div>
       </div>
@@ -200,7 +238,7 @@ export default function UsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="p-12 text-center text-slate-500">
-            Nessun membro del team trovato. Clicca su "Aggiungi autista" per creare credenziali e accesso PWA.
+            Nessun membro del team trovato. Clicca su &quot;Aggiungi autista&quot; per creare credenziali e accesso PWA.
           </div>
         ) : (
           <>
@@ -214,16 +252,27 @@ export default function UsersPage() {
                   </div>
                   <span className="chip chip-brand">{label(u.role)}</span>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
                   <span className="text-[11px] font-semibold text-emerald-400">Attivo</span>
-                  <button
-                    type="button"
-                    onClick={() => resetPassword(u)}
-                    disabled={saving}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
-                  >
-                    <KeyRound className="h-3.5 w-3.5" /> Reset password
-                  </button>
+                  <div className="flex gap-2">
+                    {u.role !== "ADMIN" && (
+                      <button
+                        type="button"
+                        onClick={() => openPermissions(u)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-indigo-600 hover:text-indigo-200"
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5" /> Permessi
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => resetPassword(u)}
+                      disabled={saving}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                    >
+                      <KeyRound className="h-3.5 w-3.5" /> Reset
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -269,15 +318,27 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => resetPassword(u)}
-                        disabled={saving}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
-                        title="Reimposta password"
-                      >
-                        <KeyRound className="h-3.5 w-3.5" /> Reset
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        {u.role !== "ADMIN" && (
+                          <button
+                            type="button"
+                            onClick={() => openPermissions(u)}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-indigo-600 hover:text-indigo-200"
+                            title="Gestisci permessi"
+                          >
+                            <ShieldCheck className="h-3.5 w-3.5" /> Permessi
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => resetPassword(u)}
+                          disabled={saving}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                          title="Reimposta password"
+                        >
+                          <KeyRound className="h-3.5 w-3.5" /> Reset
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -398,9 +459,14 @@ export default function UsersPage() {
                   <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                     Ruolo
                   </label>
-                  <div className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-slate-300">
-                    AUTISTA
-                  </div>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as "AUTISTA" | "UFFICIO")}
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none"
+                  >
+                    <option value="AUTISTA">Autista</option>
+                    <option value="UFFICIO">Ufficio</option>
+                  </select>
                 </div>
 
                 <div>
@@ -454,6 +520,72 @@ export default function UsersPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {permissionUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="flex items-center text-lg font-bold text-slate-100">
+                  <ShieldCheck className="mr-2 h-5 w-5 text-indigo-400" /> Permessi di {permissionUser.nome} {permissionUser.cognome}
+                </h3>
+                <p className="mt-1 text-xs text-slate-400">
+                  Il ruolo {label(permissionUser.role)} può accedere solo alle aree spuntate. Le API verificano gli stessi permessi.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPermissionUser(null)}
+                className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300"
+              >
+                Chiudi
+              </button>
+            </div>
+
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
+              {PERMISSION_GROUPS.map((group) => (
+                <section key={group.group}>
+                  <h4 className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{group.group}</h4>
+                  <div className="mt-2 space-y-1.5">
+                    {group.items.map((item) => (
+                      <label key={item.key} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-200">
+                        <span>{item.label}</span>
+                        <input
+                          type="checkbox"
+                          checked={permissionDraft[item.key] === true}
+                          onChange={(event) =>
+                            setPermissionDraft((current) => ({ ...current, [item.key]: event.target.checked }))
+                          }
+                          className="h-4 w-4 accent-indigo-500"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            <div className="mt-5 flex justify-end gap-3 border-t border-slate-800 pt-4">
+              <button
+                type="button"
+                onClick={() => setPermissionUser(null)}
+                className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300"
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                onClick={savePermissions}
+                disabled={permissionSaving}
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {permissionSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+                Salva permessi
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -105,6 +105,7 @@ model Company {
   subscriptionStatus SubscriptionStatus @default(TRIAL)
   subscriptionPlan   SubscriptionPlan   @default(BASE)
   trialEndsAt        DateTime?
+  deadlineSettings   Json?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -128,6 +129,7 @@ model User {
   cognome      String
   telefono     String?
   role         UserRole  @default(ADMIN)
+  permissions  Json?
   isActive     Boolean   @default(true)
   companyId    String
   company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -167,6 +169,7 @@ model Vehicle {
   portataMaxKg Float
   volumeMaxM3  Float
   status       VehicleStatus   @default(DISPONIBILE)
+  maintenanceConfig Json?
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 

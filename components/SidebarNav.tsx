@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { readHiddenSidebarItems, SIDEBAR_PREFS_EVENT } from "@/lib/nav-prefs";
+import type { PermissionKey, PermissionMap } from "@/lib/permissions-catalog";
 import {
   LayoutDashboard,
   Users,
@@ -90,8 +91,17 @@ function Group({ children }: { children: React.ReactNode }) {
   return <p className="ops-label px-2.5 pb-1 pt-4">{children}</p>;
 }
 
-export default function SidebarNav({ role, fullAccess }: { role: string; fullAccess: boolean }) {
+export default function SidebarNav({
+  role,
+  fullAccess,
+  permissions,
+}: {
+  role: string;
+  fullAccess: boolean;
+  permissions: Partial<PermissionMap>;
+}) {
   const admin = role === "ADMIN";
+  const can = (feature: PermissionKey) => permissions[feature] === true;
   const [hidden, setHidden] = useState<string[]>([]);
 
   useEffect(() => {
@@ -109,38 +119,38 @@ export default function SidebarNav({ role, fullAccess }: { role: string; fullAcc
     <HiddenSidebarContext.Provider value={hidden}>
     <nav className="flex-1 text-[13px]">
       {role === "AUTISTA" ? (
-        <Item href="/dashboard/autista" label="I miei viaggi" fullAccess icon={<NavIcon tone="var(--info)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
+        <Item href="/dashboard/autista" label="I miei viaggi" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
       ) : (
         <>
-          <Group>OperativitÃ </Group>
-          <Item href="/dashboard" label="Panoramica" fullAccess icon={<NavIcon tone="var(--brand)"><LayoutDashboard className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/vehicles" label="Mezzi" fullAccess icon={<NavIcon tone="var(--success)"><Car className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/flotta" label="Flotta live" fullAccess icon={<NavIcon tone="var(--info)"><Radar className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/users" label="Autisti e team" fullAccess icon={<NavIcon tone="var(--accent)"><Users className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/trips" label="Viaggi" fullAccess icon={<NavIcon tone="var(--brand)"><Route className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/carico" label="Piano di carico" fullAccess icon={<NavIcon tone="var(--warning)"><Boxes className="h-3.5 w-3.5" /></NavIcon>} />
+          <Group>Operatività</Group>
+          <Item href="/dashboard" label="Panoramica" fullAccess={fullAccess} icon={<NavIcon tone="var(--brand)"><LayoutDashboard className="h-3.5 w-3.5" /></NavIcon>} />
+          {can("vehicles") && <Item href="/dashboard/vehicles" label="Mezzi" fullAccess={fullAccess} icon={<NavIcon tone="var(--success)"><Car className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("trips") && <Item href="/dashboard/flotta" label="Flotta live" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><Radar className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("users") && <Item href="/dashboard/users" label="Autisti e team" fullAccess={fullAccess} icon={<NavIcon tone="var(--accent)"><Users className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("trips") && <Item href="/dashboard/trips" label="Viaggi" fullAccess={fullAccess} icon={<NavIcon tone="var(--brand)"><Route className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("load_plans") && <Item href="/dashboard/carico" label="Piano di carico" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><Boxes className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Commerciale</Group>
-          <Item href="/dashboard/preventivi" label="Preventivi" fullAccess icon={<NavIcon tone="var(--success)"><FileText className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/ordini" label="Ordini e portale" fullAccess icon={<NavIcon tone="var(--warning)"><PackageCheck className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/analisi-clienti" label="Analisi clienti" fullAccess icon={<NavIcon tone="var(--accent)"><FileSpreadsheet className="h-3.5 w-3.5" /></NavIcon>} />
+          {can("quotes") && <Item href="/dashboard/preventivi" label="Preventivi" fullAccess={fullAccess} icon={<NavIcon tone="var(--success)"><FileText className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("orders") && <Item href="/dashboard/ordini" label="Ordini e portale" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><PackageCheck className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("analytics") && <Item href="/dashboard/analisi-clienti" label="Analisi clienti" fullAccess={fullAccess} icon={<NavIcon tone="var(--accent)"><FileSpreadsheet className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Flotta e sicurezza</Group>
-          <Item href="/dashboard/carburante" label="Carburante" fullAccess icon={<NavIcon tone="var(--success)"><Fuel className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/cisterne" label="Cisterne e accise" fullAccess icon={<NavIcon tone="var(--info)"><Droplets className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/manutenzione" label="Manutenzione" fullAccess icon={<NavIcon tone="var(--warning)"><Wrench className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/costi-mezzi" label="Costi mezzi e TCO" fullAccess icon={<NavIcon tone="var(--success)"><Wallet className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/scadenze" label="Scadenze e divieti" fullAccess icon={<NavIcon tone="var(--warning)"><CalendarDays className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/benchmark" label="Benchmark costi/km" fullAccess icon={<NavIcon tone="var(--accent)"><BarChart3 className="h-3.5 w-3.5" /></NavIcon>} />
+          {can("fuel") && <Item href="/dashboard/carburante" label="Carburante" fullAccess={fullAccess} icon={<NavIcon tone="var(--success)"><Fuel className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("fuel") && <Item href="/dashboard/cisterne" label="Cisterne e accise" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><Droplets className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("maintenance") && <Item href="/dashboard/manutenzione" label="Manutenzione" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><Wrench className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("vehicle_costs") && <Item href="/dashboard/costi-mezzi" label="Costi mezzi e TCO" fullAccess={fullAccess} icon={<NavIcon tone="var(--success)"><Wallet className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("deadlines") && <Item href="/dashboard/scadenze" label="Scadenze e divieti" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><CalendarDays className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("analytics") && <Item href="/dashboard/benchmark" label="Benchmark costi/km" fullAccess={fullAccess} icon={<NavIcon tone="var(--accent)"><BarChart3 className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Fatturazione</Group>
-          <Item href="/dashboard/abbonamenti" label="Abbonamento" fullAccess icon={<NavIcon tone="var(--info)"><CreditCard className="h-3.5 w-3.5" /></NavIcon>} />
-          <Item href="/dashboard/agevolazioni" label="Agevolazioni" fullAccess icon={<NavIcon tone="var(--warning)"><BadgePercent className="h-3.5 w-3.5" /></NavIcon>} />
+          {can("billing") && <Item href="/dashboard/abbonamenti" label="Abbonamento" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><CreditCard className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("agevolazioni") && <Item href="/dashboard/agevolazioni" label="Agevolazioni" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><BadgePercent className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Configurazione</Group>
-          {admin && <Item href="/dashboard/integrazioni" label="Integrazioni" fullAccess icon={<NavIcon tone="var(--brand)"><Cloud className="h-3.5 w-3.5" /></NavIcon>} />}
-          <Item href="/dashboard/import-export" label="Import / Export" fullAccess icon={<NavIcon tone="var(--info)"><ArrowLeftRight className="h-3.5 w-3.5" /></NavIcon>} />
-          {admin && <Item href="/dashboard/licenza" label="Licenza" fullAccess icon={<NavIcon tone="var(--warning)"><KeyRound className="h-3.5 w-3.5" /></NavIcon>} />}
+          {admin && can("integrations") && <Item href="/dashboard/integrazioni" label="Integrazioni" fullAccess={fullAccess} icon={<NavIcon tone="var(--brand)"><Cloud className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("import_export") && <Item href="/dashboard/import-export" label="Import / Export" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><ArrowLeftRight className="h-3.5 w-3.5" /></NavIcon>} />}
+          {admin && can("licensing") && <Item href="/dashboard/licenza" label="Licenza" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><KeyRound className="h-3.5 w-3.5" /></NavIcon>} />}
         </>
       )}
     </nav>

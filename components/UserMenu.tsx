@@ -3,12 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { CreditCard, LogOut, Settings2, UserRound } from "lucide-react";
+import { CreditCard, LifeBuoy, LogOut, Settings2, UserRound } from "lucide-react";
 
 export default function UserMenu({
   user,
+  canSettings = true,
+  canBilling = true,
 }: {
   user: { nome: string; cognome: string; email: string; role: string };
+  canSettings?: boolean;
+  canBilling?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -59,24 +63,37 @@ export default function UserMenu({
               <UserRound className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
               Profilo e password
             </Link>
+            {canSettings && (
+              <Link
+                href="/dashboard/impostazioni"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] font-medium transition hover:opacity-80"
+                style={{ color: "var(--text)" }}
+              >
+                <Settings2 className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
+                Impostazioni e menu
+              </Link>
+            )}
             <Link
-              href="/dashboard/impostazioni"
+              href="/dashboard/assistenza"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] font-medium transition hover:opacity-80"
               style={{ color: "var(--text)" }}
             >
-              <Settings2 className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
-              Impostazioni e menu
+              <LifeBuoy className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
+              Assistenza e guide
             </Link>
-            <Link
-              href="/dashboard/abbonamenti"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] font-medium transition hover:opacity-80"
-              style={{ color: "var(--text)" }}
-            >
-              <CreditCard className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
-              Abbonamento
-            </Link>
+            {canBilling && (
+              <Link
+                href="/dashboard/abbonamenti"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] font-medium transition hover:opacity-80"
+                style={{ color: "var(--text)" }}
+              >
+                <CreditCard className="h-3.5 w-3.5" style={{ color: "var(--text-label)" }} />
+                Abbonamento
+              </Link>
+            )}
           </div>
 
           <div className="border-t p-1.5" style={{ borderColor: "var(--surface-border)" }}>

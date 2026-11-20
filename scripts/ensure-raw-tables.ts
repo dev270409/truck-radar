@@ -735,6 +735,49 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "TripCostItem_companyId_idx" ON "TripCostItem"("companyId");
   CREATE INDEX IF NOT EXISTS "TripCostItem_tripId_idx" ON "TripCostItem"("tripId");
   `,
+
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "permissions" JSONB;`,
+  `ALTER TABLE "Company" ADD COLUMN IF NOT EXISTS "deadlineSettings" JSONB;`,
+  `ALTER TABLE "Vehicle" ADD COLUMN IF NOT EXISTS "maintenanceConfig" JSONB;`,
+  `ALTER TABLE "VehicleMaintenance" ADD COLUMN IF NOT EXISTS "voce" TEXT;`,
+
+  `
+  CREATE TABLE IF NOT EXISTS "VehicleDeadline" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "vehicleId" TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    "dataScadenza" TIMESTAMPTZ NOT NULL,
+    note TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "VehicleDeadline_companyId_idx" ON "VehicleDeadline"("companyId");
+  CREATE INDEX IF NOT EXISTS "VehicleDeadline_vehicleId_idx" ON "VehicleDeadline"("vehicleId");
+  CREATE INDEX IF NOT EXISTS "VehicleDeadline_due_idx" ON "VehicleDeadline"("companyId", "dataScadenza");
+  `,
+
+  `
+  CREATE TABLE IF NOT EXISTS "DeadlineAlert" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "deadlineKey" TEXT NOT NULL,
+    "deadlineId" TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    "subjectName" TEXT,
+    "dataScadenza" TIMESTAMPTZ NOT NULL,
+    "daysBefore" INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    attempts INTEGER NOT NULL DEFAULT 0,
+    "lastError" TEXT,
+    "sentAt" TIMESTAMPTZ,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("companyId", "deadlineKey", "daysBefore")
+  );
+  CREATE INDEX IF NOT EXISTS "DeadlineAlert_companyId_idx" ON "DeadlineAlert"("companyId");
+  CREATE INDEX IF NOT EXISTS "DeadlineAlert_status_idx" ON "DeadlineAlert"("companyId", status);
+  `,
+  `ALTER TABLE "DeadlineAlert" ADD COLUMN IF NOT EXISTS "subjectName" TEXT;`,
 ];
 
 async function main() {

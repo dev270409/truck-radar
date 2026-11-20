@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireFeature } from "@/lib/api-guard";
 import {
   createMaintenance,
   listMaintenanceByVehicle,
   setMaintenanceStatus,
   deleteMaintenance,
 } from "@/lib/maintenance";
+import { getMaintenanceSchedule } from "@/lib/maintenance-schedule";
+import { MAINTENANCE_CATALOG_MAP } from "@/lib/maintenance-catalog";
 import { vehicleBelongsToCompany } from "@/lib/tenant-refs";
 
 const MANUTENZIONE_TIPI = ["TAGLIANDO", "FUNGHIOLO", "OLIO", "USURA_PNEUMATICI", "ALTRO"] as const;
 
-async function requireSession() {
-  const session = await auth();
-  if (!session?.user?.companyId || !session.user.id) {
-    return { error: NextResponse.json({ error: "Non autorizzato" }, { status: 401 }) };
-  }
-  return { session };
-}
-
 export async function GET(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("maintenance");
   if (guard.error) return guard.error;
   const session = guard.session!;
 
@@ -27,8 +21,11 @@ export async function GET(req: Request) {
   const vehicleId = url.searchParams.get("vehicleId") ?? undefined;
 
   try {
-    const items = await listMaintenanceByVehicle(session.user.companyId, vehicleId);
-    return NextResponse.json({ items });
+    const [items, schedule] = await Promise.all([
+      listMaintenanceByVehicle(session.user.companyId, vehicleId),
+      getMaintenanceSchedule(session.user.companyId, vehicleId),
+    ]);
+    return NextResponse.json({ items, schedule });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Errore del server";
     return NextResponse.json({ error: msg }, { status: 500 });
@@ -36,7 +33,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("maintenance");
   if (guard.error) return guard.error;
   const session = guard.session!;
 
@@ -50,6 +47,7 @@ export async function POST(req: Request) {
   let body: {
     vehicleId?: unknown;
     tipo?: unknown;
+    voce?: unknown;
     descrizione?: unknown;
     kmProssimo?: unknown;
     dataProssima?: unknown;
@@ -65,6 +63,7 @@ export async function POST(req: Request) {
 
   const vehicleId = String(body.vehicleId ?? "");
   const tipo = String(body.tipo ?? "").toUpperCase();
+  const voce = body.voce ? String(body.voce).trim() : null;
   const kmProssimo = body.kmProssimo != null && body.kmProssimo !== "" ? Number(body.kmProssimo) : null;
   const costo = body.costo != null && body.costo !== "" ? Number(body.costo) : null;
 
@@ -73,6 +72,9 @@ export async function POST(req: Request) {
       { error: `Tipo manutenzione non valido (attesi: ${MANUTENZIONE_TIPI.join(", ")}).` },
       { status: 400 }
     );
+  }
+  if (voce && !MAINTENANCE_CATALOG_MAP.has(voce)) {
+    return NextResponse.json({ error: "Voce di manutenzione non riconosciuta." }, { status: 400 });
   }
   if (kmProssimo != null && (isNaN(kmProssimo) || kmProssimo < 0)) {
     return NextResponse.json({ error: "KM prossimo intervento non valido." }, { status: 400 });
@@ -90,6 +92,7 @@ export async function POST(req: Request) {
       {
         vehicleId,
         tipo,
+        voce,
         descrizione: body.descrizione ? String(body.descrizione).trim() : null,
         kmProssimo,
         dataProssima: body.dataProssima ? String(body.dataProssima) : null,
@@ -107,7 +110,7 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("maintenance");
   if (guard.error) return guard.error;
   const session = guard.session!;
 
@@ -141,7 +144,7 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("maintenance");
   if (guard.error) return guard.error;
   const session = guard.session!;
   const url = new URL(req.url);

@@ -5,6 +5,7 @@ export interface VehicleMaintenanceRow {
   vehicleId: string;
   companyId: string;
   tipo: string;
+  voce: string | null;
   descrizione: string | null;
   kmProssimo: number | null;
   dataProssima: Date | null;
@@ -22,6 +23,7 @@ export interface VehicleMaintenanceRow {
 export interface NewMaintenance {
   vehicleId: string;
   tipo: string;
+  voce?: string | null;
   descrizione?: string | null;
   kmProssimo?: number | null;
   dataProssima?: string | Date | null;
@@ -33,12 +35,13 @@ export interface NewMaintenance {
 export async function createMaintenance(companyId: string, data: NewMaintenance, createdBy: string): Promise<VehicleMaintenanceRow> {
   const rows = (await db.$queryRawUnsafe(
     `INSERT INTO "VehicleMaintenance"
-       ("vehicleId", "companyId", "tipo", "descrizione", "kmProssimo", "dataProssima", "costo", "fornitore", "note", "status", "createdBy")
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PROGRAMMATO', $10)
+       ("vehicleId", "companyId", "tipo", "voce", "descrizione", "kmProssimo", "dataProssima", "costo", "fornitore", "note", "status", "createdBy")
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PROGRAMMATO', $11)
      RETURNING *`,
     data.vehicleId,
     companyId,
     data.tipo,
+    data.voce ?? null,
     data.descrizione ?? null,
     data.kmProssimo ?? null,
     data.dataProssima ? new Date(data.dataProssima) : null,

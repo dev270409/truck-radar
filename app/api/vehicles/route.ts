@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
 import { getPlanLimits } from "@/lib/plans";
+import { requireFeature } from "@/lib/api-guard";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   const tenantDb = getTenantDb(session.user.companyId);
   const vehicles = await tenantDb.vehicles.findMany({
@@ -22,13 +21,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
-    return NextResponse.json({ error: "Solo Admin o Ufficio possono creare mezzi." }, { status: 403 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   try {
     const body = await req.json();
@@ -83,7 +78,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ vehicle }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Errore del server" }, { status: 500 });
   }
 }

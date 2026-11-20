@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { getTenantDb } from "@/lib/tenant";
 import { listCustomers, listOrders, listQuotes, listVehicleCosts } from "@/lib/ops";
 import { toCsv } from "@/lib/csv";
@@ -15,7 +15,7 @@ function csvResponse(filename: string, csv: string) {
 }
 
 export async function GET(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("import_export");
   if (guard.error) return guard.error;
   const session = guard.session;
   const type = new URL(req.url).searchParams.get("type") ?? "vehicles";

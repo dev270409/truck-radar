@@ -506,6 +506,10 @@ body {
   color: var(--brand) !important;
 }
 
+details[open] > summary .faq-chevron {
+  transform: rotate(180deg);
+}
+
 /* ============================ Motion ============================ */
 @keyframes enter-up {
   from { opacity: 0; transform: translateY(10px); }

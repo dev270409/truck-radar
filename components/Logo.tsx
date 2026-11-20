@@ -9,10 +9,12 @@ export default function Logo({
   size = 42,
   withWordmark = true,
   className = "",
+  wordmarkClassName = "",
 }: {
   size?: number;
   withWordmark?: boolean;
   className?: string;
+  wordmarkClassName?: string;
 }) {
   const ink = "var(--text)";
   const brand = "var(--brand)";
@@ -54,6 +56,7 @@ export default function Logo({
           fill="none"
           aria-label="Truck-Radar"
           role="img"
+          className={wordmarkClassName}
           style={{ overflow: "visible" }}
         >
           {/* "Truck" in Space Grotesk via foreignObject-like text is unreliable;

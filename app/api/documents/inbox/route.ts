@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { db } from "@/lib/db";
 import { getTenantDb } from "@/lib/tenant";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@/lib/doc-inbox";
 
 export async function GET(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("documents");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("documents");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });

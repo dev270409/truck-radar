@@ -1,18 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { createFuelLog, listFuelLogs, deleteFuelLog, getFuelStats, estimateFuelForCompany } from "@/lib/fuel";
 import { tripBelongsToCompany, vehicleBelongsToCompany } from "@/lib/tenant-refs";
-
-async function requireSession() {
-  const session = await auth();
-  if (!session?.user?.companyId || !session.user.id) {
-    return { error: NextResponse.json({ error: "Non autorizzato" }, { status: 401 }) };
-  }
-  return { session };
-}
+import { requireFeature } from "@/lib/api-guard";
 
 export async function GET(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("fuel");
   if (guard.error) return guard.error;
   const session = guard.session!;
 
@@ -31,7 +23,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("fuel");
   if (guard.error) return guard.error;
   const session = guard.session!;
 
@@ -96,7 +88,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("fuel");
   if (guard.error) return guard.error;
   const session = guard.session!;
   const url = new URL(req.url);

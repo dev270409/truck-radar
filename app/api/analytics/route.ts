@@ -75,7 +75,7 @@ export async function GET(req: Request) {
         {
           id,
           name: t.vehicle ? `${t.vehicle.targa} (${t.vehicle.categoria})` : "Mezzo non assegnato",
-          category: t.vehicle?.categoria ?? "—",
+          category: t.vehicle?.categoria ?? "â€”",
           trips: 0,
           km: 0,
           ricavi: 0,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireFeature } from "@/lib/api-guard";
 import { getTenantDb } from "@/lib/tenant";
 import { db } from "@/lib/db";
 import { safeLog } from "@/lib/safe-log";
@@ -11,10 +11,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   const { id } = await params;
   const tenantDb = getTenantDb(session.user.companyId);
@@ -45,10 +44,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId || !session.user.id) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
   if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
     return NextResponse.json({ error: "Solo Admin o Ufficio possono modificare i mezzi." }, { status: 403 });
   }
@@ -134,10 +132,9 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.companyId || !session.user.id) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  const guard = await requireFeature("vehicles");
+  if (guard.error) return guard.error;
+  const session = guard.session;
   if (session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Solo l'Admin può eliminare un mezzo." }, { status: 403 });
   }

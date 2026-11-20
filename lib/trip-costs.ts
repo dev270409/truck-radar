@@ -1,15 +1,7 @@
 import { db } from "./db";
+import { COST_CATEGORIES, COST_CATEGORY_MAP, costCategoryLabel, isCostCategory } from "./cost-catalog";
 
-export const TRIP_COST_TIPES = [
-  "GASOLIO",
-  "PEDAGGIO",
-  "AUTISTA",
-  "TRAGHETTO",
-  "PARCHEGGIO",
-  "MANUTENZIONE",
-  "ASSICURAZIONE",
-  "ALTRO",
-] as const;
+export const TRIP_COST_TIPES = COST_CATEGORIES.map((category) => category.code);
 
 export interface TripCostItemRow {
   id: string;
@@ -23,6 +15,9 @@ export interface TripCostItemRow {
   amount: number;
   source: string;
   note: string | null;
+  ambito: string | null;
+  tipoCosto: string | null;
+  categoryLabel: string;
   createdBy: string;
   createdAt: Date;
 }
@@ -36,13 +31,17 @@ export interface TripCostSummary {
 const round2 = (value: number) => Math.round(value * 100) / 100;
 
 export async function listTripCosts(companyId: string, tripId: string): Promise<TripCostSummary> {
-  const items = (await db.$queryRawUnsafe(
+  const rawItems = (await db.$queryRawUnsafe(
     `SELECT * FROM "TripCostItem"
      WHERE "companyId" = $1 AND "tripId" = $2
      ORDER BY "createdAt" ASC`,
     companyId,
     tripId
   )) as TripCostItemRow[];
+  const items = rawItems.map((item) => {
+    const category = COST_CATEGORY_MAP.get(item.tipo.toUpperCase());
+    return { ...item, ambito: category?.ambito ?? null, tipoCosto: category?.tipo ?? null, categoryLabel: category?.label ?? costCategoryLabel(item.tipo) };
+  });
 
   const total = round2(items.reduce((sum, item) => sum + Number(item.amount || 0), 0));
   const byType: Record<string, number> = {};
@@ -83,8 +82,8 @@ export async function addTripCost(
   }
 ): Promise<{ item: TripCostItemRow; total: number }> {
   const tipo = data.tipo.trim().toUpperCase();
-  if (!TRIP_COST_TIPES.includes(tipo as (typeof TRIP_COST_TIPES)[number])) {
-    throw new Error("Tipo costo non valido.");
+  if (!isCostCategory(tipo)) {
+    throw new Error("Categoria costo non valida.");
   }
 
   const quantity = Number.isFinite(data.quantity) ? Math.max(0, Number(data.quantity)) : 0;

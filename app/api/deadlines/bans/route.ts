@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { createBan, deleteBan, listBans } from "@/lib/ops";
 
 export async function GET() {
-  const guard = await requireSession();
+  const guard = await requireFeature("deadlines");
   if (guard.error) return guard.error;
   const items = await listBans(guard.session.user.companyId);
   return NextResponse.json({ items });
 }
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("deadlines");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("deadlines");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });

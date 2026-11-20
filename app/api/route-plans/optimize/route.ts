@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { optimizeStopOrder, type GeoStop } from "@/lib/routes";
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("routes");
   if (guard.error) return guard.error;
   let body: Record<string, unknown>;
   try {

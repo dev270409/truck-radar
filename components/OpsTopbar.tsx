@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, Plus, Inbox } from "lucide-react";
 import Logo from "./Logo";
+import TutorialLauncher from "./TutorialLauncher";
 import UserMenu from "./UserMenu";
+import type { PermissionMap } from "@/lib/permissions-catalog";
 
 interface SearchResult {
   type: string;
@@ -17,9 +19,11 @@ interface SearchResult {
 export default function OpsTopbar({
   onMenu,
   user,
+  permissions,
 }: {
   onMenu?: () => void;
   user: { nome: string; cognome: string; email: string; role: string };
+  permissions?: Partial<PermissionMap>;
 }) {
   const router = useRouter();
   const [q, setQ] = useState("");
@@ -30,25 +34,31 @@ export default function OpsTopbar({
 
   useEffect(() => {
     const term = q.trim();
-    if (term.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
+    let alive = true;
     const t = setTimeout(async () => {
+      if (!alive) return;
+      if (term.length < 2) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(term)}`);
         const data = await res.json();
+        if (!alive) return;
         setResults(Array.isArray(data.results) ? data.results : []);
         setOpen(true);
       } catch {
-        setResults([]);
+        if (alive) setResults([]);
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
-    }, 250);
-    return () => clearTimeout(t);
+    }, term.length < 2 ? 0 : 250);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
   }, [q]);
 
   useEffect(() => {
@@ -89,7 +99,7 @@ export default function OpsTopbar({
       </button>
 
       <Link href="/dashboard" aria-label="Truck Radar — home">
-        <Logo />
+        <Logo wordmarkClassName="hidden min-[380px]:block" />
       </Link>
 
       <div ref={boxRef} className="relative ml-auto hidden max-w-[520px] flex-1 md:ml-8 md:block">
@@ -151,20 +161,31 @@ export default function OpsTopbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:ml-3">
-        <Link
-          href="/dashboard/documenti"
-          aria-label="Documenti in arrivo"
-          className="ops-btn ops-btn--secondary ops-btn--sm inline-flex"
-        >
-          <Inbox className="h-4 w-4" />
-          <span className="hidden sm:inline">Documenti</span>
-        </Link>
-        <div className="hidden md:block">
-          <Link href="/dashboard/trips" className="ops-btn ops-btn--primary ops-btn--sm">
-            <Plus className="h-4 w-4" /> Nuovo viaggio
-          </Link>
+        <div className="hidden sm:block">
+          <TutorialLauncher />
         </div>
-        <UserMenu user={user} />
+        {permissions?.documents !== false && (
+          <Link
+            href="/dashboard/documenti"
+            aria-label="Documenti in arrivo"
+            className="ops-btn ops-btn--secondary ops-btn--sm inline-flex"
+          >
+            <Inbox className="h-4 w-4" />
+            <span className="hidden sm:inline">Documenti</span>
+          </Link>
+        )}
+        {permissions?.trips !== false && (
+          <div className="hidden md:block">
+            <Link href="/dashboard/trips" className="ops-btn ops-btn--primary ops-btn--sm">
+              <Plus className="h-4 w-4" /> Nuovo viaggio
+            </Link>
+          </div>
+        )}
+        <UserMenu
+          user={user}
+          canSettings={permissions?.settings === true}
+          canBilling={permissions?.billing === true}
+        />
       </div>
     </header>
   );

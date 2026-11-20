@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { db } from "@/lib/db";
 
 interface FuelRow {
@@ -13,7 +13,7 @@ interface FuelRow {
 }
 
 export async function GET(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("fuel");
   if (guard.error) return guard.error;
   const url = new URL(req.url);
   const year = Number(url.searchParams.get("year") ?? new Date().getFullYear());

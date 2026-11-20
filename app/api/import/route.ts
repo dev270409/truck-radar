@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { getTenantDb } from "@/lib/tenant";
 import { getPlanLimits } from "@/lib/plans";
 import { createCustomer } from "@/lib/ops";
@@ -8,7 +8,7 @@ import { csvToObjects, parseDate, parseNumber, pick } from "@/lib/csv";
 const CATEGORIES = ["FRIGO", "TELONATO", "SPONDA_IDRAULICA", "CISTERNA", "ADR"];
 
 export async function POST(req: Request) {
-  const guard = await requireSession();
+  const guard = await requireFeature("import_export");
   if (guard.error) return guard.error;
   const session = guard.session;
   if (session.user.role === "AUTISTA") {
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         continue;
       }
       if (plates.has(targa)) {
-        errors.push(`Riga ${i + 2}: targa ${targa} già presente.`);
+        errors.push(`Riga ${i + 2}: targa ${targa} giÃ  presente.`);
         continue;
       }
       const catRaw = pick(row, ["categoria", "category", "tipo"]).toUpperCase();

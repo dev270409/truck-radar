@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
 import { db } from "@/lib/db";
+import { requireFeature } from "@/lib/api-guard";
 
 const tripIncludes = {
   vehicle: { select: { id: true, targa: true, categoria: true } },
@@ -9,13 +9,9 @@ const tripIncludes = {
 } as const;
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
-    return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
-  }
+  const guard = await requireFeature("trips");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   const tenantDb = getTenantDb(session.user.companyId);
   const trips = await tenantDb.trips.findMany({
@@ -27,18 +23,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  const role = session.user.role as string;
-  if (role !== "ADMIN" && role !== "UFFICIO") {
-    return NextResponse.json(
-      { error: "Solo l'Admin (o Ufficio) può creare viaggi." },
-      { status: 403 }
-    );
-  }
+  const guard = await requireFeature("trips");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   try {
     const body = await req.json();

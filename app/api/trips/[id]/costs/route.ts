@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { getTenantDb } from "@/lib/tenant";
 import { addTripCost, listTripCosts } from "@/lib/trip-costs";
 
@@ -9,7 +9,7 @@ async function guardTrip(companyId: string, tripId: string) {
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireSession();
+  const guard = await requireFeature("trips");
   if (guard.error) return guard.error;
   const { id } = await params;
   const trip = await guardTrip(guard.session.user.companyId, id);
@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireSession();
+  const guard = await requireFeature("trips");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });

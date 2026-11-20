@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getTenantDb } from "@/lib/tenant";
 import { hashPassword } from "@/lib/hash";
 import { getPlanLimits } from "@/lib/plans";
+import { requireFeature } from "@/lib/api-guard";
+import { resolvePermissions, sanitizePermissions } from "@/lib/permissions";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-  if (session.user.role !== "ADMIN" && session.user.role !== "UFFICIO") {
-    return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
-  }
+  const guard = await requireFeature("drivers");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   const tenantDb = getTenantDb(session.user.companyId);
   const users = await tenantDb.users.findMany({
@@ -22,6 +19,7 @@ export async function GET() {
       cognome: true,
       telefono: true,
       role: true,
+      permissions: true,
       isActive: true,
       vehicleId: true,
       createdAt: true,
@@ -29,21 +27,18 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ users });
+  return NextResponse.json({
+    users: users.map((user) => ({
+      ...user,
+      permissions: resolvePermissions(user.role, user.permissions),
+    })),
+  });
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.companyId) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  if (session.user.role !== "ADMIN") {
-    return NextResponse.json(
-      { error: "Accesso negato: solo gli amministratori possono creare nuovi utenti." },
-      { status: 403 }
-    );
-  }
+  const guard = await requireFeature("users");
+  if (guard.error) return guard.error;
+  const session = guard.session;
 
   try {
     const body = await req.json();
@@ -56,15 +51,16 @@ export async function POST(req: Request) {
       );
     }
 
-    if (role !== "AUTISTA") {
+    if (role !== "AUTISTA" && role !== "UFFICIO") {
       return NextResponse.json(
-        { error: "Per ora l'admin può creare unicamente utenti AUTISTA." },
+        { error: "Ruolo non valido: sono ammessi AUTISTA e UFFICIO." },
         { status: 400 }
       );
     }
 
     const cleanEmail = String(email).toLowerCase().trim();
     const tenantDb = getTenantDb(session.user.companyId);
+    const customPermissions = sanitizePermissions(body.permissions);
 
     if (role === "AUTISTA") {
       const company = await tenantDb.getCompany();
@@ -105,6 +101,7 @@ export async function POST(req: Request) {
         cognome,
         telefono,
         role,
+        permissions: Object.keys(customPermissions).length > 0 ? customPermissions : undefined,
         vehicleId: role === "AUTISTA" ? vehicleId || null : null,
       },
     });
@@ -116,10 +113,11 @@ export async function POST(req: Request) {
         nome: newUser.nome,
         cognome: newUser.cognome,
         role: newUser.role,
+        permissions: resolvePermissions(newUser.role, newUser.permissions),
         vehicleId: newUser.vehicleId,
       },
     }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Errore del server" }, { status: 500 });
   }
 }

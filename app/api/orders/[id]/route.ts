@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/api-guard";
+import { requireFeature } from "@/lib/api-guard";
 import { updateOrder } from "@/lib/ops";
 import { tripBelongsToCompany } from "@/lib/tenant-refs";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireSession();
+  const guard = await requireFeature("orders");
   if (guard.error) return guard.error;
   if (guard.session.user.role === "AUTISTA") {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });

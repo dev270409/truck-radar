@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { requireAdmin, requireSession } from "@/lib/api-guard";
+import { requireAdmin, requireFeature } from "@/lib/api-guard";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/hash";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireSession();
+  const guard = await requireFeature("users");
   if (guard.error) return guard.error;
   const adminError = requireAdmin(guard.session.user.role);
   if (adminError) return adminError;
