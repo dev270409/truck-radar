@@ -12,6 +12,7 @@ import {
   Truck,
   User,
   Pencil,
+  Copy,
 } from "lucide-react";
 import { label } from "@/lib/labels";
 import TripSubnav from "@/components/TripSubnav";
@@ -205,6 +206,28 @@ export default function TripsPage() {
     if (customer) setCliente(customer.name);
   };
 
+  const duplicateTrip = (trip: Trip) => {
+    const pickup = new Date(trip.dataRitiro);
+    const delivery = new Date(trip.dataConsegna);
+    pickup.setDate(pickup.getDate() + 1);
+    delivery.setDate(delivery.getDate() + 1);
+    setLuogoRitiro(trip.luogoRitiro);
+    setLuogoConsegna(trip.luogoConsegna);
+    setDataRitiro(localDateTime(pickup));
+    setDataConsegna(localDateTime(delivery));
+    setTipoMerce(trip.tipoMerce);
+    setPesoKg(String(trip.pesoKg ?? 0));
+    setVolumeM3(String(trip.volumeM3 ?? 0));
+    setCliente(trip.cliente ?? "");
+    setCustomerId("");
+    setPrezzo(trip.prezzo != null ? String(trip.prezzo) : "");
+    setCosto(trip.costo != null ? String(trip.costo) : "");
+    setVehicleId(trip.vehicle?.id ?? "");
+    setDriverId(trip.driver?.id ?? "");
+    setError("");
+    setShowAddModal(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -302,13 +325,25 @@ export default function TripsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/dashboard/trips/${t.id}`}
-                        className="inline-flex items-center space-x-1.5 text-xs font-semibold text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 px-3 py-1.5 rounded-lg transition"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                        <span>Dettaglio</span>
-                      </Link>
+                      <div className="inline-flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => duplicateTrip(t)}
+                          title="Duplica viaggio con date +1 giorno"
+                          aria-label={`Duplica viaggio ${t.luogoRitiro} - ${t.luogoConsegna}`}
+                          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-300 hover:text-slate-100 bg-slate-800/60 border border-slate-700 px-2.5 py-1.5 rounded-lg transition"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span className="hidden xl:inline">Duplica</span>
+                        </button>
+                        <Link
+                          href={`/dashboard/trips/${t.id}`}
+                          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 px-3 py-1.5 rounded-lg transition"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                          <span>Dettaglio</span>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
