@@ -20,6 +20,7 @@ export const PERMISSION_DEFINITIONS = [
   { key: "marketplace", label: "Borsa carichi", group: "Network" },
   { key: "network", label: "Network e recensioni", group: "Network" },
   { key: "economia", label: "Economia", group: "Amministrazione" },
+  { key: "expenses", label: "Spese aziendali", group: "Amministrazione" },
   { key: "integrations", label: "Integrazioni", group: "Amministrazione" },
   { key: "import_export", label: "Import / Export", group: "Amministrazione" },
   { key: "settings", label: "Impostazioni", group: "Amministrazione" },
@@ -70,6 +71,7 @@ const UFFICIO_PERMISSIONS: PermissionMap = {
   parking: true,
   marketplace: true,
   network: true,
+  expenses: true,
   import_export: true,
 };
 
@@ -122,6 +124,7 @@ const PATH_PERMISSIONS: Array<[string, PermissionKey]> = [
   ["/dashboard/impostazioni", "settings"],
   ["/dashboard/documenti", "documents"],
   ["/dashboard/economia", "economia"],
+  ["/dashboard/spese", "expenses"],
   ["/dashboard/marketplace", "marketplace"],
   ["/dashboard/network", "network"],
   ["/dashboard/reviews", "network"],

@@ -813,6 +813,32 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "DeadlineAlert_status_idx" ON "DeadlineAlert"("companyId", status);
   `,
   `ALTER TABLE "DeadlineAlert" ADD COLUMN IF NOT EXISTS "subjectName" TEXT;`,
+
+  // Spese aziendali con ricevuta, IVA e export per il commercialista
+  `
+  CREATE TABLE IF NOT EXISTS "Expense" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    date DATE NOT NULL,
+    category TEXT NOT NULL,
+    supplier TEXT,
+    description TEXT NOT NULL,
+    "netAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "vatRate" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "vatAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "paymentMethod" TEXT,
+    "receiptUrl" TEXT,
+    "receiptName" TEXT,
+    notes TEXT,
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "Expense_companyId_idx" ON "Expense"("companyId");
+  CREATE INDEX IF NOT EXISTS "Expense_date_idx" ON "Expense"("companyId", date);
+  CREATE INDEX IF NOT EXISTS "Expense_category_idx" ON "Expense"("companyId", category);
+  `,
 ];
 
 async function main() {

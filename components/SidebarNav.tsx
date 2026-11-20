@@ -27,6 +27,7 @@ import {
   Droplets,
   BadgePercent,
   Building2,
+  ReceiptText,
 } from "lucide-react";
 
 function NavIcon({ tone, children }: { tone: string; children: React.ReactNode }) {
@@ -147,6 +148,7 @@ export default function SidebarNav({
 
           <Group>Fatturazione</Group>
           {can("billing") && <Item href="/dashboard/abbonamenti" label="Abbonamento" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><CreditCard className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("expenses") && <Item href="/dashboard/spese" label="Spese aziendali" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><ReceiptText className="h-3.5 w-3.5" /></NavIcon>} />}
           {can("agevolazioni") && <Item href="/dashboard/agevolazioni" label="Agevolazioni" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><BadgePercent className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Configurazione</Group>

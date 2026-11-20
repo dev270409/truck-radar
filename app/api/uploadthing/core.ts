@@ -44,6 +44,13 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ file }) => {
       return { fileUrl: file.url };
     }),
+
+  // Ricevute e fatture delle spese aziendali.
+  expenseReceipt: f({ pdf: { maxFileSize: "8MB" }, image: { maxFileSize: "8MB" } })
+    .middleware(requireUploadSession)
+    .onUploadComplete(async ({ file }) => {
+      return { fileUrl: file.url };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
