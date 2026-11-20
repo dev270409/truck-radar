@@ -26,6 +26,7 @@ import {
   Wallet,
   Droplets,
   BadgePercent,
+  Building2,
 } from "lucide-react";
 
 function NavIcon({ tone, children }: { tone: string; children: React.ReactNode }) {
@@ -133,6 +134,7 @@ export default function SidebarNav({
           <Group>Commerciale</Group>
           {can("quotes") && <Item href="/dashboard/preventivi" label="Preventivi" fullAccess={fullAccess} icon={<NavIcon tone="var(--success)"><FileText className="h-3.5 w-3.5" /></NavIcon>} />}
           {can("orders") && <Item href="/dashboard/ordini" label="Ordini e portale" fullAccess={fullAccess} icon={<NavIcon tone="var(--warning)"><PackageCheck className="h-3.5 w-3.5" /></NavIcon>} />}
+          {can("clients") && <Item href="/dashboard/anagrafica" label="Anagrafica" fullAccess={fullAccess} icon={<NavIcon tone="var(--info)"><Building2 className="h-3.5 w-3.5" /></NavIcon>} />}
           {can("analytics") && <Item href="/dashboard/analisi-clienti" label="Analisi clienti" fullAccess={fullAccess} icon={<NavIcon tone="var(--accent)"><FileSpreadsheet className="h-3.5 w-3.5" /></NavIcon>} />}
 
           <Group>Flotta e sicurezza</Group>

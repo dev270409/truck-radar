@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Download, FileText, Loader2, Plus, Send, Trash2 } from "lucide-react";
 import { label } from "@/lib/labels";
 
+interface CustomerLite {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+}
+
 interface Quote {
   id: string;
   customerName: string;
@@ -39,7 +46,9 @@ export default function PreventiviPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [customers, setCustomers] = useState<CustomerLite[]>([]);
 
+  const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -66,11 +75,41 @@ export default function PreventiviPage() {
     }
   };
 
+  const loadCustomers = async () => {
+    try {
+      const res = await fetch("/api/customers?type=CLIENTE");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.items)) {
+        setCustomers(
+          data.items.map((item: CustomerLite) => ({
+            id: item.id,
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+          }))
+        );
+      }
+    } catch {
+      // l'anagrafica è opzionale: il preventivo resta compilabile a mano
+    }
+  };
+
   useEffect(() => {
     load();
+    loadCustomers();
   }, []);
 
+  const selectCustomer = (id: string) => {
+    setCustomerId(id);
+    const customer = customers.find((item) => item.id === id);
+    if (!customer) return;
+    setCustomerName(customer.name);
+    setCustomerEmail(customer.email ?? "");
+    setCustomerPhone(customer.phone ?? "");
+  };
+
   const reset = () => {
+    setCustomerId("");
     setCustomerName("");
     setCustomerEmail("");
     setCustomerPhone("");
@@ -95,6 +134,7 @@ export default function PreventiviPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          customerId: customerId || null,
           customerName,
           customerEmail,
           customerPhone,
@@ -172,6 +212,22 @@ export default function PreventiviPage() {
       {showForm && (
         <form onSubmit={create} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
           <div className="grid gap-3 md:grid-cols-3">
+            <div className="col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
+              <select
+                value={customerId}
+                onChange={(e) => selectCustomer(e.target.value)}
+                aria-label="Seleziona cliente dall'anagrafica"
+                className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+              >
+                <option value="">Cliente occasionale / nuovo — compila i campi sotto</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <a href="/dashboard/anagrafica" className="text-xs font-semibold text-indigo-300 hover:text-indigo-200">
+                Gestisci anagrafica
+              </a>
+            </div>
             <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input placeholder="Telefono" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />

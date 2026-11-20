@@ -96,11 +96,12 @@ export function makeClient(port: number, cookie: string): ApiClient {
         ...(init.headers ?? {}),
       },
     });
-    let body: any = null;
+    const text = await res.text().catch(() => "");
+    let body: any = text;
     try {
-      body = await res.json();
+      body = text ? JSON.parse(text) : null;
     } catch {
-      body = await res.text().catch(() => null);
+      /* risposta non JSON (HTML, CSV): il testo resta disponibile */
     }
     return { status: res.status, body };
   };

@@ -66,14 +66,56 @@ export interface OrderRow {
 export interface CustomerRow {
   id: string;
   companyId: string;
+  type: string;
   name: string;
+  contactName: string | null;
   email: string | null;
   phone: string | null;
   address: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+  country: string | null;
   vat: string | null;
+  sdi: string | null;
+  pec: string | null;
+  paymentTerms: string | null;
   notes: string | null;
+  addressCount?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface CustomerAddressRow {
+  id: string;
+  companyId: string;
+  customerId: string;
+  label: string;
+  address: string;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+  country: string | null;
+  notes: string | null;
+  createdAt: Date;
+}
+
+export interface CustomerInputData {
+  type?: string | null;
+  name: string;
+  contactName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
+  vat?: string | null;
+  sdi?: string | null;
+  pec?: string | null;
+  paymentTerms?: string | null;
+  notes?: string | null;
 }
 
 export interface PortalRow {
@@ -289,30 +331,217 @@ export async function deleteLoadPlan(companyId: string, id: string): Promise<boo
 /* Customers / quotes / orders                                        */
 /* ------------------------------------------------------------------ */
 
-export async function listCustomers(companyId: string): Promise<CustomerRow[]> {
+export async function listCustomers(
+  companyId: string,
+  options: { type?: "CLIENTE" | "FORNITORE" | null; q?: string | null } = {}
+): Promise<CustomerRow[]> {
+  const type = options.type === "FORNITORE" ? "FORNITORE" : options.type === "CLIENTE" ? "CLIENTE" : null;
+  const q = options.q?.trim() || null;
   return db.$queryRawUnsafe(
-    `SELECT * FROM "Customer" WHERE "companyId" = $1 ORDER BY name ASC`,
-    companyId
+    `SELECT c.*,
+            (SELECT count(*)::int FROM "CustomerAddress" a
+              WHERE a."companyId" = c."companyId" AND a."customerId" = c.id) AS "addressCount"
+     FROM "Customer" c
+     WHERE c."companyId" = $1
+       AND ($2::text IS NULL OR c.type = $2::text)
+       AND (
+         $3::text IS NULL
+         OR c.name ILIKE '%' || $3::text || '%'
+         OR COALESCE(c."contactName", '') ILIKE '%' || $3::text || '%'
+         OR COALESCE(c.email, '') ILIKE '%' || $3::text || '%'
+         OR COALESCE(c.vat, '') ILIKE '%' || $3::text || '%'
+         OR COALESCE(c.city, '') ILIKE '%' || $3::text || '%'
+       )
+     ORDER BY c.type ASC, c.name ASC`,
+    companyId,
+    type,
+    q
   ) as Promise<CustomerRow[]>;
+}
+
+export async function getCustomer(companyId: string, id: string): Promise<CustomerRow | null> {
+  const rows = (await db.$queryRawUnsafe(
+    `SELECT c.*,
+            (SELECT count(*)::int FROM "CustomerAddress" a
+              WHERE a."companyId" = c."companyId" AND a."customerId" = c.id) AS "addressCount"
+     FROM "Customer" c
+     WHERE c.id = $1 AND c."companyId" = $2
+     LIMIT 1`,
+    id,
+    companyId
+  )) as CustomerRow[];
+  return rows[0] ?? null;
 }
 
 export async function createCustomer(
   companyId: string,
-  data: { name: string; email?: string | null; phone?: string | null; address?: string | null; vat?: string | null; notes?: string | null }
+  data: CustomerInputData
 ): Promise<CustomerRow> {
   const rows = (await db.$queryRawUnsafe(
-    `INSERT INTO "Customer" ("companyId", name, email, phone, address, vat, notes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO "Customer" ("companyId", type, name, "contactName", email, phone, address, city, province, "postalCode", country, vat, sdi, pec, "paymentTerms", notes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
      RETURNING *`,
     companyId,
+    data.type === "FORNITORE" ? "FORNITORE" : "CLIENTE",
     data.name.trim(),
+    str(data.contactName),
     str(data.email),
     str(data.phone),
     str(data.address),
+    str(data.city),
+    str(data.province),
+    str(data.postalCode),
+    data.country?.trim() || "IT",
     str(data.vat),
+    str(data.sdi),
+    str(data.pec),
+    str(data.paymentTerms),
     str(data.notes)
   )) as CustomerRow[];
   return rows[0];
+}
+
+export async function updateCustomer(
+  companyId: string,
+  id: string,
+  data: Partial<CustomerInputData>
+): Promise<CustomerRow | null> {
+  const values: unknown[] = [id, companyId];
+  const sets: string[] = [];
+  const push = (column: string, value: unknown) => {
+    values.push(value);
+    sets.push(`"${column}" = $${values.length}`);
+  };
+
+  if (data.type !== undefined) push("type", data.type === "FORNITORE" ? "FORNITORE" : "CLIENTE");
+  if (data.name !== undefined) push("name", data.name.trim());
+  if (data.contactName !== undefined) push("contactName", str(data.contactName));
+  if (data.email !== undefined) push("email", str(data.email));
+  if (data.phone !== undefined) push("phone", str(data.phone));
+  if (data.address !== undefined) push("address", str(data.address));
+  if (data.city !== undefined) push("city", str(data.city));
+  if (data.province !== undefined) push("province", str(data.province));
+  if (data.postalCode !== undefined) push("postalCode", str(data.postalCode));
+  if (data.country !== undefined) push("country", data.country?.trim() || "IT");
+  if (data.vat !== undefined) push("vat", str(data.vat));
+  if (data.sdi !== undefined) push("sdi", str(data.sdi));
+  if (data.pec !== undefined) push("pec", str(data.pec));
+  if (data.paymentTerms !== undefined) push("paymentTerms", str(data.paymentTerms));
+  if (data.notes !== undefined) push("notes", str(data.notes));
+
+  if (sets.length === 0) return getCustomer(companyId, id);
+
+  const rows = (await db.$queryRawUnsafe(
+    `UPDATE "Customer"
+     SET ${sets.join(", ")}, "updatedAt" = now()
+     WHERE id = $1 AND "companyId" = $2
+     RETURNING *`,
+    ...values
+  )) as CustomerRow[];
+  return rows[0] ?? null;
+}
+
+export async function countCustomerReferences(
+  companyId: string,
+  id: string
+): Promise<{ quotes: number; orders: number }> {
+  const [quotes, orders] = await Promise.all([
+    db.$queryRawUnsafe(
+      `SELECT count(*)::int AS n FROM "Quote" WHERE "companyId" = $1 AND "customerId" = $2`,
+      companyId,
+      id
+    ) as Promise<Array<{ n: number }>>,
+    db.$queryRawUnsafe(
+      `SELECT count(*)::int AS n FROM "CustomerOrder" WHERE "companyId" = $1 AND "customerId" = $2`,
+      companyId,
+      id
+    ) as Promise<Array<{ n: number }>>,
+  ]);
+  return { quotes: Number(quotes[0]?.n ?? 0), orders: Number(orders[0]?.n ?? 0) };
+}
+
+export async function deleteCustomer(
+  companyId: string,
+  id: string
+): Promise<{ deleted: boolean; quotes: number; orders: number }> {
+  const refs = await countCustomerReferences(companyId, id);
+  if (refs.quotes > 0 || refs.orders > 0) {
+    return { deleted: false, ...refs };
+  }
+  const removed = await db.$transaction(
+    async (tx) => {
+      await tx.$executeRawUnsafe(
+        `DELETE FROM "CustomerAddress" WHERE "customerId" = $1 AND "companyId" = $2`,
+        id,
+        companyId
+      );
+      return (await tx.$executeRawUnsafe(
+        `DELETE FROM "Customer" WHERE id = $1 AND "companyId" = $2`,
+        id,
+        companyId
+      )) as number;
+    },
+    { timeout: 30000 }
+  );
+  return { deleted: removed > 0, ...refs };
+}
+
+export async function listCustomerAddresses(
+  companyId: string,
+  customerId: string
+): Promise<CustomerAddressRow[]> {
+  return db.$queryRawUnsafe(
+    `SELECT * FROM "CustomerAddress"
+     WHERE "companyId" = $1 AND "customerId" = $2
+     ORDER BY label ASC, "createdAt" ASC`,
+    companyId,
+    customerId
+  ) as Promise<CustomerAddressRow[]>;
+}
+
+export async function createCustomerAddress(
+  companyId: string,
+  customerId: string,
+  data: {
+    label?: string | null;
+    address: string;
+    city?: string | null;
+    province?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+    notes?: string | null;
+  }
+): Promise<CustomerAddressRow> {
+  const rows = (await db.$queryRawUnsafe(
+    `INSERT INTO "CustomerAddress" ("companyId", "customerId", label, address, city, province, "postalCode", country, notes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     RETURNING *`,
+    companyId,
+    customerId,
+    data.label?.trim() || "Sede",
+    data.address.trim(),
+    str(data.city),
+    str(data.province),
+    str(data.postalCode),
+    data.country?.trim() || "IT",
+    str(data.notes)
+  )) as CustomerAddressRow[];
+  return rows[0];
+}
+
+export async function deleteCustomerAddress(
+  companyId: string,
+  customerId: string,
+  addressId: string
+): Promise<boolean> {
+  const removed = (await db.$executeRawUnsafe(
+    `DELETE FROM "CustomerAddress"
+     WHERE id = $1 AND "companyId" = $2 AND "customerId" = $3`,
+    addressId,
+    companyId,
+    customerId
+  )) as number;
+  return removed > 0;
 }
 
 export async function listQuotes(companyId: string): Promise<QuoteRow[]> {

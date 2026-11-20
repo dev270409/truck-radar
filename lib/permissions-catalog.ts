@@ -106,6 +106,7 @@ const PATH_PERMISSIONS: Array<[string, PermissionKey]> = [
   ["/dashboard/carico", "load_plans"],
   ["/dashboard/preventivi", "quotes"],
   ["/dashboard/ordini", "orders"],
+  ["/dashboard/anagrafica", "clients"],
   ["/dashboard/analisi-clienti", "analytics"],
   ["/dashboard/carburante", "fuel"],
   ["/dashboard/cisterne", "fuel"],

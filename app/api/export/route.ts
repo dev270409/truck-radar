@@ -99,8 +99,20 @@ export async function GET(req: Request) {
   if (type === "customers") {
     const customers = await listCustomers(session.user.companyId);
     const csv = toCsv(
-      ["nome", "email", "telefono", "indirizzo", "piva", "note"],
-      customers.map((c) => [c.name, c.email ?? "", c.phone ?? "", c.address ?? "", c.vat ?? "", c.notes ?? ""])
+      ["tipo", "nome", "referente", "email", "telefono", "indirizzo", "citta", "provincia", "cap", "piva", "note"],
+      customers.map((c) => [
+        c.type,
+        c.name,
+        c.contactName ?? "",
+        c.email ?? "",
+        c.phone ?? "",
+        c.address ?? "",
+        c.city ?? "",
+        c.province ?? "",
+        c.postalCode ?? "",
+        c.vat ?? "",
+        c.notes ?? "",
+      ])
     );
     return csvResponse("clienti.csv", csv);
   }

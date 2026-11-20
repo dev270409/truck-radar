@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         continue;
       }
       if (plates.has(targa)) {
-        errors.push(`Riga ${i + 2}: targa ${targa} giÃ  presente.`);
+        errors.push(`Riga ${i + 2}: targa ${targa} già presente.`);
         continue;
       }
       const catRaw = pick(row, ["categoria", "category", "tipo"]).toUpperCase();
@@ -84,11 +84,17 @@ export async function POST(req: Request) {
         errors.push(`Riga ${i + 2}: nome mancante.`);
         continue;
       }
+      const rawType = pick(row, ["tipo", "type"]).toUpperCase();
       await createCustomer(session.user.companyId, {
+        type: rawType === "FORNITORE" ? "FORNITORE" : "CLIENTE",
         name,
+        contactName: pick(row, ["referente", "contatto", "contactName"]) || null,
         email: pick(row, ["email", "mail"]) || null,
         phone: pick(row, ["telefono", "phone", "cellulare"]) || null,
         address: pick(row, ["indirizzo", "address", "sede"]) || null,
+        city: pick(row, ["citta", "città", "city", "comune"]) || null,
+        province: pick(row, ["provincia", "province"]) || null,
+        postalCode: pick(row, ["cap", "postalCode"]) || null,
         vat: pick(row, ["piva", "partitaIva", "vat"]) || null,
         notes: pick(row, ["note", "notes"]) || null,
       });

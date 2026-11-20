@@ -438,22 +438,57 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "GeotabTripSnapshot_company_plate_idx" ON "GeotabTripSnapshot"("companyId", "licensePlate");
   `,
 
-  // Ops Suite — anagrafica clienti per preventivi, ordini e analisi commerciale
+  // Ops Suite — anagrafica unica clienti/fornitori e indirizzi secondari
   `
   CREATE TABLE IF NOT EXISTS "Customer" (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
     "companyId" TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'CLIENTE',
     name TEXT NOT NULL,
+    "contactName" TEXT,
     email TEXT,
     phone TEXT,
     address TEXT,
+    city TEXT,
+    province TEXT,
+    "postalCode" TEXT,
+    country TEXT NOT NULL DEFAULT 'IT',
     vat TEXT,
+    sdi TEXT,
+    pec TEXT,
+    "paymentTerms" TEXT,
     notes TEXT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
   );
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT 'CLIENTE';
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS "contactName" TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS city TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS province TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS "postalCode" TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS country TEXT NOT NULL DEFAULT 'IT';
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS sdi TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS pec TEXT;
+  ALTER TABLE "Customer" ADD COLUMN IF NOT EXISTS "paymentTerms" TEXT;
   CREATE INDEX IF NOT EXISTS "Customer_companyId_idx" ON "Customer"("companyId");
   CREATE INDEX IF NOT EXISTS "Customer_name_idx" ON "Customer"("companyId", name);
+  CREATE INDEX IF NOT EXISTS "Customer_type_idx" ON "Customer"("companyId", type);
+
+  CREATE TABLE IF NOT EXISTS "CustomerAddress" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "customerId" TEXT NOT NULL,
+    label TEXT NOT NULL DEFAULT 'Sede',
+    address TEXT NOT NULL,
+    city TEXT,
+    province TEXT,
+    "postalCode" TEXT,
+    country TEXT NOT NULL DEFAULT 'IT',
+    notes TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS "CustomerAddress_company_idx" ON "CustomerAddress"("companyId");
+  CREATE INDEX IF NOT EXISTS "CustomerAddress_customer_idx" ON "CustomerAddress"("customerId");
   `,
 
   // Ops Suite — piani di carico 2D/3D e calcolatore trasporto

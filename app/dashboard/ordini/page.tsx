@@ -27,6 +27,12 @@ interface Portal {
   brandColor: string;
 }
 
+interface CustomerLite {
+  id: string;
+  name: string;
+  email: string | null;
+}
+
 const statuses = ["RICEVUTO", "CONFERMATO", "IN_VIAGGIO", "CONSEGNATO", "ANNULLATO"];
 
 const statusStyle: Record<string, string> = {
@@ -37,7 +43,7 @@ const statusStyle: Record<string, string> = {
   ANNULLATO: "bg-red-950 text-red-300 border-red-800",
 };
 
-const eur = (n: number) => `â‚¬ ${Math.round(n).toLocaleString("it-IT")}`;
+const eur = (n: number) => `€ ${Math.round(n).toLocaleString("it-IT")}`;
 
 export default function OrdiniPage() {
   const [items, setItems] = useState<Order[]>([]);
@@ -49,7 +55,9 @@ export default function OrdiniPage() {
   const [saving, setSaving] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [brandColor, setBrandColor] = useState("#F5B800");
+  const [customers, setCustomers] = useState<CustomerLite[]>([]);
 
+  const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [pickup, setPickup] = useState("");
@@ -78,9 +86,36 @@ export default function OrdiniPage() {
     }
   };
 
+  const loadCustomers = async () => {
+    try {
+      const res = await fetch("/api/customers?type=CLIENTE");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.items)) {
+        setCustomers(
+          data.items.map((item: CustomerLite) => ({
+            id: item.id,
+            name: item.name,
+            email: item.email,
+          }))
+        );
+      }
+    } catch {
+      // l'anagrafica è opzionale: l'ordine resta compilabile a mano
+    }
+  };
+
   useEffect(() => {
     load();
+    loadCustomers();
   }, []);
+
+  const selectCustomer = (id: string) => {
+    setCustomerId(id);
+    const customer = customers.find((item) => item.id === id);
+    if (!customer) return;
+    setCustomerName(customer.name);
+    setCustomerEmail(customer.email ?? "");
+  };
 
   const portalUrl = portal ? `${typeof window !== "undefined" ? window.location.origin : ""}/portale/${portal.token}` : "";
 
@@ -138,6 +173,7 @@ export default function OrdiniPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          customerId: customerId || null,
           customerName,
           customerEmail,
           pickup,
@@ -153,6 +189,7 @@ export default function OrdiniPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Errore nel salvataggio");
       setShowForm(false);
+      setCustomerId("");
       setCustomerName("");
       setCustomerEmail("");
       setPickup("");
@@ -273,14 +310,30 @@ export default function OrdiniPage() {
       {showForm && (
         <form onSubmit={create} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
           <div className="grid gap-3 md:grid-cols-3">
+            <div className="col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
+              <select
+                value={customerId}
+                onChange={(e) => selectCustomer(e.target.value)}
+                aria-label="Seleziona cliente dall'anagrafica"
+                className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+              >
+                <option value="">Cliente occasionale / nuovo — compila i campi sotto</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <a href="/dashboard/anagrafica" className="text-xs font-semibold text-indigo-300 hover:text-indigo-200">
+                Gestisci anagrafica
+              </a>
+            </div>
             <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input placeholder="Merce" value={goods} onChange={(e) => setGoods(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input required placeholder="Ritiro *" value={pickup} onChange={(e) => setPickup(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input required placeholder="Consegna *" value={delivery} onChange={(e) => setDelivery(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Prezzo â‚¬" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input type="number" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <input type="number" placeholder="Peso kg" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Volume mÂ³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input type="number" placeholder="Volume m³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
             <textarea placeholder="Note" value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 md:col-span-1" rows={1} />
           </div>
           <div className="mt-3 flex justify-end gap-2">
@@ -348,11 +401,11 @@ export default function OrdiniPage() {
                 <tr key={o.id} className="border-b border-slate-800/60 last:border-0">
                   <td className="px-4 py-3">
                     <p className="font-semibold text-slate-100">{o.customerName}</p>
-                    <p className="text-xs text-slate-500">{o.customerEmail || "â€”"}</p>
+                    <p className="text-xs text-slate-500">{o.customerEmail || "—"}</p>
                   </td>
                   <td className="px-4 py-3 text-slate-300">
-                    {o.pickup} â†’ {o.delivery}
-                    <p className="text-xs text-slate-500">{o.goods || "Merce"} Â· {o.weightKg} kg</p>
+                    {o.pickup} → {o.delivery}
+                    <p className="text-xs text-slate-500">{o.goods || "Merce"} · {o.weightKg} kg</p>
                   </td>
                   <td className="px-4 py-3 text-right font-semibold text-slate-100">{eur(o.price)}</td>
                   <td className="px-4 py-3">
