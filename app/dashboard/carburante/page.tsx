@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Fuel, Plus, Trash2, Wallet, Droplets, Gauge, TrendingUp, Sparkles } from "lucide-react";
+import EmptyState from "@/components/ops/EmptyState";
 
 interface VehicleLite {
   id: string;
@@ -233,9 +234,13 @@ export default function CarburantePage() {
             <Loader2 className="w-5 h-5 animate-spin" /> <span>Caricamento rifornimenti...</span>
           </div>
         ) : items.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            Nessun rifornimento registrato. Usa &quot;Registra Rifornimento&quot; per tracciare consumi ed efficienza.
-          </div>
+          <EmptyState
+            icon={Fuel}
+            title="Nessun rifornimento registrato"
+            description="Registra litri, costo e odometro: consumi ed efficienza per mezzo vengono calcolati automaticamente."
+            actionLabel="Registra il primo rifornimento"
+            onAction={() => setShowModal(true)}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">

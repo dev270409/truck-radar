@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, Download, FileText, Loader2, Plus, Send, Trash2 } from "lucide-react";
 import { label } from "@/lib/labels";
+import EmptyState from "@/components/ops/EmptyState";
 
 interface CustomerLite {
   id: string;
@@ -261,7 +262,15 @@ export default function PreventiviPage() {
         {loading ? (
           <div className="ops-card flex items-center justify-center p-8 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
-          <div className="ops-card p-8 text-center text-sm text-slate-500">Nessun preventivo. Creane uno.</div>
+          <div className="ops-card">
+            <EmptyState
+              icon={FileText}
+              title="Nessun preventivo"
+              description="Parti da cliente e tratta: prezzo, costo e margine vengono calcolati mentre compili."
+              actionLabel="Crea il primo preventivo"
+              onAction={() => setShowForm(true)}
+            />
+          </div>
         ) : (
           items.map((q) => (
             <div key={q.id} className="ops-card p-4">
@@ -301,7 +310,13 @@ export default function PreventiviPage() {
         {loading ? (
           <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
-          <div className="p-10 text-center text-sm text-slate-500">Nessun preventivo. Creane uno o importa i clienti.</div>
+          <EmptyState
+            icon={FileText}
+            title="Nessun preventivo"
+            description="Crea un preventivo o importa i clienti dall'anagrafica: il margine resta visibile accanto al prezzo."
+            actionLabel="Crea il primo preventivo"
+            onAction={() => setShowForm(true)}
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">

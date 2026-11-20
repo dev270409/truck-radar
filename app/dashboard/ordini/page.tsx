@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Copy, Download, ExternalLink, Loader2, PackageCheck, Plus, RefreshCw, Route } from "lucide-react";
 import { label } from "@/lib/labels";
+import EmptyState from "@/components/ops/EmptyState";
 
 interface Order {
   id: string;
@@ -349,7 +350,15 @@ export default function OrdiniPage() {
         {loading ? (
           <div className="ops-card flex items-center justify-center p-8 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
-          <div className="ops-card p-8 text-center text-sm text-slate-500">Nessun ordine. Attiva il portale e condividi il link.</div>
+          <div className="ops-card">
+            <EmptyState
+              icon={PackageCheck}
+              title="Nessun ordine"
+              description="Crea il primo ordine oppure attiva il portale e condividi il link con i clienti."
+              actionLabel="Crea il primo ordine"
+              onAction={() => setShowForm(true)}
+            />
+          </div>
         ) : (
           items.map((o) => (
             <div key={o.id} className="ops-card p-4">
@@ -384,7 +393,13 @@ export default function OrdiniPage() {
         {loading ? (
           <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
-          <div className="p-10 text-center text-sm text-slate-500">Nessun ordine. Attiva il portale e condividi il link con i clienti.</div>
+          <EmptyState
+            icon={PackageCheck}
+            title="Nessun ordine"
+            description="Gli ordini del portale arrivano qui. Puoi anche crearne uno manualmente e convertirlo in viaggio."
+            actionLabel="Crea il primo ordine"
+            onAction={() => setShowForm(true)}
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">

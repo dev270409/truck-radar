@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import { label } from "@/lib/labels";
+import EmptyState from "@/components/ops/EmptyState";
 
 interface VehicleDocument {
   id: string;
@@ -373,9 +374,13 @@ export default function VehiclesPage() {
             <span>Caricamento veicoli in corso...</span>
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            Nessun veicolo registrato nella flotta. Clicca su &quot;Aggiungi Veicolo&quot; per iniziare.
-          </div>
+          <EmptyState
+            icon={Car}
+            title="Nessun veicolo in flotta"
+            description="Aggiungi targa, portata e documenti: bastano pochi secondi e il mezzo è subito assegnabile ai viaggi."
+            actionLabel="Aggiungi il primo veicolo"
+            onAction={() => setShowAddModal(true)}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">

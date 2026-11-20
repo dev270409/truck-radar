@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { label } from "@/lib/labels";
 import TripSubnav from "@/components/TripSubnav";
+import EmptyState from "@/components/ops/EmptyState";
 
 interface Driver {
   id: string;
@@ -27,6 +28,13 @@ interface Vehicle {
   id: string;
   targa: string;
   categoria: string;
+}
+
+interface CustomerLite {
+  id: string;
+  name: string;
+  city: string | null;
+  province: string | null;
 }
 
 interface Trip {
@@ -46,6 +54,11 @@ interface Trip {
   driver?: { id: string; nome: string; cognome: string } | null;
 }
 
+function localDateTime(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 const statusStyles: Record<string, string> = {
   DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
@@ -59,6 +72,7 @@ export default function TripsPage() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [customers, setCustomers] = useState<CustomerLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -70,6 +84,7 @@ export default function TripsPage() {
   const [pesoKg, setPesoKg] = useState("0");
   const [volumeM3, setVolumeM3] = useState("0");
   const [cliente, setCliente] = useState("");
+  const [customerId, setCustomerId] = useState("");
   const [prezzo, setPrezzo] = useState("");
   const [costo, setCosto] = useState("");
   const [vehicleId, setVehicleId] = useState("");
@@ -92,12 +107,27 @@ export default function TripsPage() {
 
   const fetchOptions = async () => {
     try {
-      const [resV, resU] = await Promise.all([fetch("/api/vehicles"), fetch("/api/users")]);
+      const [resV, resU, resC] = await Promise.all([
+        fetch("/api/vehicles"),
+        fetch("/api/users"),
+        fetch("/api/customers?type=CLIENTE"),
+      ]);
       const dataV = await resV.json();
       const dataU = await resU.json();
+      const dataC = await resC.json();
       if (dataV.vehicles) setVehicles(dataV.vehicles);
       if (dataU.users) {
         setDrivers(dataU.users.filter((u: Driver) => u.role === "AUTISTA"));
+      }
+      if (resC.ok && Array.isArray(dataC.items)) {
+        setCustomers(
+          dataC.items.map((item: CustomerLite) => ({
+            id: item.id,
+            name: item.name,
+            city: item.city,
+            province: item.province,
+          }))
+        );
       }
     } catch (err) {
       console.error(err);
@@ -145,6 +175,7 @@ export default function TripsPage() {
       setPesoKg("0");
       setVolumeM3("0");
       setCliente("");
+      setCustomerId("");
       setPrezzo("");
       setCosto("");
       setVehicleId("");
@@ -156,6 +187,22 @@ export default function TripsPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const openAddModal = () => {
+    const start = new Date();
+    start.setMinutes(0, 0, 0);
+    start.setHours(start.getHours() + 1);
+    const end = new Date(start.getTime() + 86_400_000);
+    setDataRitiro(localDateTime(start));
+    setDataConsegna(localDateTime(end));
+    setShowAddModal(true);
+  };
+
+  const selectCustomer = (id: string) => {
+    setCustomerId(id);
+    const customer = customers.find((item) => item.id === id);
+    if (customer) setCliente(customer.name);
   };
 
   return (
@@ -172,7 +219,7 @@ export default function TripsPage() {
         </div>
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center space-x-2 transition"
         >
           <Plus className="w-4 h-4" />
@@ -190,9 +237,13 @@ export default function TripsPage() {
             <span>Caricamento viaggi in corso...</span>
           </div>
         ) : trips.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            Nessun viaggio registrato. Clicca su &quot;Aggiungi Viaggio&quot; per iniziare.
-          </div>
+          <EmptyState
+            icon={Route}
+            title="Nessun viaggio registrato"
+            description="Crea il primo viaggio: cliente, tratta e date sono sufficienti. Mezzo e autista si possono assegnare dopo."
+            actionLabel="Crea il primo viaggio"
+            onAction={openAddModal}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
@@ -401,17 +452,40 @@ export default function TripsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
-                  Cliente (opzionale)
-                </label>
-                <input
-                  type="text"
-                  value={cliente}
-                  onChange={(e) => setCliente(e.target.value)}
-                  placeholder="Ragione sociale cliente"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                    Anagrafica cliente
+                  </label>
+                  <select
+                    value={customerId}
+                    onChange={(e) => selectCustomer(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-xs"
+                  >
+                    <option value="">Cliente occasionale / nuovo</option>
+                    {customers.map((customer) => (
+                      <option key={customer.id} value={customer.id}>
+                        {customer.name}
+                        {customer.city ? ` · ${customer.city}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                    Cliente (opzionale)
+                  </label>
+                  <input
+                    type="text"
+                    value={cliente}
+                    onChange={(e) => {
+                      setCliente(e.target.value);
+                      setCustomerId("");
+                    }}
+                    placeholder="Ragione sociale cliente"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

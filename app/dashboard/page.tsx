@@ -15,7 +15,11 @@ import {
   ArrowRight,
   Route,
   Gauge,
+  AlertTriangle,
+  BellRing,
+  Sparkles,
 } from "lucide-react";
+import { normalizeDeadlineSettings } from "@/lib/deadline-settings";
 import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
@@ -115,6 +119,95 @@ export default async function DashboardPage() {
   const kycRejected = kycDocs.filter((d) => d.status === "RIFIUTATO").length;
   const kycOk = kycDocs.length > 0 && kycPending === 0 && kycRejected === 0;
 
+  const deadlineSettings = normalizeDeadlineSettings(company?.deadlineSettings);
+  const alertsMissing =
+    deadlineSettings.alertsEnabled && deadlineSettings.alertEmails.length === 0;
+
+  // Una sola azione consigliata: prima le eccezioni che bloccano il lavoro,
+  // poi la conformità, poi il commerciale. Evita che l'utente debba scegliere
+  // tra 12 card uguali.
+  const nextAction = (() => {
+    if (vehicles.length === 0) {
+      return {
+        icon: Car,
+        tone: BRAND,
+        title: "Aggiungi il primo mezzo",
+        detail: "Senza un veicolo non puoi assegnare viaggi né calcolare i costi.",
+        href: "/dashboard/vehicles",
+        cta: "Vai ai mezzi",
+      };
+    }
+    if (hasExpired) {
+      return {
+        icon: AlertTriangle,
+        tone: DANGER,
+        title: "Ci sono documenti scaduti",
+        detail: "Un documento scaduto blocca il mezzo: rinnova o aggiorna la scadenza.",
+        href: "/dashboard/scadenze",
+        cta: "Controlla le scadenze",
+      };
+    }
+    if (unassignedTrips > 0) {
+      return {
+        icon: Route,
+        tone: AMBER,
+        title: `${unassignedTrips} viagg${unassignedTrips === 1 ? "io" : "i"} da assegnare`,
+        detail: "Assegna mezzo e autista per mettere in movimento la giornata.",
+        href: "/dashboard/trips",
+        cta: "Assegna ora",
+      };
+    }
+    if (pendingOrders > 0) {
+      return {
+        icon: Sparkles,
+        tone: INFO,
+        title: `${pendingOrders} ordin${pendingOrders === 1 ? "e" : "i"} da confermare`,
+        detail: "Conferma l'ordine e trasformalo in viaggio con un clic.",
+        href: "/dashboard/ordini",
+        cta: "Apri gli ordini",
+      };
+    }
+    if (pendingQuotes > 0) {
+      return {
+        icon: FileWarning,
+        tone: AMBER,
+        title: `${pendingQuotes} preventiv${pendingQuotes === 1 ? "o" : "i"} da inviare`,
+        detail: "Completa prezzo e margine, poi invia il preventivo al cliente.",
+        href: "/dashboard/preventivi",
+        cta: "Apri i preventivi",
+      };
+    }
+    if (alertsMissing) {
+      return {
+        icon: BellRing,
+        tone: AMBER,
+        title: "Attiva gli avvisi di scadenza",
+        detail: "Nessuno riceve le email: aggiungi un destinatario per non perdere i rinnovi.",
+        href: "/dashboard/scadenze",
+        cta: "Configura avvisi",
+      };
+    }
+    if (expiring.length > 0) {
+      return {
+        icon: CalendarClock,
+        tone: AMBER,
+        title: `${expiring.length} document${expiring.length === 1 ? "o" : "i"} in scadenza`,
+        detail: "Hai 30 giorni per rinnovare senza fermare i mezzi.",
+        href: "/dashboard/scadenze",
+        cta: "Vedi le scadenze",
+      };
+    }
+    return {
+      icon: CheckCircle2,
+      tone: GREEN,
+      title: "Tutto in ordine",
+      detail: "Nessuna urgenza oggi: puoi pianificare i prossimi viaggi.",
+      href: "/dashboard/trips",
+      cta: "Pianifica un viaggio",
+    };
+  })();
+  const NextActionIcon = nextAction.icon;
+
   // Barre: distribuzione mezzi per categoria (dato reale). Se non ci sono
   // mezzi con categoria, il grafico mostra uno stato vuoto anziché valori fittizi.
   const byCategory = vehicles.reduce<Record<string, number>>((acc, v) => {
@@ -139,6 +232,50 @@ export default async function DashboardPage() {
           <span className="font-semibold" style={{ color: BRAND }}>{company?.ragioneSociale}</span>.
         </p>
       </div>
+
+      {/* Prossima azione: una sola cosa da fare */}
+      <section
+        className="ops-card enter-up flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+        style={{ animationDelay: "20ms", borderColor: "color-mix(in oklab, " + nextAction.tone + " 35%, var(--surface-border))" }}
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px]"
+            style={{
+              background: `color-mix(in oklab, ${nextAction.tone} 14%, transparent)`,
+              color: nextAction.tone,
+            }}
+          >
+            <NextActionIcon className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="ops-label">Prossima azione</p>
+            <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+              {nextAction.title}
+            </p>
+            <p className="mt-0.5 text-[12px]" style={{ color: "var(--text-label)" }}>
+              {nextAction.detail}
+            </p>
+          </div>
+        </div>
+        <Link href={nextAction.href} className="ops-btn ops-btn--primary ops-btn--sm shrink-0">
+          {nextAction.cta} <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </section>
+
+      {alertsMissing && (
+        <Link
+          href="/dashboard/scadenze"
+          className="enter-up flex items-center gap-2 rounded-[12px] border p-3 text-[12px] font-semibold"
+          style={{ borderColor: "var(--warning)", color: "var(--warning)", background: "var(--surface)" }}
+        >
+          <BellRing className="h-4 w-4 shrink-0" />
+          <span className="min-w-0">
+            Nessuno riceve gli avvisi di scadenza. Aggiungi un&apos;email in Scadenze per automatizzare i promemoria.
+          </span>
+          <ArrowRight className="ml-auto h-4 w-4 shrink-0" />
+        </Link>
+      )}
 
       {/* Da fare oggi */}
       <section className="enter-up" style={{ animationDelay: "40ms" }}>
