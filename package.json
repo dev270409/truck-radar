@@ -38,6 +38,7 @@
     "react-dom": "19.2.8",
     "stripe": "^22.6.2",
     "tailwind-merge": "^3.7.0",
+    "unpdf": "^2.2.1",
     "uploadthing": "^7.7.4"
   },
   "devDependencies": {

@@ -34,6 +34,8 @@ Regola: automatizzare il 90% prevedibile, lasciare all'admin solo l'eccezione.
 ### Cosa serve prima
 Serve un **PDF campione anonimizzato** (o 2-3 PDF di mesi diversi). Non ho trovato un formato pubblico Energy Trucks: senza un esempio non si può garantire la mappatura delle colonne. Il flusso può essere costruito in modo generico, ma va tarato sul PDF reale.
 
+**Aggiornamento 20/11/2026:** PDF campione TAROS/Energy Trucks ricevuto e parser implementato. Flusso completo in `docs/TRIP_STATEMENT_IMPORT.md` (import, deduplica, assegnazione, analisi Geotab, stima carburante).
+
 ### Flusso proposto
 1. L'admin carica il PDF da `/dashboard/trips` oppure lo inoltra a `viaggi@in.truck-radar.it` (fase successiva).
 2. Il file viene salvato su UploadThing (già usato per KYC/DDT).

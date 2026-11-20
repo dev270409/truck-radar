@@ -51,6 +51,13 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ file }) => {
       return { fileUrl: file.url };
     }),
+
+  // Rendiconti viaggi periodici (PDF) da importare in blocco.
+  tripStatement: f({ pdf: { maxFileSize: "16MB" } })
+    .middleware(requireUploadSession)
+    .onUploadComplete(async ({ file }) => {
+      return { fileUrl: file.url };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

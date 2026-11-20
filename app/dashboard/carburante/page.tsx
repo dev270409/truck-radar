@@ -48,6 +48,21 @@ interface FuelEstimate {
   costoStimato: number;
   kmPerLitroMedio: number;
   prezzoRiferimento: number;
+  metodo: "REALE" | "MISTO" | "STIMA" | "NESSUNO";
+  kmConConsumoReale: number;
+  kmConStima: number;
+  prezzoSource: "RIFORNIMENTI" | "RIFERIMENTO";
+  dettaglio: Array<{
+    vehicleId: string;
+    targa: string;
+    km: number;
+    kmPerLitro: number;
+    fonte: "REALE" | "STIMA";
+    litri: number;
+    costo: number;
+    prezzo: number;
+    segmentiReali: number;
+  }>;
   nota: string;
 }
 
@@ -182,9 +197,18 @@ export default function CarburantePage() {
 
       {(stats?.perVehicle.length ?? 0) === 0 && estimate && (
         <div className="rounded-2xl border border-amber-800/50 bg-amber-950/20 p-4">
-          <h3 className="flex items-center text-sm font-bold text-amber-100">
-            <Sparkles className="mr-2 h-4 w-4" /> Stima consumi carburante
-          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="flex items-center text-sm font-bold text-amber-100">
+              <Sparkles className="mr-2 h-4 w-4" /> Stima consumi carburante
+            </h3>
+            <span className="rounded-full border border-amber-700/60 bg-amber-950/60 px-2.5 py-1 text-[10px] font-bold uppercase text-amber-200">
+              {estimate.metodo === "REALE"
+                ? "Consumi reali"
+                : estimate.metodo === "MISTO"
+                  ? "Dati misti"
+                  : "Stima"}
+            </span>
+          </div>
           <p className="mt-1 text-xs leading-5 text-amber-100/80">{estimate.nota}</p>
           {estimate.kmSource !== "NESSUNO" && (
             <div className="mt-3 grid grid-cols-3 gap-3">
@@ -197,12 +221,46 @@ export default function CarburantePage() {
                 <p className="mt-1 text-lg font-bold text-amber-200">€ {estimate.costoStimato.toLocaleString("it-IT", { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Consumo rif.</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Consumo medio</p>
                 <p className="mt-1 text-lg font-bold text-amber-200">{estimate.kmPerLitroMedio} km/l</p>
               </div>
             </div>
           )}
-          <p className="mt-2 text-[10px] text-amber-200/70">Stima indicativa a {estimate.prezzoRiferimento} €/l. Registra i rifornimenti reali per dati precisi. I km a vuoto non sono stimati.</p>
+          {estimate.dettaglio.length > 0 && (
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="text-[10px] uppercase tracking-wide text-slate-400">
+                  <tr>
+                    <th className="py-1.5 pr-3">Mezzo</th>
+                    <th className="py-1.5 pr-3">Km</th>
+                    <th className="py-1.5 pr-3">Consumo</th>
+                    <th className="py-1.5 pr-3">Fonte</th>
+                    <th className="py-1.5 text-right">€/l</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-300">
+                  {estimate.dettaglio.map((row) => (
+                    <tr key={row.vehicleId} className="border-t border-slate-800/70">
+                      <td className="py-1.5 pr-3 font-mono font-semibold text-slate-100">{row.targa}</td>
+                      <td className="py-1.5 pr-3">{row.km.toLocaleString("it-IT")}</td>
+                      <td className="py-1.5 pr-3">{row.kmPerLitro} km/l</td>
+                      <td className="py-1.5 pr-3">
+                        <span className={row.fonte === "REALE" ? "text-emerald-300" : "text-amber-300"}>
+                          {row.fonte === "REALE" ? `Reale (${row.segmentiReali} pieni)` : "Stima categoria"}
+                        </span>
+                      </td>
+                      <td className="py-1.5 text-right">{row.prezzo.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="mt-2 text-[10px] text-amber-200/70">
+            Prezzo {estimate.prezzoSource === "RIFORNIMENTI" ? "medio dai rifornimenti" : "di riferimento"}:{" "}
+            {estimate.prezzoRiferimento} €/l · {estimate.kmConConsumoReale.toLocaleString("it-IT")} km con consumi
+            reali, {estimate.kmConStima.toLocaleString("it-IT")} km stimati. I km a vuoto non sono inclusi.
+          </p>
         </div>
       )}
 

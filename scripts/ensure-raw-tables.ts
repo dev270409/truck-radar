@@ -839,6 +839,66 @@ const statements = [
   CREATE INDEX IF NOT EXISTS "Expense_date_idx" ON "Expense"("companyId", date);
   CREATE INDEX IF NOT EXISTS "Expense_category_idx" ON "Expense"("companyId", category);
   `,
+
+  // Import rendiconti viaggi periodici (Energy Trucks / TAROS, ecc.)
+  `
+  CREATE TABLE IF NOT EXISTS "TripStatement" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "fileUrl" TEXT,
+    provider TEXT,
+    "periodStart" DATE,
+    "periodEnd" DATE,
+    "declaredTrips" INTEGER,
+    "declaredDays" INTEGER,
+    "declaredTotal" DOUBLE PRECISION,
+    "parsedTrips" INTEGER NOT NULL DEFAULT 0,
+    "importedTrips" INTEGER NOT NULL DEFAULT 0,
+    "parsedTotal" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'PARSED',
+    payload JSONB NOT NULL DEFAULT '{}',
+    warnings JSONB NOT NULL DEFAULT '[]',
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "importedAt" TIMESTAMPTZ
+  );
+  CREATE INDEX IF NOT EXISTS "TripStatement_company_idx" ON "TripStatement"("companyId", "createdAt");
+  CREATE INDEX IF NOT EXISTS "TripStatement_period_idx" ON "TripStatement"("companyId", "periodStart");
+
+  CREATE TABLE IF NOT EXISTS "TripStatementLine" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "statementId" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    code TEXT NOT NULL,
+    date DATE NOT NULL,
+    description TEXT NOT NULL,
+    customer TEXT,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "tripId" TEXT,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("companyId", code)
+  );
+  CREATE INDEX IF NOT EXISTS "TripStatementLine_statement_idx" ON "TripStatementLine"("statementId");
+  CREATE INDEX IF NOT EXISTS "TripStatementLine_trip_idx" ON "TripStatementLine"("tripId");
+
+  CREATE TABLE IF NOT EXISTS "TripGeotabMatch" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "tripId" TEXT NOT NULL,
+    "geotabTripId" TEXT NOT NULL,
+    "licensePlate" TEXT,
+    "startAt" TIMESTAMPTZ,
+    "stopAt" TIMESTAMPTZ,
+    "distanceKm" DOUBLE PRECISION,
+    "drivingSeconds" TEXT,
+    "idlingSeconds" TEXT,
+    "matchType" TEXT NOT NULL DEFAULT 'AUTO',
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("companyId", "tripId", "geotabTripId")
+  );
+  CREATE INDEX IF NOT EXISTS "TripGeotabMatch_trip_idx" ON "TripGeotabMatch"("tripId");
+  `,
 ];
 
 async function main() {
