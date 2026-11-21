@@ -101,6 +101,12 @@ export default function TripsPage() {
   const [assignVehicleId, setAssignVehicleId] = useState("");
   const [assignSaving, setAssignSaving] = useState(false);
   const [assignError, setAssignError] = useState("");
+  const [suggestions, setSuggestions] = useState<{
+    vehicles: Array<{ id: string; targa: string; categoria: string; score: number; reasons: string[] }>;
+    drivers: Array<{ id: string; nome: string; score: number; reasons: string[] }>;
+    note?: string;
+  } | null>(null);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   const fetchTrips = async () => {
     try {
@@ -236,11 +242,22 @@ export default function TripsPage() {
     setShowAddModal(true);
   };
 
-  const openAssign = (trip: Trip) => {
+  const openAssign = async (trip: Trip) => {
     setAssignTrip(trip);
     setAssignDriverId(trip.driver?.id ?? "");
     setAssignVehicleId(trip.vehicle?.id ?? "");
     setAssignError("");
+    setSuggestions(null);
+    setSuggestionsLoading(true);
+    try {
+      const res = await fetch(`/api/trips/${trip.id}/recommendations`);
+      const data = await res.json();
+      if (res.ok) setSuggestions(data);
+    } catch {
+      /* i consigli sono un extra: il form resta utilizzabile */
+    } finally {
+      setSuggestionsLoading(false);
+    }
   };
 
   const saveAssign = async (event: React.FormEvent) => {
@@ -447,6 +464,72 @@ export default function TripsPage() {
             {assignError && (
               <div className="p-3 bg-red-950/60 border border-red-800 text-red-200 text-xs rounded-xl">
                 {assignError}
+              </div>
+            )}
+
+            {suggestionsLoading && (
+              <p className="flex items-center gap-2 text-[11px] text-slate-400">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Calcolo dei consigli…
+              </p>
+            )}
+
+            {suggestions && (
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Consigliati</p>
+                {suggestions.vehicles.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-[10px] font-semibold text-slate-500">Mezzi</p>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {suggestions.vehicles.map((vehicle) => (
+                        <button
+                          key={vehicle.id}
+                          type="button"
+                          onClick={() => setAssignVehicleId(vehicle.id)}
+                          title={vehicle.reasons.join(" · ")}
+                          className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition ${
+                            assignVehicleId === vehicle.id
+                              ? "border-emerald-600 bg-emerald-950/60 text-emerald-200"
+                              : "border-slate-700 bg-slate-900 text-slate-300 hover:border-emerald-700"
+                          }`}
+                        >
+                          {vehicle.targa} · {label(vehicle.categoria)}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-1 text-[10px] text-slate-500">
+                      {suggestions.vehicles[0].reasons.slice(0, 2).join(" · ")}
+                    </p>
+                  </div>
+                )}
+                {suggestions.drivers.length > 0 ? (
+                  <div className="mt-2">
+                    <p className="text-[10px] font-semibold text-slate-500">Autisti</p>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {suggestions.drivers.map((driver) => (
+                        <button
+                          key={driver.id}
+                          type="button"
+                          onClick={() => setAssignDriverId(driver.id)}
+                          title={driver.reasons.join(" · ")}
+                          className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition ${
+                            assignDriverId === driver.id
+                              ? "border-emerald-600 bg-emerald-950/60 text-emerald-200"
+                              : "border-slate-700 bg-slate-900 text-slate-300 hover:border-emerald-700"
+                          }`}
+                        >
+                          {driver.nome}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-1 text-[10px] text-slate-500">
+                      {suggestions.drivers[0].reasons.slice(0, 2).join(" · ")}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-[10px] text-amber-300">
+                    {suggestions.note ?? "Nessun autista consigliato."}
+                  </p>
+                )}
               </div>
             )}
 

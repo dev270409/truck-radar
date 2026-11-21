@@ -19,6 +19,7 @@ export interface TripStatementRow {
   parsedTrips: number;
   importedTrips: number;
   parsedTotal: number;
+  parserMode: string;
   status: string;
   payload: ParsedTripStatement;
   warnings: string[];
@@ -64,13 +65,14 @@ export async function createTripStatement(
   companyId: string,
   createdBy: string,
   file: { fileName: string; fileUrl: string },
-  parsed: ParsedTripStatement
+  parsed: ParsedTripStatement,
+  parserMode = "DETERMINISTIC"
 ): Promise<TripStatementRow> {
   const total = Math.round(parsed.lines.reduce((sum, line) => sum + line.amount, 0) * 100) / 100;
   const rows = (await db.$queryRawUnsafe(
     `INSERT INTO "TripStatement"
-      ("companyId", "fileName", "fileUrl", provider, "periodStart", "periodEnd", "declaredTrips", "declaredDays", "declaredTotal", "parsedTrips", "parsedTotal", payload, warnings, "createdBy")
-     VALUES ($1, $2, $3, $4, $5::date, $6::date, $7, $8, $9, $10, $11, $12::jsonb, $13::jsonb, $14)
+      ("companyId", "fileName", "fileUrl", provider, "periodStart", "periodEnd", "declaredTrips", "declaredDays", "declaredTotal", "parsedTrips", "parsedTotal", "parserMode", payload, warnings, "createdBy")
+     VALUES ($1, $2, $3, $4, $5::date, $6::date, $7, $8, $9, $10, $11, $12, $13::jsonb, $14::jsonb, $15)
      RETURNING *`,
     companyId,
     file.fileName,
@@ -83,6 +85,7 @@ export async function createTripStatement(
     parsed.declaredTotal,
     parsed.lines.length,
     total,
+    parserMode,
     JSON.stringify(parsed),
     JSON.stringify(parsed.warnings),
     createdBy

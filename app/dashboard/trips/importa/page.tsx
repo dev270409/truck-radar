@@ -33,6 +33,7 @@ interface StatementSummary {
   declaredTotal: number | null;
   parsedTrips: number;
   parsedTotal: number;
+  parserMode?: string;
 }
 
 interface ParseResult {
@@ -57,6 +58,15 @@ interface Analytics {
   avgPerTrip: number;
   avgPerActiveDay: number;
   projectedYear: number;
+  forecast: {
+    monthsUsed: number;
+    statementsUsed: number;
+    totalImported: number;
+    avgMonthly: number;
+    projected12m: number;
+    confidence: "BASSA" | "MEDIA" | "ALTA";
+    note: string;
+  };
   topTrips: TripSummary[];
   bottomTrips: TripSummary[];
   topRevenuePerKm: Array<{ code: string; km: number; amount: number; revenuePerKm: number }>;
@@ -71,10 +81,19 @@ interface Analytics {
     matchedTrips: number;
     unassignedTrips: number;
     unallocatedKm: number;
+    emptyKm: number;
+    emptyTrips: number;
     unmatchedGeotabTrips: number;
     coveragePct: number;
   };
   warnings: string[];
+}
+
+interface AutoMatchSummary {
+  matchedVehicles: number;
+  matchedDrivers: number;
+  emptyTrips: number;
+  emptyKm: number;
 }
 
 const eur = (value: number) =>
@@ -93,7 +112,11 @@ export default function ImportaRendicontoPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState("");
-  const [imported, setImported] = useState<{ imported: number; skipped: string[] } | null>(null);
+  const [imported, setImported] = useState<{
+    imported: number;
+    skipped: string[];
+    autoMatch?: AutoMatchSummary | null;
+  } | null>(null);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -161,7 +184,11 @@ export default function ImportaRendicontoPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Errore nell'importazione.");
-      setImported({ imported: data.imported, skipped: data.skipped ?? [] });
+      setImported({
+        imported: data.imported,
+        skipped: data.skipped ?? [],
+        autoMatch: data.autoMatch ?? null,
+      });
       setSelected(new Set());
       setAnalyticsLoading(true);
       try {
@@ -222,9 +249,14 @@ export default function ImportaRendicontoPage() {
               <p className="font-semibold">
                 {imported.imported} viaggi creati
                 {imported.skipped.length > 0 ? ` · ${imported.skipped.length} già presenti` : ""}
+                {imported.autoMatch && imported.autoMatch.matchedVehicles > 0
+                  ? ` · ${imported.autoMatch.matchedVehicles} collegati a Geotab`
+                  : ""}
               </p>
               <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
-                Sono in stato “Da assegnare”: assegna autista e mezzo dalla lista viaggi.
+                {imported.autoMatch && imported.autoMatch.matchedVehicles > 0
+                  ? `${imported.autoMatch.matchedDrivers} autisti assegnati automaticamente. Controlla i mezzi proposti e assegna gli autisti mancanti dalla lista viaggi.`
+                  : "Sono in stato “Da assegnare”: usa il pulsante Assegna dalla lista viaggi, con i consigli su mezzo e autista."}
               </p>
             </div>
           </div>
@@ -259,8 +291,14 @@ export default function ImportaRendicontoPage() {
               label={`Media per giorno attivo (${analytics.activeDays})`}
               value={eur(analytics.avgPerActiveDay)}
             />
-            <SummaryCard label="Stima 12 mesi (ritmo attuale)" value={eur(analytics.projectedYear)} />
+            <SummaryCard
+              label={`Stima 12 mesi (${analytics.forecast.monthsUsed} mes${analytics.forecast.monthsUsed === 1 ? "e" : "i"}, ${analytics.forecast.confidence.toLowerCase()})`}
+              value={eur(analytics.forecast.projected12m)}
+            />
           </div>
+          <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
+            {analytics.forecast.note}
+          </p>
 
           <div className="grid gap-3 lg:grid-cols-3">
             <div className="ops-card p-4">
@@ -278,8 +316,13 @@ export default function ImportaRendicontoPage() {
                   value={`${analytics.geotab.movementCount} · ${km(analytics.geotab.movementKm)}`}
                 />
                 <AnalysisRow
-                  label="Km non attribuiti"
-                  value={km(analytics.geotab.unallocatedKm)}
+                  label="Km a vuoto (stima)"
+                  value={km(analytics.geotab.emptyKm)}
+                  tone="var(--warning)"
+                />
+                <AnalysisRow
+                  label="Viaggi a vuoto"
+                  value={String(analytics.geotab.emptyTrips)}
                   tone="var(--warning)"
                 />
                 <AnalysisRow
@@ -294,8 +337,9 @@ export default function ImportaRendicontoPage() {
                 </p>
               )}
               <p className="mt-3 text-[10px]" style={{ color: "var(--text-label-soft)" }}>
-                Spostamenti = micro-tragitti sotto 3 km o 8 minuti. I km non attribuiti sono quelli
-                non collegati a un viaggio pagato: stima di viaggi a vuoto o altri movimenti.
+                Spostamenti = micro-tragitti sotto 3 km o 8 minuti. I km a vuoto sono i tracciati
+                oltre 3 km o 8 minuti non collegati a un viaggio pagato: la stima diminuisce man
+                mano che colleghi i viaggi.
               </p>
             </div>
 
@@ -415,7 +459,10 @@ export default function ImportaRendicontoPage() {
       {result && (
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <SummaryCard label="Provider" value={result.statement.provider ?? "Rendiconto"} />
+            <SummaryCard
+              label="Provider"
+              value={`${result.statement.provider ?? "Rendiconto"}${result.statement.parserMode === "AI" ? " · letto con AI" : ""}`}
+            />
             <SummaryCard
               label="Periodo"
               value={

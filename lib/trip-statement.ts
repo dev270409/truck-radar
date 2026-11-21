@@ -11,6 +11,7 @@ export interface ParsedTripLine {
   code: string;
   date: string;
   pickupTime: string;
+  pickupTimeExplicit: boolean;
   description: string;
   customer: string;
   amount: number;
@@ -153,7 +154,13 @@ export function parseTripStatement(text: string): ParsedTripStatement {
       : null;
 
   const lines: ParsedTripLine[] = [];
-  let currentDay: { year: number; month: number; day: number; departure: string | null } | null = null;
+  let currentDay: {
+    year: number;
+    month: number;
+    day: number;
+    departure: string | null;
+    explicit: boolean;
+  } | null = null;
   let dayTripIndex = 0;
   let block: { code: string; lines: string[] } | null = null;
 
@@ -174,6 +181,7 @@ export function parseTripStatement(text: string): ParsedTripStatement {
       code: blockValue.code,
       date: dateKey(currentDay.year, currentDay.month, currentDay.day),
       pickupTime,
+      pickupTimeExplicit: currentDay.explicit && dayTripIndex === 0,
       description,
       customer,
       amount,
@@ -198,6 +206,7 @@ export function parseTripStatement(text: string): ParsedTripStatement {
         month,
         day: dayNumber,
         departure: day[4] && day[5] ? `${pad(Number(day[4]))}:${day[5]}` : null,
+        explicit: Boolean(day[4] && day[5]),
       };
       dayTripIndex = 0;
       block = null;
@@ -253,7 +262,9 @@ export function parseTripStatement(text: string): ParsedTripStatement {
 }
 
 export async function extractTripStatementText(buffer: Uint8Array): Promise<string> {
-  const pdf = await getDocumentProxy(buffer);
+  // pdf.js può trasferire il buffer al worker: passiamo una copia per poter
+  // riusare lo stesso PDF nel fallback AI (scansioni senza testo).
+  const pdf = await getDocumentProxy(buffer.slice());
   const result = await extractText(pdf, { mergePages: true });
   return result.text;
 }
@@ -268,6 +279,16 @@ export function romeDateTime(date: string, time: string): Date {
   const guess = new Date(Date.UTC(year, month - 1, day, hour, minute));
   const offset = romeOffsetMinutes(guess);
   return new Date(guess.getTime() - offset * 60_000);
+}
+
+export function romeDayKey(date: Date): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Rome",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return formatter.format(date);
 }
 
 function romeOffsetMinutes(date: Date): number {

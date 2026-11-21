@@ -50,7 +50,11 @@ Regole principali:
 
 Sul PDF di esempio: **24/24 viaggi, 7.790,00 €, zero warning**.
 
-Limite attuale: servono PDF con testo selezionabile. Le scansioni senza testo restituiscono un errore esplicito; l'OCR/AI è il passo successivo.
+### Scansioni: fallback AI
+
+Se il PDF non ha testo (scansione) o il parser deterministico non chiude i conti, il server prova **Gemini** con il PDF nativo (`lib/trip-statement-ai.ts`). Il risultato passa sempre dall'anteprima e viene marcato `parserMode: "AI"`. Sul PDF TAROS convertito in immagini: **24/24 viaggi, 7.790 €**. Costi e alternative in `docs/OCR_COSTS.md`.
+
+Se l'AI non è configurata o fallisce, il parser deterministico resta la prima scelta e l'import si blocca con un errore esplicito, senza creare viaggi errati.
 
 ## 4. Assegnazione rapida
 
@@ -65,18 +69,39 @@ Nella lista viaggi ogni riga ha il pulsante **Assegna** (o **Riassegna**):
 
 Endpoint: `GET /api/trips/import/:id/analytics`.
 
-- **Micro-spostamenti**: tracciati Geotab sotto 3 km o sotto 8 minuti (e < 10 km). Non sono contati come viaggi veri.
-- **Match**: per ogni viaggio importato con mezzo assegnato si cerca il tracciato Geotab dello stesso giorno e della stessa targa, scegliendo quello con ora di partenza più vicina.
-- **Km non attribuiti** = km dei viaggi Geotab "veri" meno i km collegati a un viaggio pagato. È la prima stima dei **km a vuoto / altri movimenti**, dichiarata come tale.
-- **Copertura match**: percentuale di viaggi con mezzo collegati a Geotab.
-- **Ricavi**: totale rendiconto, media per viaggio, media per giorno attivo, stima 12 mesi al ritmo attuale.
+- **Micro-spostamenti**: tracciati Geotab sotto 3 km o sotto 8 minuti. Non sono contati come viaggi veri.
+- **Match automatico**: al termine dell'import il server collega i viaggi ai tracciati Geotab quando il match è certo:
+  1. ora di partenza esplicita nel rendiconto entro 90 minuti;
+  2. un solo mezzo con tracciati quel giorno;
+  3. un solo viaggio pagato e un tracciato nettamente più lungo degli altri.
+  I casi ambigui restano all'admin.
+- **Km a vuoto (stima)**: tracciati Geotab oltre 3 km o 8 minuti **non collegati** a un viaggio pagato. Più rendiconti e viaggi colleghi, più il numero scende e diventa preciso. Non è una verità contabile finché non sono importati tutti i provider.
+- **Copertura match**: percentuale di viaggi collegati a Geotab.
+- **Ricavi**: totale rendiconto, media per viaggio, media per giorno attivo.
 - **Top/bottom 5** per importo e **resa €/km** per i viaggi collegati.
 
-Limite: finché i viaggi non hanno un mezzo assegnato il match è parziale. L'analisi lo dichiara nei warning.
+### Stima 12 mesi adattiva
 
-Tabelle: `TripStatement`, `TripStatementLine`, `TripGeotabMatch` (predisposta per salvare i match; l'analisi attuale li calcola al volo).
+`lib/trip-forecast.ts` calcola la media mensile sui **viaggi realmente importati**, mese per mese:
 
-## 6. Stima carburante su dati reali
+- 1 mese → affidabilità `BASSA`;
+- 3–5 mesi → `MEDIA`;
+- 6+ mesi → `ALTA`.
+
+La stima si aggiorna automaticamente a ogni nuovo rendiconto. Sul solo ottobre TAROS: 7.790 €/mese → **93.480 €/anno**, affidabilità bassa.
+
+Tabelle: `TripStatement`, `TripStatementLine`, `TripGeotabMatch` (i match automatici vengono salvati con tipo e confidenza).
+
+## 6. Consigli mezzo e autista
+
+Nel modale **Assegna** (`GET /api/trips/:id/recommendations`) Truck Radar propone:
+
+- mezzi compatibili per portata e volume, disponibili e liberi nella finestra del viaggio, con categoria adatta alla merce (FRIGO/ADR/CISTERNA);
+- autisti attivi e liberi, con priorità a chi è già associato al mezzo consigliato.
+
+L'admin vede le motivazioni e sceglie: il sistema non assegna mai un autista al posto suo.
+
+## 7. Stima carburante su dati reali
 
 `lib/fuel.ts` non usa più un consumo unico per tutta l'azienda:
 
@@ -86,36 +111,50 @@ Tabelle: `TripStatement`, `TripStatementLine`, `TripGeotabMatch` (predisposta pe
 - se un mezzo non ha abbastanza pieni, usa il consumo di categoria e lo dichiara `STIMA`;
 - il risultato espone `metodo` (`REALE`/`MISTO`/`STIMA`), `kmConConsumoReale`, `kmConStima`, `prezzoSource` e il dettaglio per targa.
 
-## 7. API e tabelle
+## 8. API e tabelle
 
 | Metodo | Endpoint | Funzione |
 |---|---|---|
 | POST | `/api/trips/import/parse` | carica, estrae e interpreta il PDF; crea il rendiconto in bozza |
-| POST | `/api/trips/import/confirm` | crea i viaggi selezionati, deduplica per codice |
+| POST | `/api/trips/import/confirm` | crea i viaggi selezionati, deduplica e lancia il match Geotab |
 | GET | `/api/trips/import` | ultimi rendiconti |
-| GET | `/api/trips/import/:id/analytics` | ricavi, top/bottom, Geotab, km non attribuiti |
+| POST | `/api/trips/import/:id/auto-match` | ricalcola il match automatico Geotab |
+| GET | `/api/trips/import/:id/analytics` | ricavi, top/bottom, Geotab, km a vuoto, previsione |
 | PATCH | `/api/trips/:id` | assegnazione rapida (driver/mezzo/stato) |
+| GET | `/api/trips/:id/recommendations` | consigli mezzo/autista con motivazioni |
 
 Tabelle raw in `scripts/ensure-raw-tables.ts`; eseguire `npm run db:raw` prima del deploy.
 
-## 8. Verifiche
+## 9. Verifiche
 
 - `npx tsc --noEmit` → pulito.
-- `npm run build` → pulito (133 route).
-- `npx tsx scripts/e2e-trip-statement.ts` → **33/33 PASS**:
-  - upload reale su UploadThing, parse 24 righe / 7.790 €, zero warning;
-  - 24 viaggi creati, note con codice, stato `DA_ASSEGNARE`;
-  - secondo caricamento: 24 duplicati, 0 nuovi viaggi;
-  - assegnazione di 5 viaggi, visibilità nell'account autista;
-  - Geotab simulato: 3 micro-spostamenti, 5 match, km non attribuiti, stima 12 mesi 93.480 €, resa €/km.
-- `npx tsx scripts/e2e-fuel-estimate.ts` → **15/15 PASS**: consumo pieno-pieno 3,33 km/l, prezzo 1,50 €/l, metodo `REALE`.
+- `npm run build` → pulito.
+- `npx tsx scripts/e2e-trip-statement.ts` → **51/51 PASS**:
+  - upload reale, parse 24 righe / 7.790 €, zero warning;
+  - 24 viaggi creati, deduplica, note con codice;
+  - match automatico Geotab: 5 mezzi collegati, 2 viaggi a vuoto, km a vuoto;
+  - analisi: 5 match, 3 micro-spostamenti, top/bottom, resa €/km;
+  - forecast: 1 mese, affidabilità bassa, 93.480 €/anno;
+  - consigli mezzo/autista con motivazioni;
+  - assegnazione autista e visibilità nell'account autista.
+- `npx tsx scripts/e2e-trip-statement-ai.ts` → **5/5 PASS** su PDF scansionato: parserMode AI, 24/24 righe, 7.790 €.
+- `npx tsx scripts/e2e-fuel-estimate.ts` → **14/14 PASS**: consumo pieno-pieno 3,33 km/l, prezzo 1,50 €/l, metodo `REALE`.
 - `npx tsx scripts/test-trip-statement.ts` → parser sul PDF reale (24/24).
 
-## 9. Prossimi passi
+### Import nell'account TAROS
 
-1. OCR/AI per PDF scansionati e layout di altri provider.
-2. Salvataggio dei match Geotab in `TripGeotabMatch` e ricalcolo incrementale.
-3. Migliore stima km a vuoto usando le tratte geocodificate, non solo i tracciati.
+Eseguito `scripts/import-taros-rendiconto.ts` sull'account `tapesolegto@gmail.com`:
+
+- 24 viaggi importati, totale 7.790 €;
+- **23/24 collegati automaticamente ai tracciati Geotab** (copertura 96%);
+- 143 tracciati Geotab non giustificati dal solo rendiconto Energy Trucks: 6.842,6 km a vuoto stimati (scendono importando anche gli altri provider);
+- previsione 12 mesi: 93.480 €, affidabilità bassa (1 mese);
+- 0 autisti assegnati: in Geotab ci sono ALEXANDRU BOLOZAN, OLEG TAPES e IOAN SILVIU NEGOITA, ma nell'app non esistevano utenti AUTISTA. L'admin deve crearli per completare l'assegnazione.
+
+## 10. Prossimi passi
+
+1. Creare gli utenti AUTISTA e mapparli ai nomi Geotab per l'assegnazione automatica anche dell'autista.
+2. Migliorare il match ambiguo con geocoding delle tratte (quando il rendiconto non indica l'ora).
+3. Import via email in `viaggi@in.truck-radar.it` e OCR per altri provider.
 4. Costo carburante per singolo viaggio importato.
-5. Import dello stesso formato via email in `viaggi@in.truck-radar.it`.
-6. Storicizzazione dei rendiconti con pagina dedicata e confronto mese su mese.
+5. Pagina storica dei rendiconti con confronto mese su mese.

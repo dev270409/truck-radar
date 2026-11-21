@@ -5,6 +5,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { isAllowedUploadUrl } from "@/lib/url-safety";
 import { createTripStatement, listExistingStatementCodes } from "@/lib/trip-statements";
 import { extractTripStatementText, parseTripStatement } from "@/lib/trip-statement";
+import { parseTripStatementWithAi, tripStatementAiConfigured } from "@/lib/trip-statement-ai";
 
 const MAX_BYTES = 15 * 1024 * 1024;
 
@@ -66,19 +67,50 @@ export async function POST(req: Request) {
   }
 
   let parsed;
+  let parserMode = "DETERMINISTIC";
   try {
     const text = await extractTripStatementText(buffer);
     parsed = parseTripStatement(text);
   } catch {
-    return NextResponse.json(
-      { error: "PDF non leggibile: verificare che non sia una scansione senza testo." },
-      { status: 422 }
-    );
+    parsed = null;
   }
 
-  if (parsed.lines.length === 0) {
+  // Se il PDF è una scansione o il layout non torna, prova la lettura AI
+  // (Gemini legge il PDF nativamente). Il risultato passa sempre dall'anteprima.
+  const deterministicTotal = parsed
+    ? parsed.lines.reduce((sum, line) => sum + line.amount, 0)
+    : 0;
+  const needsAi =
+    !parsed ||
+    parsed.lines.length === 0 ||
+    (parsed.declaredTrips !== null && parsed.lines.length < parsed.declaredTrips) ||
+    (parsed.declaredTotal !== null && Math.abs(deterministicTotal - parsed.declaredTotal) > 0.01);
+
+  let aiError: string | null = null;
+  if (needsAi && tripStatementAiConfigured()) {
+    try {
+      const aiParsed = await parseTripStatementWithAi(buffer);
+      if (aiParsed && (!parsed || aiParsed.lines.length >= parsed.lines.length)) {
+        parsed = aiParsed;
+        parserMode = "AI";
+      } else if (!aiParsed) {
+        aiError = "AI ha restituito un risultato non valido.";
+      }
+    } catch (error) {
+      aiError = error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  if (!parsed || parsed.lines.length === 0) {
     return NextResponse.json(
-      { error: "Nessun viaggio riconosciuto. Il layout del rendiconto non è supportato." },
+      {
+        error:
+          "Nessun viaggio riconosciuto. Il PDF potrebbe essere una scansione illeggibile o un layout non supportato.",
+        debug:
+          process.env.NODE_ENV !== "production"
+            ? { needsAi, aiConfigured: tripStatementAiConfigured(), aiError }
+            : undefined,
+      },
       { status: 422 }
     );
   }
@@ -87,7 +119,8 @@ export async function POST(req: Request) {
     session.user.companyId,
     session.user.id,
     { fileName, fileUrl },
-    parsed
+    parsed,
+    parserMode
   );
   const existing = await listExistingStatementCodes(
     session.user.companyId,
@@ -122,6 +155,7 @@ export async function POST(req: Request) {
       declaredTotal: statement.declaredTotal,
       parsedTrips: statement.parsedTrips,
       parsedTotal: statement.parsedTotal,
+      parserMode: statement.parserMode,
     },
     lines: parsed.lines,
     duplicates: [...existing],

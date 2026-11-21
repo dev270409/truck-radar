@@ -856,6 +856,7 @@ const statements = [
     "parsedTrips" INTEGER NOT NULL DEFAULT 0,
     "importedTrips" INTEGER NOT NULL DEFAULT 0,
     "parsedTotal" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "parserMode" TEXT NOT NULL DEFAULT 'DETERMINISTIC',
     status TEXT NOT NULL DEFAULT 'PARSED',
     payload JSONB NOT NULL DEFAULT '{}',
     warnings JSONB NOT NULL DEFAULT '[]',
@@ -894,10 +895,13 @@ const statements = [
     "drivingSeconds" TEXT,
     "idlingSeconds" TEXT,
     "matchType" TEXT NOT NULL DEFAULT 'AUTO',
+    confidence TEXT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE ("companyId", "tripId", "geotabTripId")
   );
   CREATE INDEX IF NOT EXISTS "TripGeotabMatch_trip_idx" ON "TripGeotabMatch"("tripId");
+  ALTER TABLE "TripGeotabMatch" ADD COLUMN IF NOT EXISTS confidence TEXT;
+  ALTER TABLE "TripStatement" ADD COLUMN IF NOT EXISTS "parserMode" TEXT NOT NULL DEFAULT 'DETERMINISTIC';
   `,
 ];
 

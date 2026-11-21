@@ -106,7 +106,7 @@ async function main() {
     assert(confirmedAgain.body.imported === 0, "nessun nuovo viaggio creato");
     assert(confirmedAgain.body.skipped.length === 24, "24 righe saltate come duplicate");
 
-    console.log("5) Assegnazione rapida all'autista...");
+    console.log("5) Match automatico Geotab e km a vuoto...");
     const users = await admin.req("/api/users");
     const driver = users.body.users.find(
       (user: { email: string; role: string }) => user.email === DRIVER.email && user.role === "AUTISTA"
@@ -116,40 +116,25 @@ async function main() {
     const vehicle = vehicles.body.vehicles[0];
     assert(Boolean(vehicle?.targa), "mezzo demo disponibile per l'analisi Geotab");
 
-    const assignedIds = tripIds.slice(0, 5);
-    for (const tripId of assignedIds) {
-      const assigned = await admin.req(`/api/trips/${tripId}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          driverId: driver.id,
-          vehicleId: vehicle?.id ?? null,
-          status: "COMPLETATO",
-          eventNote: "e2e rendiconto",
-        }),
-      });
-      assert(assigned.status === 200, `PATCH assegnazione ${tripId} 200 (${assigned.status})`);
-    }
-    const firstTripId = assignedIds[0];
-
-    console.log("6) Analisi Geotab e ricavi...");
-    const tripsAfterAssign = await admin.req("/api/trips");
-    const assignedTrips = tripsAfterAssign.body.trips.filter((trip: { id: string }) =>
-      assignedIds.includes(trip.id)
-    );
-    assert(assignedTrips.length === 5, "5 viaggi assegnati per il test Geotab");
-
     const companyId = (
       await db.user.findFirst({ where: { email: ADMIN.email }, select: { companyId: true } })
     )?.companyId;
     if (!companyId) throw new Error("companyId demo non trovato");
     demoCompanyId = companyId;
 
+    const tripsAfterImport = await admin.req("/api/trips");
+    const firstTrips = tripIds
+      .slice(0, 5)
+      .map((id: string) => tripsAfterImport.body.trips.find((trip: { id: string }) => trip.id === id))
+      .filter(Boolean);
+    assert(firstTrips.length === 5, "5 viaggi per il match automatico");
+
     await db.$executeRawUnsafe(
       `DELETE FROM "GeotabTripSnapshot" WHERE "companyId" = $1 AND "geotabTripId" LIKE 'e2e-stmt-%'`,
       companyId
     );
     let index = 0;
-    for (const trip of assignedTrips) {
+    for (const trip of firstTrips) {
       const start = new Date(trip.dataRitiro);
       const stop = new Date(start.getTime() + 90 * 60_000);
       await db.$executeRawUnsafe(
@@ -168,7 +153,7 @@ async function main() {
       index += 1;
     }
     for (let movement = 0; movement < 3; movement++) {
-      const start = new Date(`${assignedTrips[movement].dataRitiro}`);
+      const start = new Date(`${firstTrips[movement].dataRitiro}`);
       start.setUTCHours(5, 0, 0, 0);
       const stop = new Date(start.getTime() + 5 * 60_000);
       await db.$executeRawUnsafe(
@@ -182,7 +167,39 @@ async function main() {
         stop
       );
     }
+    // Due viaggi Geotab reali senza un viaggio pagato che li giustifichi.
+    for (let empty = 0; empty < 2; empty++) {
+      const start = new Date("2026-10-20T08:00:00.000Z");
+      start.setUTCHours(8 + empty, 0, 0, 0);
+      const stop = new Date(start.getTime() + 60 * 60_000);
+      await db.$executeRawUnsafe(
+        `INSERT INTO "GeotabTripSnapshot"
+          ("companyId", "connectionId", "geotabTripId", "licensePlate", "startAt", "stopAt", "distanceKm", "drivingSeconds", "idlingSeconds")
+         VALUES ($1, 'e2e-connection', $2, $3, $4, $5, $6, '3000', '300')`,
+        companyId,
+        `e2e-stmt-empty-${empty}`,
+        vehicle.targa,
+        start,
+        stop,
+        25 + empty * 5
+      );
+    }
 
+    const autoMatch = await admin.req(`/api/trips/import/${statementId}/auto-match`, {
+      method: "POST",
+    });
+    assert(
+      autoMatch.status === 200,
+      `POST auto-match 200 (${autoMatch.status}) ${JSON.stringify(autoMatch.body).slice(0, 300)}`
+    );
+    assert(
+      autoMatch.body.autoMatch.matchedVehicles === 5,
+      `auto-match: 5 mezzi collegati (${autoMatch.body.autoMatch.matchedVehicles})`
+    );
+    assert(autoMatch.body.autoMatch.emptyTrips === 2, "auto-match: 2 viaggi a vuoto");
+    assert(autoMatch.body.autoMatch.emptyKm > 0, "auto-match: km a vuoto calcolati");
+
+    console.log("6) Analisi Geotab, km a vuoto e stima adattiva...");
     const analyticsRes = await admin.req(`/api/trips/import/${statementId}/analytics`);
     assert(analyticsRes.status === 200, `GET analisi 200 (${analyticsRes.status})`);
     const analytics = analyticsRes.body.analytics;
@@ -192,10 +209,35 @@ async function main() {
     assert(analytics.geotab.available === true, "analisi: dati Geotab disponibili");
     assert(analytics.geotab.movementCount === 3, "analisi: 3 micro-spostamenti esclusi");
     assert(analytics.geotab.matchedTrips === 5, `analisi: 5 viaggi collegati (${analytics.geotab.matchedTrips})`);
+    assert(analytics.geotab.emptyTrips === 2, "analisi: 2 viaggi a vuoto");
+    assert(analytics.geotab.emptyKm > 0, "analisi: km a vuoto espliciti");
     assert(analytics.geotab.totalKm > 0, "analisi: km Geotab calcolati");
-    assert(analytics.geotab.unallocatedKm >= 0, "analisi: km non attribuiti calcolati");
-    assert(Math.abs(analytics.projectedYear - 93480) < 0.01, "analisi: stima 12 mesi 93.480 €");
+    assert(analytics.forecast.monthsUsed === 1, "forecast: 1 mese importato");
+    assert(analytics.forecast.confidence === "BASSA", "forecast: affidabilità bassa con un mese");
+    assert(Math.abs(analytics.forecast.projected12m - 93480) < 0.01, "forecast: stima 12 mesi 93.480 €");
     assert(analytics.topRevenuePerKm.length > 0, "analisi: resa €/km calcolata");
+
+    const firstTripId = firstTrips[0].id;
+    const recommendations = await admin.req(`/api/trips/${firstTripId}/recommendations`);
+    assert(recommendations.status === 200, `GET consigli 200 (${recommendations.status})`);
+    assert(recommendations.body.vehicles.length > 0, "consigli: mezzi proposti");
+    assert(
+      recommendations.body.vehicles.every((vehicle: { reasons: string[] }) => vehicle.reasons.length > 0),
+      "consigli: motivazioni mezzo presenti"
+    );
+    assert(recommendations.body.drivers.length > 0, "consigli: autisti proposti");
+
+    const assigned = await admin.req(`/api/trips/${firstTripId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        driverId: driver.id,
+        vehicleId: vehicle.id,
+        status: "COMPLETATO",
+        eventNote: "e2e rendiconto",
+      }),
+    });
+    assert(assigned.status === 200, `PATCH assegnazione autista 200 (${assigned.status})`);
+    assert(assigned.body.trip.driver?.id === driver.id, "autista collegato al viaggio");
 
     const driverClient = makeClient(3000, await login(3000, DRIVER.email, DRIVER.password));
     const driverTrips = await driverClient.req("/api/autista/trips");

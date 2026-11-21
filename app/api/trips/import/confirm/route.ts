@@ -6,6 +6,7 @@ import {
   importTripStatement,
   markTripStatementImported,
 } from "@/lib/trip-statements";
+import { autoMatchStatement } from "@/lib/trip-auto-match";
 
 export async function POST(req: Request) {
   const guard = await requireFeature("trips");
@@ -55,6 +56,13 @@ export async function POST(req: Request) {
     );
   }
 
+  let autoMatch = null;
+  try {
+    autoMatch = await autoMatchStatement(session.user.companyId, statement.id);
+  } catch {
+    autoMatch = null;
+  }
+
   await db.auditLog.create({
     data: {
       userId: session.user.id,
@@ -66,6 +74,8 @@ export async function POST(req: Request) {
         requested: codes.length,
         imported: result.imported.length,
         skipped: result.skipped.length,
+        autoMatched: autoMatch?.matchedVehicles ?? 0,
+        autoMatchedDrivers: autoMatch?.matchedDrivers ?? 0,
       },
     },
   });
@@ -74,5 +84,6 @@ export async function POST(req: Request) {
     imported: result.imported.length,
     skipped: result.skipped,
     trips: result.imported,
+    autoMatch,
   });
 }
