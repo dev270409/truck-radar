@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireFeature } from "@/lib/api-guard";
+import { getEarningsForecast } from "@/lib/trip-forecast";
 import { listTripStatements } from "@/lib/trip-statements";
 
 export async function GET() {
@@ -9,7 +10,10 @@ export async function GET() {
     return NextResponse.json({ error: "Operazione riservata alla sede." }, { status: 403 });
   }
 
-  const items = await listTripStatements(guard.session.user.companyId, 20);
+  const [items, forecast] = await Promise.all([
+    listTripStatements(guard.session.user.companyId, 20),
+    getEarningsForecast(guard.session.user.companyId),
+  ]);
   return NextResponse.json({
     items: items.map((item) => ({
       id: item.id,
@@ -21,9 +25,11 @@ export async function GET() {
       parsedTrips: item.parsedTrips,
       importedTrips: item.importedTrips,
       parsedTotal: item.parsedTotal,
+      parserMode: item.parserMode,
       status: item.status,
       createdAt: item.createdAt,
       importedAt: item.importedAt,
     })),
+    forecast,
   });
 }

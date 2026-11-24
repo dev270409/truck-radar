@@ -202,7 +202,7 @@ export interface FuelEstimate {
 }
 
 /** Consumo pieno-pieno: litri tra due pieni / km tra i due odometri. */
-function realConsumption(rows: FuelLogRow[]): { kmPerLitro: number; segments: number } | null {
+export function realConsumption(rows: FuelLogRow[]): { kmPerLitro: number; segments: number } | null {
   const sorted = [...rows].sort((a, b) => a.odometerKm - b.odometerKm);
   const fulls = sorted.filter((row) => row.pieno);
   const values: number[] = [];
@@ -225,7 +225,7 @@ function realConsumption(rows: FuelLogRow[]): { kmPerLitro: number; segments: nu
   };
 }
 
-function fuelPrice(rows: FuelLogRow[]): number | null {
+export function fuelPrice(rows: FuelLogRow[]): number | null {
   const liters = rows.reduce((sum, row) => sum + row.litri, 0);
   const cost = rows.reduce((sum, row) => sum + row.costo, 0);
   return liters > 0 && cost > 0 ? cost / liters : null;

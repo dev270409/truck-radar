@@ -96,6 +96,11 @@ export default function TripsPage() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [forecast, setForecast] = useState<{
+    monthsUsed: number;
+    projected12m: number;
+    confidence: string;
+  } | null>(null);
   const [assignTrip, setAssignTrip] = useState<Trip | null>(null);
   const [assignDriverId, setAssignDriverId] = useState("");
   const [assignVehicleId, setAssignVehicleId] = useState("");
@@ -149,9 +154,26 @@ export default function TripsPage() {
     }
   };
 
+  const fetchForecast = async () => {
+    try {
+      const res = await fetch("/api/trips/import");
+      const data = await res.json();
+      if (res.ok && data.forecast) {
+        setForecast({
+          monthsUsed: data.forecast.monthsUsed,
+          projected12m: data.forecast.projected12m,
+          confidence: data.forecast.confidence,
+        });
+      }
+    } catch {
+      /* la stima è un extra */
+    }
+  };
+
   useEffect(() => {
     fetchTrips();
     fetchOptions();
+    fetchForecast();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -325,6 +347,26 @@ export default function TripsPage() {
       </div>
 
       <TripSubnav active="trips" />
+
+      {forecast && forecast.monthsUsed > 0 && (
+        <Link
+          href="/dashboard/trips/importa"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition hover:bg-emerald-950/30"
+        >
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-200/70">
+              Stima 12 mesi · {forecast.monthsUsed} mes{forecast.monthsUsed === 1 ? "e" : "i"}
+            </p>
+            <p className="font-display text-lg font-bold text-emerald-100">
+              € {Math.round(forecast.projected12m).toLocaleString("it-IT")}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] text-emerald-200/70">Affidabilità {forecast.confidence.toLowerCase()}</p>
+            <p className="text-[11px] font-semibold text-emerald-200">Apri rendiconti e analisi →</p>
+          </div>
+        </Link>
+      )}
 
       {/* Trips Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">

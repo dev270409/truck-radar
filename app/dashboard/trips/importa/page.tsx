@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -96,6 +96,32 @@ interface AutoMatchSummary {
   emptyKm: number;
 }
 
+interface ForecastSummary {
+  monthsUsed: number;
+  statementsUsed: number;
+  totalImported: number;
+  avgMonthly: number;
+  projected12m: number;
+  confidence: "BASSA" | "MEDIA" | "ALTA";
+  note: string;
+}
+
+interface HistoryItem {
+  id: string;
+  fileName: string;
+  provider: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  declaredTrips: number | null;
+  parsedTrips: number;
+  importedTrips: number;
+  parsedTotal: number;
+  parserMode: string;
+  status: string;
+  createdAt: string;
+  importedAt: string | null;
+}
+
 const eur = (value: number) =>
   `€ ${Number(value).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -119,6 +145,47 @@ export default function ImportaRendicontoPage() {
   } | null>(null);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [forecast, setForecast] = useState<ForecastSummary | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
+  const loadHistory = async () => {
+    try {
+      const res = await fetch("/api/trips/import");
+      const data = await res.json();
+      if (res.ok) {
+        setHistory(Array.isArray(data.items) ? data.items : []);
+        setForecast(data.forecast ?? null);
+      }
+    } catch {
+      /* lo storico è un extra: la pagina resta utilizzabile */
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadHistory();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const openHistoryAnalytics = async (id: string) => {
+    setAnalyticsLoading(true);
+    setAnalytics(null);
+    setError("");
+    try {
+      const res = await fetch(`/api/trips/import/${id}/analytics`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore nel caricamento dell'analisi.");
+      setAnalytics(data.analytics ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   const duplicates = useMemo(() => new Set(result?.duplicates ?? []), [result]);
 
@@ -200,6 +267,7 @@ export default function ImportaRendicontoPage() {
       } finally {
         setAnalyticsLoading(false);
       }
+      await loadHistory();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -237,6 +305,100 @@ export default function ImportaRendicontoPage() {
           {error}
         </div>
       )}
+
+      {forecast && forecast.monthsUsed > 0 && (
+        <section className="ops-card flex flex-wrap items-center justify-between gap-3 p-4">
+          <div>
+            <p className="ops-label">Stima 12 mesi · si aggiorna a ogni rendiconto</p>
+            <p className="font-display mt-1 text-2xl font-bold" style={{ color: "var(--text)" }}>
+              {eur(forecast.projected12m)}
+            </p>
+            <p className="mt-1 max-w-2xl text-[11px]" style={{ color: "var(--text-label)" }}>
+              {forecast.note}
+            </p>
+          </div>
+          <span className="chip chip-brand">
+            {forecast.monthsUsed} mes{forecast.monthsUsed === 1 ? "e" : "i"} · {forecast.confidence.toLowerCase()}
+          </span>
+        </section>
+      )}
+
+      <section className="ops-card overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
+          <div>
+            <p className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+              Rendiconti importati
+            </p>
+            <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
+              Storico dei PDF caricati: riapri l&apos;analisi senza reimportare.
+            </p>
+          </div>
+          <span className="chip chip-brand">{history.length}</span>
+        </div>
+
+        {historyLoading ? (
+          <div className="flex items-center gap-2 p-6 text-[12px]" style={{ color: "var(--text-label)" }}>
+            <Loader2 className="h-4 w-4 animate-spin" /> Caricamento storico…
+          </div>
+        ) : history.length === 0 ? (
+          <p className="p-6 text-[12px]" style={{ color: "var(--text-label)" }}>
+            Nessun rendiconto ancora importato. Carica il primo PDF qui sotto.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="ops-table w-full text-left">
+              <thead>
+                <tr>
+                  <th>Periodo</th>
+                  <th>Provider</th>
+                  <th>Viaggi</th>
+                  <th className="text-right">Totale</th>
+                  <th>Stato</th>
+                  <th className="text-right">Analisi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item) => (
+                  <tr key={item.id}>
+                    <td className="whitespace-nowrap text-[12px]" style={{ color: "var(--text)" }}>
+                      {item.periodStart && item.periodEnd
+                        ? `${prettyDate(item.periodStart)} – ${prettyDate(item.periodEnd)}`
+                        : item.fileName}
+                    </td>
+                    <td className="text-[12px]" style={{ color: "var(--text-soft)" }}>
+                      {item.provider ?? "—"}
+                      {item.parserMode === "AI" && (
+                        <span className="ml-2 chip chip-brand" style={{ fontSize: 8 }}>AI</span>
+                      )}
+                    </td>
+                    <td className="text-[12px]" style={{ color: "var(--text-soft)" }}>
+                      {item.importedTrips}/{item.parsedTrips}
+                    </td>
+                    <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>
+                      {eur(item.parsedTotal)}
+                    </td>
+                    <td>
+                      <span className={`chip ${item.status === "IMPORTED" ? "chip-success" : "chip-warning"}`} style={{ fontSize: 8 }}>
+                        {item.status === "IMPORTED" ? "Importato" : "Bozza"}
+                      </span>
+                    </td>
+                    <td className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => void openHistoryAnalytics(item.id)}
+                        className="text-[11px] font-semibold"
+                        style={{ color: "var(--brand)" }}
+                      >
+                        Apri analisi
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {imported && (
         <div

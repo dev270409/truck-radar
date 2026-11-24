@@ -1,109 +1,348 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { BarChart3, Loader2, TrendingDown, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  Fuel,
+  Loader2,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { label } from "@/lib/labels";
 
-interface Vehicle {
-  id: string;
+interface BenchmarkVehicle {
+  vehicleId: string;
   targa: string;
   categoria: string;
+  km: number;
+  kmSource: "GEOTAB" | "TRIPKM" | "NESSUNO";
+  geotabTrips: number;
+  paidTrips: number;
+  coveragePct: number;
+  fuelLiters: number;
+  fuelCost: number;
+  fuelSource: "RIFORNIMENTI" | "STIMA" | "NESSUNO";
+  kmPerLitro: number | null;
+  otherCost: number;
+  totalCost: number;
+  costPerKm: number | null;
+  revenue: number;
+  revenuePerKm: number | null;
+  marginPerKm: number | null;
+  avgRevenuePerTrip: number | null;
+  vsCompanyCostPct: number | null;
+  vsCompanyRevenuePct: number | null;
 }
 
-interface Cost {
-  vehicleId: string;
-  importo: number;
-}
-
-interface FuelStat {
-  vehicleId: string;
-  costo: number;
-  kmPercorsi: number;
+interface BenchmarkCategory {
+  categoria: string;
+  vehicles: number;
+  km: number;
+  geotabTrips: number;
+  paidTrips: number;
+  coveragePct: number;
+  fuelCost: number;
+  otherCost: number;
+  totalCost: number;
+  costPerKm: number | null;
+  revenue: number;
+  revenuePerKm: number | null;
+  marginPerKm: number | null;
   kmPerLitro: number | null;
 }
 
-const eur = (n: number) => `€ ${n.toFixed(2)}`;
+interface Benchmark {
+  periodMonths: number;
+  from: string;
+  to: string;
+  totals: {
+    km: number;
+    geotabTrips: number;
+    paidTrips: number;
+    coveragePct: number;
+    fuelCost: number;
+    otherCost: number;
+    totalCost: number;
+    costPerKm: number | null;
+    revenue: number;
+    revenuePerKm: number | null;
+    marginPerKm: number | null;
+  };
+  categories: BenchmarkCategory[];
+  vehicles: BenchmarkVehicle[];
+  forecast: {
+    monthsUsed: number;
+    projected12m: number;
+    confidence: "BASSA" | "MEDIA" | "ALTA";
+    note: string;
+  };
+  warnings: string[];
+}
+
+const eur = (value: number | null | undefined) =>
+  value == null
+    ? "—"
+    : `€ ${value.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const kmValue = (value: number) =>
+  `${value.toLocaleString("it-IT", { maximumFractionDigits: 0 })} km`;
 
 export default function BenchmarkPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [costs, setCosts] = useState<Cost[]>([]);
-  const [fuel, setFuel] = useState<FuelStat[]>([]);
+  const [benchmark, setBenchmark] = useState<Benchmark | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([fetch("/api/vehicles"), fetch("/api/vehicles/costs"), fetch("/api/fuel")])
-      .then(async ([v, c, f]) => {
-        const vData = await v.json();
-        const cData = await c.json();
-        const fData = await f.json();
-        if (vData.vehicles) setVehicles(vData.vehicles);
-        if (cData.items) setCosts(cData.items);
-        if (fData.stats?.perVehicle) setFuel(fData.stats.perVehicle);
-      })
-      .finally(() => setLoading(false));
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/benchmark");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Errore nel calcolo del benchmark.");
+        setBenchmark(data.benchmark);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoading(false);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
-
-  const rows = useMemo(() => {
-    const byCat = new Map<string, { categoria: string; vehicles: number; km: number; total: number; costPerKm: number; kmPerL: number | null }>();
-    for (const v of vehicles) {
-      const f = fuel.find((x) => x.vehicleId === v.id);
-      const other = costs.filter((c) => c.vehicleId === v.id).reduce((s, c) => s + c.importo, 0);
-      const total = (f?.costo ?? 0) + other;
-      const km = f?.kmPercorsi ?? 0;
-      const current = byCat.get(v.categoria) ?? { categoria: v.categoria, vehicles: 0, km: 0, total: 0, costPerKm: 0, kmPerL: null };
-      current.vehicles += 1;
-      current.km += km;
-      current.total += total;
-      byCat.set(v.categoria, current);
-    }
-    return [...byCat.values()]
-      .map((r) => ({
-        ...r,
-        costPerKm: r.km > 0 ? r.total / r.km : 0,
-        kmPerL: (() => {
-          const stats = vehicles
-            .filter((v) => v.categoria === r.categoria)
-            .map((v) => fuel.find((f) => f.vehicleId === v.id)?.kmPerLitro)
-            .filter((n): n is number => n != null && n > 0);
-          return stats.length > 0 ? stats.reduce((s, n) => s + n, 0) / stats.length : null;
-        })(),
-      }))
-      .sort((a, b) => a.costPerKm - b.costPerKm);
-  }, [vehicles, costs, fuel]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="flex items-center text-2xl font-bold text-slate-100">
-          <BarChart3 className="mr-2.5 h-6 w-6 text-indigo-400" /> Benchmark costi/km
-        </h1>
-        <p className="mt-1 text-sm text-slate-400">Confronta costo al chilometro e consumo per categoria di mezzo.</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="ops-label">Analisi automatica</p>
+          <h1 className="ops-title mt-1 flex items-center gap-2 text-2xl">
+            <BarChart3 className="h-6 w-6" style={{ color: "var(--brand)" }} /> Benchmark flotta
+          </h1>
+          <p className="ops-subtitle mt-1 max-w-3xl text-[13px]">
+            Costo/km, ricavo/km, margine, consumi e copertura dei rendiconti calcolati dai dati reali
+            di Geotab, rifornimenti, costi mezzi e viaggi importati. Si aggiorna a ogni nuovo dato.
+          </p>
+        </div>
+        <Link href="/dashboard/trips/importa" className="ops-btn ops-btn--secondary ops-btn--sm">
+          Importa rendiconto <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Calcolo...</div>
-      ) : rows.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-sm text-slate-500">Servono mezzi, rifornimenti e costi registrati.</div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {rows.map((r, idx) => (
-            <div key={r.categoria} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-              <div className="flex items-center justify-between">
-                <p className="font-display text-lg font-bold text-slate-100">{label(r.categoria)}</p>
-                {idx === 0 ? <TrendingUp className="h-5 w-5 text-emerald-400" /> : idx === rows.length - 1 ? <TrendingDown className="h-5 w-5 text-red-400" /> : null}
-              </div>
-              <p className="mt-3 text-3xl font-bold text-slate-100">{r.costPerKm > 0 ? eur(r.costPerKm) : "—"}<span className="ml-1 text-sm font-normal text-slate-500">/km</span></p>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-400">
-                <p>Mezzi: <b className="text-slate-200">{r.vehicles}</b></p>
-                <p>Km: <b className="text-slate-200">{r.km.toLocaleString("it-IT")}</b></p>
-                <p>Costo: <b className="text-slate-200">€ {r.total.toLocaleString("it-IT")}</b></p>
-                <p>Consumo: <b className="text-slate-200">{r.kmPerL != null ? `${r.kmPerL.toFixed(2)} km/l` : "—"}</b></p>
-              </div>
-            </div>
-          ))}
+      {error && (
+        <div
+          className="rounded-[12px] border p-3 text-[13px]"
+          style={{ borderColor: "var(--danger)", color: "var(--danger)", background: "var(--surface)" }}
+        >
+          {error}
         </div>
       )}
-      <p className="text-xs text-slate-500">Il costo/km include gasolio registrato e costi mezzi (gomme, officina, tagliando, assicurazione, bollo, pedaggi, altro). Non include il costo autista.</p>
+
+      {loading ? (
+        <div className="ops-card flex items-center justify-center gap-2 p-12 text-[13px]" style={{ color: "var(--text-label)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" /> Calcolo benchmark…
+        </div>
+      ) : !benchmark ? (
+        <div className="ops-card p-10 text-center text-[13px]" style={{ color: "var(--text-label)" }}>
+          Nessun dato disponibile.
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <Kpi label={`Km reali (${benchmark.periodMonths} mesi)`} value={kmValue(benchmark.totals.km)} tone="var(--info)" />
+            <Kpi label="Costo/km" value={eur(benchmark.totals.costPerKm)} tone="var(--warning)" />
+            <Kpi label="Ricavo/km" value={eur(benchmark.totals.revenuePerKm)} tone="var(--success)" />
+            <Kpi
+              label="Margine/km"
+              value={eur(benchmark.totals.marginPerKm)}
+              tone={(benchmark.totals.marginPerKm ?? 0) >= 0 ? "var(--success)" : "var(--danger)"}
+            />
+            <Kpi
+              label={`Stima 12 mesi · ${benchmark.forecast.monthsUsed} mesi`}
+              value={`€ ${Math.round(benchmark.forecast.projected12m).toLocaleString("it-IT")}`}
+              tone="var(--brand)"
+            />
+          </div>
+
+          {benchmark.warnings.length > 0 && (
+            <div
+              className="rounded-[12px] border p-3 text-[12px]"
+              style={{ borderColor: "var(--warning)", color: "var(--warning)", background: "var(--surface)" }}
+            >
+              <p className="flex items-center gap-2 font-semibold">
+                <AlertTriangle className="h-4 w-4" /> Come leggere questi numeri
+              </p>
+              <ul className="mt-1 list-inside list-disc">
+                {benchmark.warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <section>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="ops-label">Benchmark per categoria</h2>
+              <span className="text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+                {benchmark.from} → {benchmark.to}
+              </span>
+            </div>
+            {benchmark.categories.length === 0 ? (
+              <div className="ops-card p-8 text-center text-[12px]" style={{ color: "var(--text-label)" }}>
+                Servono mezzi, km Geotab e almeno un rendiconto importato.
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {benchmark.categories.map((category, index) => (
+                  <div key={category.categoria} className="ops-card p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+                        {label(category.categoria)}
+                      </p>
+                      {index === 0 ? (
+                        <TrendingUp className="h-4 w-4" style={{ color: "var(--success)" }} />
+                      ) : index === benchmark.categories.length - 1 ? (
+                        <TrendingDown className="h-4 w-4" style={{ color: "var(--danger)" }} />
+                      ) : null}
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
+                      <Metric label="Costo/km" value={eur(category.costPerKm)} />
+                      <Metric label="Ricavo/km" value={eur(category.revenuePerKm)} />
+                      <Metric
+                        label="Margine/km"
+                        value={eur(category.marginPerKm)}
+                        tone={(category.marginPerKm ?? 0) >= 0 ? "var(--success)" : "var(--danger)"}
+                      />
+                      <Metric label="Consumo" value={category.kmPerLitro ? `${category.kmPerLitro} km/l` : "—"} />
+                      <Metric label="Km" value={kmValue(category.km)} />
+                      <Metric label="Mezzi" value={String(category.vehicles)} />
+                    </div>
+                    <div className="mt-3 flex items-center justify-between border-t pt-2 text-[10px]" style={{ borderColor: "var(--surface-border)" }}>
+                      <span style={{ color: "var(--text-label)" }}>
+                        {category.paidTrips}/{category.geotabTrips} viaggi collegati
+                      </span>
+                      <span
+                        className={`chip ${category.coveragePct >= 80 ? "chip-success" : "chip-warning"}`}
+                        style={{ fontSize: 8 }}
+                      >
+                        {category.coveragePct}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="ops-card overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
+              <div>
+                <h2 className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+                  Dettaglio per mezzo
+                </h2>
+                <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
+                  Confronto con la media aziendale. Carburante stimato se mancano rifornimenti.
+                </p>
+              </div>
+              <span className="chip chip-brand">{benchmark.vehicles.length} mezzi</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="ops-table w-full text-left">
+                <thead>
+                  <tr>
+                    <th>Mezzo</th>
+                    <th className="text-right">Km</th>
+                    <th className="text-right">Costo/km</th>
+                    <th className="text-right">Ricavo/km</th>
+                    <th className="text-right">Margine/km</th>
+                    <th className="text-right">Consumo</th>
+                    <th className="text-right">Copertura</th>
+                    <th>Fonti</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {benchmark.vehicles.map((vehicle) => (
+                    <tr key={vehicle.vehicleId}>
+                      <td>
+                        <p className="font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>
+                          {vehicle.targa}
+                        </p>
+                        <p className="text-[10px]" style={{ color: "var(--text-label)" }}>{label(vehicle.categoria)}</p>
+                      </td>
+                      <td className="text-right text-[12px]" style={{ color: "var(--text-soft)" }}>{kmValue(vehicle.km)}</td>
+                      <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>
+                        {eur(vehicle.costPerKm)}
+                        {vehicle.vsCompanyCostPct != null && (
+                          <span className="block text-[9px]" style={{ color: vehicle.vsCompanyCostPct <= 0 ? "var(--success)" : "var(--danger)" }}>
+                            {vehicle.vsCompanyCostPct > 0 ? "+" : ""}{vehicle.vsCompanyCostPct}% vs media
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>
+                        {eur(vehicle.revenuePerKm)}
+                        {vehicle.vsCompanyRevenuePct != null && (
+                          <span className="block text-[9px]" style={{ color: vehicle.vsCompanyRevenuePct >= 0 ? "var(--success)" : "var(--danger)" }}>
+                            {vehicle.vsCompanyRevenuePct > 0 ? "+" : ""}{vehicle.vsCompanyRevenuePct}% vs media
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-right font-mono text-[12px]" style={{ color: (vehicle.marginPerKm ?? 0) >= 0 ? "var(--success)" : "var(--danger)" }}>
+                        {eur(vehicle.marginPerKm)}
+                      </td>
+                      <td className="text-right text-[12px]" style={{ color: "var(--text-soft)" }}>
+                        {vehicle.kmPerLitro ? `${vehicle.kmPerLitro} km/l` : "—"}
+                      </td>
+                      <td className="text-right">
+                        <span className={`chip ${vehicle.coveragePct >= 80 ? "chip-success" : "chip-warning"}`} style={{ fontSize: 8 }}>
+                          {vehicle.coveragePct}%
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="chip chip-info" style={{ fontSize: 8 }} title="Fonte km">
+                            {vehicle.kmSource === "GEOTAB" ? "Geotab" : vehicle.kmSource === "TRIPKM" ? "Viaggi" : "No km"}
+                          </span>
+                          <span className="chip chip-warning" style={{ fontSize: 8 }} title="Fonte carburante">
+                            <Fuel className="mr-0.5 inline h-2.5 w-2.5" />
+                            {vehicle.fuelSource === "RIFORNIMENTI" ? "Reale" : vehicle.fuelSource === "STIMA" ? "Stima" : "—"}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <p className="text-[11px]" style={{ color: "var(--text-label-soft)" }}>
+            Il costo/km include carburante (reale o stimato) e costi mezzi registrati; non include il
+            costo autista. Il ricavo/km usa solo i rendiconti importati: più mesi/provider importi,
+            più il margine diventa preciso.
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Kpi({ label: title, value, tone }: { label: string; value: string; tone: string }) {
+  return (
+    <div className="ops-card p-4">
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full" style={{ background: tone }} />
+        <p className="ops-label">{title}</p>
+      </div>
+      <p className="font-display mt-2 text-[17px] font-bold" style={{ color: "var(--text)" }}>{value}</p>
+    </div>
+  );
+}
+
+function Metric({ label: title, value, tone }: { label: string; value: string; tone?: string }) {
+  return (
+    <div>
+      <p className="ops-label" style={{ fontSize: 9 }}>{title}</p>
+      <p className="font-mono font-semibold" style={{ color: tone ?? "var(--text)" }}>{value}</p>
     </div>
   );
 }

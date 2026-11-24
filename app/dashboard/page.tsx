@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { normalizeDeadlineSettings } from "@/lib/deadline-settings";
+import { getEarningsForecast } from "@/lib/trip-forecast";
 import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
@@ -122,6 +123,7 @@ export default async function DashboardPage() {
   const deadlineSettings = normalizeDeadlineSettings(company?.deadlineSettings);
   const alertsMissing =
     deadlineSettings.alertsEnabled && deadlineSettings.alertEmails.length === 0;
+  const earningsForecast = await getEarningsForecast(session.user.companyId);
 
   // Una sola azione consigliata: prima le eccezioni che bloccano il lavoro,
   // poi la conformità, poi il commerciale. Evita che l'utente debba scegliere
@@ -262,6 +264,28 @@ export default async function DashboardPage() {
           {nextAction.cta} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </section>
+
+      {earningsForecast.monthsUsed > 0 && (
+        <Link
+          href="/dashboard/trips/importa"
+          className="ops-card enter-up flex flex-wrap items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5"
+          style={{ animationDelay: "30ms" }}
+        >
+          <div>
+            <p className="ops-label">Stima 12 mesi · rendiconti viaggi</p>
+            <p className="font-display mt-1 text-[22px] font-bold" style={{ color: "var(--text)" }}>
+              € {Math.round(earningsForecast.projected12m).toLocaleString("it-IT")}
+            </p>
+            <p className="mt-0.5 max-w-2xl text-[11px]" style={{ color: "var(--text-label)" }}>
+              {earningsForecast.note}
+            </p>
+          </div>
+          <span className="chip chip-brand">
+            {earningsForecast.monthsUsed} mes{earningsForecast.monthsUsed === 1 ? "e" : "i"} ·{" "}
+            {earningsForecast.confidence.toLowerCase()}
+          </span>
+        </Link>
+      )}
 
       {alertsMissing && (
         <Link

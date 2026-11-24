@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3, KeyRound, Copy } from "lucide-react";
+import { Users, Plus, ShieldCheck, UserCheck, Loader2, BarChart3, KeyRound, Copy, UserPlus } from "lucide-react";
 import { label } from "@/lib/labels";
 import { PERMISSION_GROUPS, type PermissionKey } from "@/lib/permissions-catalog";
 
@@ -189,7 +189,10 @@ export default function UsersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/dashboard/users/geotab" className="bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 text-sm font-semibold px-4 py-2.5 rounded-xl border border-emerald-800/60 flex items-center space-x-2 transition">
+            <UserPlus className="w-4 h-4" /><span>Importa da Geotab</span>
+          </Link>
           <Link href="/dashboard/analytics?scope=autista" className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
             <BarChart3 className="w-4 h-4" /><span>Analisi autisti</span>
           </Link>

@@ -903,6 +903,21 @@ const statements = [
   ALTER TABLE "TripGeotabMatch" ADD COLUMN IF NOT EXISTS confidence TEXT;
   ALTER TABLE "TripStatement" ADD COLUMN IF NOT EXISTS "parserMode" TEXT NOT NULL DEFAULT 'DETERMINISTIC';
   `,
+
+  // Autisti presenti in Geotab, confermati dall'admin e collegati a un utente
+  `
+  CREATE TABLE IF NOT EXISTS "GeotabDriverLink" (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    "companyId" TEXT NOT NULL,
+    "geotabDriverId" TEXT NOT NULL,
+    "driverName" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE ("companyId", "geotabDriverId")
+  );
+  CREATE INDEX IF NOT EXISTS "GeotabDriverLink_company_idx" ON "GeotabDriverLink"("companyId");
+  CREATE INDEX IF NOT EXISTS "GeotabDriverLink_user_idx" ON "GeotabDriverLink"("userId");
+  `,
 ];
 
 async function main() {

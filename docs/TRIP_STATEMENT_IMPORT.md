@@ -90,6 +90,15 @@ Endpoint: `GET /api/trips/import/:id/analytics`.
 
 La stima si aggiorna automaticamente a ogni nuovo rendiconto. Sul solo ottobre TAROS: 7.790 €/mese → **93.480 €/anno**, affidabilità bassa.
 
+Dove si vede:
+
+- card **Stima 12 mesi** nella home;
+- card nella pagina **Viaggi**;
+- card e storico **Rendiconti importati** in `/dashboard/trips/importa`;
+- KPI nel **Benchmark flotta**.
+
+Lo storico permette di riaprire l'analisi di un rendiconto già importato senza ricaricare il PDF.
+
 Tabelle: `TripStatement`, `TripStatementLine`, `TripGeotabMatch` (i match automatici vengono salvati con tipo e confidenza).
 
 ## 6. Consigli mezzo e autista
@@ -100,6 +109,10 @@ Nel modale **Assegna** (`GET /api/trips/:id/recommendations`) Truck Radar propon
 - autisti attivi e liberi, con priorità a chi è già associato al mezzo consigliato.
 
 L'admin vede le motivazioni e sceglie: il sistema non assegna mai un autista al posto suo.
+
+### Autisti Geotab
+
+I conducenti presenti nei tracciati Geotab possono essere confermati in **Autisti e team → Importa da Geotab**: Truck Radar crea l'account AUTISTA, genera email di accesso e password temporanea, mostra il messaggio da copiare e collega i viaggi già importati. Dettagli in `docs/GEOTAB_DRIVERS.md`.
 
 ## 7. Stima carburante su dati reali
 
@@ -153,8 +166,8 @@ Eseguito `scripts/import-taros-rendiconto.ts` sull'account `tapesolegto@gmail.co
 
 ## 10. Prossimi passi
 
-1. Creare gli utenti AUTISTA e mapparli ai nomi Geotab per l'assegnazione automatica anche dell'autista.
-2. Migliorare il match ambiguo con geocoding delle tratte (quando il rendiconto non indica l'ora).
-3. Import via email in `viaggi@in.truck-radar.it` e OCR per altri provider.
-4. Costo carburante per singolo viaggio importato.
-5. Pagina storica dei rendiconti con confronto mese su mese.
+1. Migliorare il match ambiguo con geocoding delle tratte (quando il rendiconto non indica l'ora).
+2. Import via email in `viaggi@in.truck-radar.it` e OCR per altri provider.
+3. Costo carburante per singolo viaggio importato.
+4. Confronto mese su mese nella pagina storica dei rendiconti (già presente lo storico).
+5. Benchmark esterni di mercato oltre al confronto interno.
