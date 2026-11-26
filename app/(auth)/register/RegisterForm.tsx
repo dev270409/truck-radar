@@ -131,7 +131,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
           <div className="flex items-center space-x-3">
             <Logo size={40} withWordmark={false} />
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">Truck Radar</h1>
+              <h1 className="text-lg font-semibold tracking-tight">Truck Radar</h1>
               <p className="text-xs text-slate-400">Prova gratuita di 21 giorni</p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
           </p>
         </div>
 
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-[11px] text-slate-300">
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-xs text-slate-300">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Nessuna carta
           </span>
@@ -188,7 +188,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
                   <Icon className="h-4 w-4" />
                   <span className="text-xs font-semibold">{String(index + 1).padStart(2, "0")}</span>
                 </div>
-                <span className="max-w-full truncate text-[11px]">{item.label}</span>
+                <span className="max-w-full truncate text-xs">{item.label}</span>
               </div>
             );
           })}
@@ -263,7 +263,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
             <div className="flex justify-end border-t border-slate-800 pt-4">
               <button
                 type="submit"
-                className="flex items-center space-x-2 rounded-xl bg-blue-600 px-6 py-2.5 font-medium text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-500"
+                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-blue-500"
               >
                 <span>Prosegui</span>
                 <ArrowRight className="h-4 w-4" />
@@ -355,7 +355,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
               </button>
               <button
                 type="submit"
-                className="flex items-center space-x-2 rounded-xl bg-blue-600 px-6 py-2.5 font-medium text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-500"
+                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-blue-500"
               >
                 <span>Prosegui</span>
                 <ArrowRight className="h-4 w-4" />
@@ -372,23 +372,23 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
 
             <div className="grid gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm md:grid-cols-2">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Azienda</p>
+                <p className="text-[11px] font-medium text-slate-500">Azienda</p>
                 <p className="mt-1 font-semibold text-slate-100">{ragioneSociale}</p>
-                <p className="text-xs text-slate-400">P.IVA/CF {partitaIva}</p>
+                <p className="text-xs text-slate-400">P. IVA/CF {partitaIva}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Admin</p>
+                <p className="text-[11px] font-medium text-slate-500">Admin</p>
                 <p className="mt-1 font-semibold text-slate-100">{nome} {cognome}</p>
                 <p className="text-xs text-slate-400">{email}</p>
               </div>
               <div className="md:col-span-2 border-t border-slate-800 pt-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Piano della prova</p>
+                <p className="text-[11px] font-medium text-slate-500">Piano della prova</p>
                 <p className="mt-1 font-semibold text-slate-100">
                   {selectedPlan} · €{planPrice[selectedPlan]} al mese dopo i 21 giorni di prova
                 </p>
               </div>
               <div className="md:col-span-2 border-t border-slate-800 pt-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Cosa succede ora</p>
+                <p className="text-[11px] font-medium text-slate-500">Cosa succede ora</p>
                 <p className="mt-1 text-xs leading-5 text-slate-300">
                   Accedi al piano {selectedPlan} per 21 giorni. Non ti chiediamo documenti adesso: al termine della prova,
                   per continuare, dovrai completare la verifica aziendale (P.IVA/CF) e la verifica identità del legale rappresentante.
@@ -446,7 +446,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
               <CheckCircle2 className="h-10 w-10" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Account creato</h2>
+              <h2 className="text-xl font-semibold text-white">Account creato</h2>
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
                 <span className="font-semibold text-blue-300">{ragioneSociale}</span> è in prova sul piano {selectedPlan} per 21 giorni.
                 Nessun documento richiesto ora.

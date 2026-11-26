@@ -38,6 +38,14 @@
   --map-bg: oklch(0.96 0.02 226);
   --map-grid: oklch(0.29 0.08 250 / 0.12);
 
+  /* bklit UI chart variables (light) */
+  --chart-line-primary: var(--brand);
+  --chart-grid: oklch(0.29 0.08 250 / 0.08);
+  --chart-label: var(--text-label);
+  --chart-tooltip-background: var(--surface-strong);
+  --chart-tooltip-foreground: var(--text);
+  --chart-tooltip-muted: var(--text-label);
+
   --radius-base: 10px;
   --radius-card: 14px;
   --radius-pill: 999px;
@@ -77,6 +85,14 @@
   --map-bg: oklch(0.22 0.03 240);
   --map-grid: oklch(1 0 0 / 0.12);
 
+  /* bklit UI chart variables (dark) */
+  --chart-line-primary: var(--brand);
+  --chart-grid: oklch(1 0 0 / 0.08);
+  --chart-label: var(--text-label);
+  --chart-tooltip-background: var(--surface-strong);
+  --chart-tooltip-foreground: var(--text);
+  --chart-tooltip-muted: var(--text-label);
+
   color-scheme: dark;
 }
 
@@ -105,6 +121,12 @@
   --radius-base: var(--radius-base);
   --radius-card: var(--radius-card);
   --radius-pill: var(--radius-pill);
+
+  /* bklit UI chart theming */
+  --color-chart-label: var(--text-label);
+  --color-chart-tooltip-background: var(--surface-strong);
+  --color-chart-tooltip-foreground: var(--text);
+  --color-chart-tooltip-muted: var(--text-label);
 }
 
 * {

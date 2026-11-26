@@ -388,7 +388,7 @@ export default function TripsPage() {
           </Link>
           <button
             onClick={openAddModal}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center space-x-2 transition"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Aggiungi viaggio</span>
@@ -401,13 +401,13 @@ export default function TripsPage() {
       {forecast && forecast.monthsUsed > 0 && (
         <Link
           href="/dashboard/trips/importa"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition hover:bg-emerald-950/30"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition-colors hover:bg-emerald-950/30"
         >
           <div>
             <p className="text-xs font-semibold text-emerald-200/70">
               Stima 12 mesi · {forecast.monthsUsed} mes{forecast.monthsUsed === 1 ? "e" : "i"}
             </p>
-            <p className="font-display text-lg font-bold text-emerald-100">
+            <p className="font-display text-lg font-semibold text-emerald-100">
               € {Math.round(forecast.projected12m).toLocaleString("it-IT")}
             </p>
           </div>
@@ -541,7 +541,7 @@ export default function TripsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}>
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}>
                         {label(t.status)}
                       </span>
                     </td>
@@ -587,11 +587,11 @@ export default function TripsPage() {
 
       {/* Quick assign modal */}
       {assignTrip && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-lg font-bold text-slate-100 flex items-center">
+                <h3 className="text-lg font-semibold text-slate-100 flex items-center">
                   <UserPlus className="w-5 h-5 mr-2 text-emerald-400" /> Assegna viaggio
                 </h3>
                 <p className="mt-1 text-xs text-slate-400">
@@ -623,7 +623,7 @@ export default function TripsPage() {
 
             {suggestions && (
               <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Consigliati</p>
+                <p className="text-xs font-semibold text-slate-400">Consigliati</p>
                 {suggestions.vehicles.length > 0 && (
                   <div className="mt-2">
                     <p className="text-[10px] font-semibold text-slate-500">Mezzi</p>
@@ -683,7 +683,7 @@ export default function TripsPage() {
 
             <form onSubmit={saveAssign} className="space-y-3 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Autista *
                 </label>
                 <select
@@ -702,7 +702,7 @@ export default function TripsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Mezzo (opzionale)
                 </label>
                 <select
@@ -762,10 +762,10 @@ export default function TripsPage() {
 
       {/* Add Trip Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-100 flex items-center">
-              <Route className="w-5 h-5 mr-2 text-blue-400" /> Nuovo Viaggio
+        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-slate-100 flex items-center">
+              <Route className="w-5 h-5 mr-2 text-blue-400" /> Nuovo viaggio
             </h3>
 
             {error && (
@@ -777,7 +777,7 @@ export default function TripsPage() {
             <form onSubmit={handleCreate} className="space-y-4 text-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
                     <MapPin className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Luogo di Ritiro *
                   </label>
                   <input
@@ -790,7 +790,7 @@ export default function TripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
                     <MapPin className="w-3.5 h-3.5 mr-1 text-rose-400" /> Luogo di Consegna *
                   </label>
                   <input
@@ -806,7 +806,7 @@ export default function TripsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Data & Ora Ritiro *
                   </label>
                   <input
@@ -818,7 +818,7 @@ export default function TripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Data & Ora Consegna *
                   </label>
                   <input
@@ -832,7 +832,7 @@ export default function TripsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Tipologia Merce *
                 </label>
                 <input
@@ -847,7 +847,7 @@ export default function TripsPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Peso (kg)
                   </label>
                   <input
@@ -858,7 +858,7 @@ export default function TripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Volume (m³)
                   </label>
                   <input
@@ -869,7 +869,7 @@ export default function TripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     <Euro className="w-3 h-3 inline mr-1" /> Prezzo (€)
                   </label>
                   <input
@@ -881,7 +881,7 @@ export default function TripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Costo (€)
                   </label>
                   <input
@@ -896,7 +896,7 @@ export default function TripsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Anagrafica cliente
                   </label>
                   <select
@@ -914,7 +914,7 @@ export default function TripsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Cliente (opzionale)
                   </label>
                   <input
@@ -932,7 +932,7 @@ export default function TripsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
                     <Truck className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Mezzo (opzionale)
                   </label>
                   <select
@@ -949,7 +949,7 @@ export default function TripsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
                     <User className="w-3.5 h-3.5 mr-1 text-indigo-400" /> Autista (opzionale)
                   </label>
                   <select
