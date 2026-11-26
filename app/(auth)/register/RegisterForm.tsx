@@ -140,7 +140,7 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
           </Link>
         </div>
 
-        <div className="mb-6 grid gap-3 rounded-xl border border-slate-800 bg-slate-950/50 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950/50 p-4">
           <label className="block">
             <span className="mb-1.5 block text-xs font-medium text-slate-300">Piano della prova</span>
             <select
@@ -148,13 +148,13 @@ export default function RegisterForm({ initialPlan }: { initialPlan: Plan }) {
               name="plan"
               value={selectedPlan}
               onChange={(event) => setSelectedPlan(event.target.value as Plan)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 sm:min-w-64"
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
             >
               <option value="BASE">BASE · €59 al mese</option>
               <option value="PRO">PRO · €199 al mese</option>
             </select>
           </label>
-          <p className="text-xs leading-5 text-slate-400">
+          <p className="mt-3 text-xs leading-5 text-slate-400">
             21 giorni senza carta. Il piano scelto viene mantenuto dopo la registrazione.
           </p>
         </div>

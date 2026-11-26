@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Truck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Logo from "./Logo";
 
 /**
@@ -17,9 +17,8 @@ export default function PublicFooter({ showTrialCta = false }: { showTrialCta?: 
         <div className="wrap grid items-center gap-6 border-b py-12 md:grid-cols-[1fr_auto]" style={{ borderColor: "var(--glass-border)" }}>
           <div className="max-w-2xl">
             <p className="ops-label">Truck Radar</p>
-            <h2 className="ops-title mt-3 flex items-start gap-3 text-balance text-3xl md:text-5xl">
-              <Truck data-icon="truck" className="mt-1 h-6 w-6 shrink-0" style={{ color: "var(--brand)" }} aria-hidden="true" />
-              <span>Prova Truck Radar con i dati della tua flotta</span>
+            <h2 className="ops-title mt-3 text-balance text-3xl md:text-5xl">
+              Prova Truck Radar con i dati della tua flotta
             </h2>
             <p className="ops-subtitle mt-3">
               Crea l’account e scegli BASE o PRO. La prova dura 21 giorni, senza carta.
