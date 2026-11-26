@@ -18,12 +18,14 @@ Produzione `www.truck-radar.it` è collegata correttamente al branch Git `master
 | Progetto Vercel | `truck-radar` |
 | Dominio Production | `https://www.truck-radar.it` |
 | Vercel project ID | `prj_rJwSHuy5I5c5L3WQbo8BFT8cXAI9` |
-| Ultimo HEAD Git osservato | `592d31d docs: organizza handoff, mappa percorsi e stato TAROS` |
-| Ultimo deploy osservato | `truck-radar-a7qd1k2mx`, Ready, Production, 26 novembre 2026 |
+| Codice applicativo verificato | typecheck/build verdi al 26 novembre 2026; app su `master` |
+| Deploy app verificato | `truck-radar-a7qd1k2mx`, Ready, Production, 26 novembre 2026 |
 
 La root locale si chiama ancora `transport-saas` per compatibilità con Antigravity; **non rinominarla**. `package.json` e il progetto Vercel si chiamano `truck-radar`. `.vercel/project.json` è locale/gitignored e punta al progetto corretto.
 
 Il tree tracciato è pulito. Sono rimasti non tracciati `.agents/` e `skills-lock.json`: sono tooling locale, non rimuoverli e non committarli automaticamente. Esiste anche il worktree `giant-radiator` sotto `.kilo/worktrees/` con file `.env`: non toccare né rimuovere.
+
+I commit che aggiornano solo i documenti possono generare deploy Vercel nuovi pur senza modificare il runtime. Per conoscere sempre il deploy più recente usa `vercel ls --environment production`; per il commit corrente `git log -1 --oneline`.
 
 Per deploy normale:
 
