@@ -22,6 +22,7 @@ import { getEarningsForecast } from "@/lib/trip-forecast";
 import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
+import TutorialBanner from "@/components/TutorialBanner";
 import { getFleetMap } from "@/lib/fleet";
 import { label } from "@/lib/labels";
 
@@ -239,6 +240,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <TutorialBanner />
       {/* Header */}
       <div>
         <p className="ops-label">Console operativa</p>

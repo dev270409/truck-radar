@@ -161,9 +161,7 @@ export default function OpsTopbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:ml-3">
-        <div className="hidden sm:block">
-          <TutorialLauncher />
-        </div>
+        <TutorialLauncher />
         {permissions?.documents !== false && (
           <Link
             href="/dashboard/documenti"

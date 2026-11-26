@@ -3,10 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CircleHelp, PlayCircle } from "lucide-react";
+import { CircleHelp, PlayCircle, Clock } from "lucide-react";
 import { getTutorialForPath } from "@/lib/tutorials";
 import TutorialModal from "./TutorialModal";
 
+/**
+ * Bottone "Come si usa" prominente nella topbar.
+ * Mostra il titolo della guida, la durata e un'icona play.
+ * Sempre visibile su tutte le dimensioni dello schermo.
+ */
 export default function TutorialLauncher() {
   const pathname = usePathname();
   const tutorial = getTutorialForPath(pathname);
@@ -16,12 +21,16 @@ export default function TutorialLauncher() {
     return (
       <Link
         href="/dashboard/assistenza"
-        aria-label="Assistenza e guide"
-        title="Assistenza e guide"
-        className="ops-btn ops-btn--ghost ops-btn--sm inline-flex"
+        aria-label="Guide e assistenza"
+        title="Guide e assistenza"
+        className="group inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
+        style={{
+          borderColor: "var(--surface-border)",
+          color: "var(--text-soft)",
+        }}
       >
-        <CircleHelp className="h-4 w-4" />
-        <span className="hidden xl:inline">Aiuto</span>
+        <CircleHelp className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
+        <span className="hidden sm:inline">Guide</span>
       </Link>
     );
   }
@@ -32,12 +41,30 @@ export default function TutorialLauncher() {
         type="button"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
-        aria-label={tutorial.title}
+        aria-label={`Guarda la guida: ${tutorial.title} (${tutorial.durationLabel})`}
         title={tutorial.title}
-        className="ops-btn ops-btn--ghost ops-btn--sm inline-flex"
+        className="group relative inline-flex h-9 items-center gap-2.5 rounded-lg border px-3.5 text-sm font-medium transition-all"
+        style={{
+          borderColor: "color-mix(in oklab, var(--brand) 35%, var(--surface-border))",
+          background: "color-mix(in oklab, var(--brand) 8%, var(--surface))",
+          color: "var(--text)",
+        }}
       >
-        <PlayCircle className="h-4 w-4" />
-        <span className="hidden xl:inline">Come si usa</span>
+        <span
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-md transition-transform group-hover:scale-110"
+          style={{ background: "var(--brand)", color: "white" }}
+        >
+          <PlayCircle className="h-3.5 w-3.5" />
+        </span>
+        <span className="flex flex-col items-start leading-none">
+          <span className="text-[11px] font-semibold" style={{ color: "var(--text)" }}>
+            Come si usa
+          </span>
+          <span className="mt-0.5 flex items-center gap-1 text-[9px]" style={{ color: "var(--text-label)" }}>
+            <Clock className="h-2.5 w-2.5" />
+            {tutorial.durationLabel}
+          </span>
+        </span>
       </button>
       <TutorialModal
         tutorial={open ? tutorial : null}
