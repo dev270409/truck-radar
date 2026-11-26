@@ -1,6 +1,6 @@
 # Deploy: come funziona adesso
 
-Aggiornato il 20/11/2026. Serve a evitare la confusione tra i due progetti Vercel.
+Aggiornato il 26/11/2026. Serve a evitare la confusione tra cartella locale, repository Git e progetti Vercel.
 
 ## 1. Regola in una riga
 
@@ -20,6 +20,11 @@ Aggiornato il 20/11/2026. Serve a evitare la confusione tra i due progetti Verce
 | `truck-radar` | Produzione | `dev270409/truck-radar`, branch `master` | `www.truck-radar.it` | Deploy automatico a ogni push |
 | `transport-saas` | Legacy/scollegato | nessuno | `transport-saas-six.vercel.app` | Ignorarlo; eliminabile in futuro |
 
+La directory Antigravity può chiamarsi ancora `transport-saas`:
+`C:\Users\Asus\.gemini\antigravity\scratch\transport-saas`. È solo il percorso locale,
+non il nome del repo/prodotto. Non rinominare la directory mentre worktree e sessione la usano.
+Il package npm ora si chiama `truck-radar`. La mappa è in `docs/PROJECT_MAP.md`.
+
 Modifiche fatte:
 
 1. `truck-radar` → Settings → Environments → Production → Branch Tracking = **`master`**.
@@ -28,7 +33,8 @@ Modifiche fatte:
 ## 4. Deploy quotidiano
 
 ```bash
-git add -A
+git status --short
+git add <file specifici>
 git commit -m "feat: ..."
 git push origin master
 ```
@@ -40,6 +46,8 @@ vercel ls --environment production
 ```
 
 L'ultimo deploy deve avere progetto `truck-radar`, ambiente `Production`, stato `Ready`.
+Non usare `git add -A` alla cieca: `.agents/` e `skills-lock.json` possono essere tooling
+locale non tracciato; non vanno inclusi automaticamente.
 
 ## 5. Deploy manuale (hotfix o rollback)
 

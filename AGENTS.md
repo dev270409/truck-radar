@@ -44,3 +44,12 @@ Quando tutti i task sono `[x]` o `[FAILED]`, scrivere il sommario finale e termi
 
 ## Nota rotazione password DB
 La rotazione password `postgres` Supabase richiede l'azione dell'utente (dashboard Supabase). NON bloccare il loop: se le vecchie credenziali smettono di funzionare, marcare il task come `[FAILED-PASSWORD-DB]` e proseguire. Ad avvenuta rotazione, aggiornare i `.env` e riverificare.
+
+## Ripresa sessione e stato attuale
+- Il MEGA PAPER originario è completato; per le richieste successive seguire l'ultima istruzione dell'utente e non ripetere task già chiusi.
+- Punto di ingresso obbligatorio alla ripresa: `START_HERE.md`, poi `docs/SESSION_HANDOFF.md`; mappa repository: `docs/PROJECT_MAP.md`; indice: `docs/INDEX.md`.
+- Repository GitHub: `dev270409/truck-radar`, branch `master`. Il nome della cartella locale/workspace può essere `transport-saas`; non rinominare la cartella attiva né il worktree senza richiesta esplicita.
+- Produzione Vercel: progetto `truck-radar`, dominio `www.truck-radar.it`, deployment automatico da `master`. I dettagli correnti sono in `docs/DEPLOY.md`.
+- Non salvare password, API key, contenuti `.env.local` o credenziali temporanee nei documenti/commit. Per lo stato TAROS usare i dati correnti in `docs/SESSION_HANDOFF.md`; per password perse usare il reset account.
+- Le directory `.agents/` e il file `skills-lock.json` possono essere tooling locale non tracciato: non rimuoverli né committarli automaticamente.
+- Le date e i dati correnti possono evolvere: prima di operazioni sul DB rileggere il handoff ed eseguire verifiche read-only.

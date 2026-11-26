@@ -160,9 +160,9 @@ Eseguito `scripts/import-taros-rendiconto.ts` sull'account `tapesolegto@gmail.co
 
 - 24 viaggi importati, totale 7.790 €;
 - **23/24 collegati automaticamente ai tracciati Geotab** (copertura 96%);
-- 143 tracciati Geotab non giustificati dal solo rendiconto Energy Trucks: 6.842,6 km a vuoto stimati (scendono importando anche gli altri provider);
+- al momento dell'import, 143 tracciati Geotab non risultavano collegati al solo rendiconto Energy Trucks: 6.842,6 km **non attribuiti** (non necessariamente tutti vuoti; alcuni possono appartenere ad altri provider);
 - previsione 12 mesi: 93.480 €, affidabilità bassa (1 mese);
-- 0 autisti assegnati: in Geotab ci sono ALEXANDRU BOLOZAN, OLEG TAPES e IOAN SILVIU NEGOITA, ma nell'app non esistevano utenti AUTISTA. L'admin deve crearli per completare l'assegnazione.
+- autisti Geotab poi confermati: ALEXANDRU BOLOZAN e IOAN SILVIU NEGOITA hanno account AUTISTA; OLEG TAPES è collegato all'account ADMIN esistente. 22 viaggi assegnati ad Alexandru; lo stato corrente è in `docs/SESSION_HANDOFF.md`.
 
 ## 10. Prossimi passi
 

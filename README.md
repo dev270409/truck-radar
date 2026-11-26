@@ -4,6 +4,11 @@ Piattaforma per la gestione digitale di aziende di trasporto: **mezzi, autisti e
 viaggi** da un unico ambiente, con DDT digitale, documenti, tracking, integrazioni
 API, analytics, borsa carichi, subappalto, Smart Return, reputazione, community ed ESG.
 
+## Per riprendere il lavoro
+
+Leggi [`START_HERE.md`](START_HERE.md), poi [`docs/SESSION_HANDOFF.md`](docs/SESSION_HANDOFF.md).
+Mappa del repository: [`docs/PROJECT_MAP.md`](docs/PROJECT_MAP.md).
+
 Questo repository è distribuibile come **prodotto self-hosted**: l'azienda cliente
 installatela sulla propria infrastruttura (proprio database, proprio dominio) e ne
 resta titolare dei dati.
