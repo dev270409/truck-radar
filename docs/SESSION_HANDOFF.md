@@ -5,7 +5,7 @@
 
 ## Stato in una frase
 
-Produzione `www.truck-radar.it` è collegata correttamente al branch Git `master`; l'import rendiconti, il match Geotab, gli account conducenti TAROS e il benchmark sono già attivi. Il prossimo lavoro è importare gli altri rendiconti e migliorare copertura/dati reali, soprattutto carburante.
+Produzione `www.truck-radar.it` è collegata correttamente al branch Git `master`; l'import rendiconti, il match Geotab, gli account conducenti TAROS e il benchmark sono già attivi. La landing pubblica è stata ridisegnata senza claim non verificati e con il funnel BASE/PRO funzionante. Il prossimo lavoro è importare gli altri rendiconti e migliorare copertura/dati reali, soprattutto carburante.
 
 ## 1. Root, Git e deploy
 
@@ -18,8 +18,9 @@ Produzione `www.truck-radar.it` è collegata correttamente al branch Git `master
 | Progetto Vercel | `truck-radar` |
 | Dominio Production | `https://www.truck-radar.it` |
 | Vercel project ID | `prj_rJwSHuy5I5c5L3WQbo8BFT8cXAI9` |
-| Codice applicativo verificato | typecheck/build verdi al 26 novembre 2026; app su `master` |
-| Deploy app verificato | `truck-radar-a7qd1k2mx`, Ready, Production, 26 novembre 2026 |
+| Codice applicativo verificato | typecheck/build/ESLint verdi al 26 novembre 2026; app su `master` |
+| Deploy app verificato | `truck-radar-8koty6vhg`, Ready, Production, 26 novembre 2026 |
+| Commit deploy app | `a07696b feat: aggiorna landing e flussi operativi` |
 
 La root locale si chiama ancora `transport-saas` per compatibilità con Antigravity; **non rinominarla**. `package.json` e il progetto Vercel si chiamano `truck-radar`. `.vercel/project.json` è locale/gitignored e punta al progetto corretto.
 
@@ -91,8 +92,10 @@ Benchmark osservato: ultimi 12 mesi, 34.109 km Geotab, 551 viaggi Geotab reali, 
 | Carburante | `app/dashboard/carburante/page.tsx`, `lib/fuel.ts` |
 | Tabelle raw | `scripts/ensure-raw-tables.ts` |
 | Upload PDF | `app/api/uploadthing/core.ts` (`tripStatement`) |
+| Registrazione con piano scelto | `app/(auth)/register/`, `app/api/register/route.ts` |
+| Audit UI OSS | `docs/UI_REDESIGN_PLAN.md` |
 
-Documentazione: [`TRIP_STATEMENT_IMPORT.md`](TRIP_STATEMENT_IMPORT.md), [`BENCHMARK.md`](BENCHMARK.md), [`OCR_COSTS.md`](OCR_COSTS.md), [`INDEX.md`](INDEX.md).
+Documentazione: [`TRIP_STATEMENT_IMPORT.md`](TRIP_STATEMENT_IMPORT.md), [`BENCHMARK.md`](BENCHMARK.md), [`OCR_COSTS.md`](OCR_COSTS.md), [`UI_REDESIGN_PLAN.md`](UI_REDESIGN_PLAN.md), [`INDEX.md`](INDEX.md).
 
 ## 5. Checklist per la prossima sessione
 
@@ -102,6 +105,8 @@ Documentazione: [`TRIP_STATEMENT_IMPORT.md`](TRIP_STATEMENT_IMPORT.md), [`BENCHM
 4. Ricontrollare il forecast e il benchmark dopo più mesi: la copertura attuale è 4%.
 5. Aggiungere FuelLog reali e costi mezzi per eliminare la stima carburante/costo.
 6. Valutare il provider email/consenso privacy prima dell'intake email o dell'invio automatico di credenziali.
+7. Chiudere i rilievi Taste gate residui: lo stato è `GATE: DONE` per richiesta utente, con 59 FAIL strutturali aperti (vedi `docs/UI_REDESIGN_PLAN.md`, sezione "Gate Taste — stato").
+8. Smoke visivo autenticato delle pagine dashboard protette (richiede sessione).
 
 ## 6. Comandi di verifica
 
