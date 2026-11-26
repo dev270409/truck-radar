@@ -21,6 +21,7 @@ import {
 import { label } from "@/lib/labels";
 import TripSubnav from "@/components/TripSubnav";
 import EmptyState from "@/components/ops/EmptyState";
+import HoldButton from "@/components/kokonutui/hold-button";
 
 interface Driver {
   id: string;
@@ -732,14 +733,27 @@ export default function TripsPage() {
                 >
                   Annulla
                 </button>
-                <button
-                  type="submit"
-                  disabled={assignSaving || !assignDriverId}
-                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                  {assignSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-                  Assegna
-                </button>
+                {assignSaving ? (
+                  <button
+                    type="submit"
+                    disabled
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white opacity-50"
+                  >
+                    <Loader2 className="w-4 h-4 animate-spin" /> Assegnazione…
+                  </button>
+                ) : (
+                  <HoldButton
+                    variant="green"
+                    holdDuration={1500}
+                    holdingLabel="Continua a tenere premuto"
+                    completeLabel="Viaggio assegnato"
+                    onHoldComplete={() => saveAssign({ preventDefault: () => {} } as React.FormEvent)}
+                    disabled={!assignDriverId}
+                    className="min-h-10"
+                  >
+                    Tieni premuto per assegnare
+                  </HoldButton>
+                )}
               </div>
             </form>
           </div>

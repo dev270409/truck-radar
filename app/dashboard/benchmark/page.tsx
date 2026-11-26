@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { label } from "@/lib/labels";
+import { RevenueLineChart } from "@/components/ops/RevenueLineChart";
 
 interface BenchmarkVehicle {
   vehicleId: string;
@@ -92,16 +93,24 @@ const kmValue = (value: number) =>
 
 export default function BenchmarkPage() {
   const [benchmark, setBenchmark] = useState<Benchmark | null>(null);
+  const [monthly, setMonthly] = useState<Array<{ label: string; value: number; trips: number }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch("/api/benchmark");
+        const [res, resMonthly] = await Promise.all([
+          fetch("/api/benchmark"),
+          fetch("/api/benchmark/monthly"),
+        ]);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Errore nel calcolo del benchmark.");
         setBenchmark(data.benchmark);
+        if (resMonthly.ok) {
+          const monthlyData = await resMonthly.json();
+          setMonthly(monthlyData.months ?? []);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
@@ -208,6 +217,15 @@ export default function BenchmarkPage() {
               tone="var(--brand)"
             />
           </div>
+
+          {monthly.length > 0 && (
+            <RevenueLineChart
+              data={monthly.map((m) => ({ label: m.label, value: m.value }))}
+              title="Ricavi mensili da rendiconti"
+              subtitle="Totale importi per mese di competenza. Solo rendiconti importati e confermati."
+              height={200}
+            />
+          )}
 
           <section>
             <div className="mb-2 flex items-center justify-between">

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { ArrowRight, BarChart3, Check, FileText, Fuel, Route, Truck } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
 import Logo from "@/components/Logo";
+import { HeroMotionTitle, HeroMotionLead, HeroMotionActions, HeroPrimaryCTA, HeroPreviewWrapper } from "@/components/landing/HeroMotion";
+import { RouteFlowLine } from "@/components/landing/RouteFlowLine";
 
 const capabilities = [
   {
@@ -110,7 +112,7 @@ function ProductPreview() {
     <div
       role="img"
       aria-label="Anteprima illustrativa del flusso Truck Radar: importazione di un rendiconto, verifica di un abbinamento e assegnazione di un viaggio"
-      className="app-frame landing-hero-visual w-full min-w-0 max-w-full"
+      className="app-frame w-full min-w-0 max-w-full"
       data-theme="dark"
     >
       <div className="app-frame__bar">
@@ -237,23 +239,25 @@ export default async function HomePage() {
           <div className="wrap grid min-h-[calc(100svh-128px)] items-center gap-6 lg:min-h-[calc(100svh-192px)] lg:grid-cols-2 lg:gap-6">
           <div className="landing-hero-copy min-w-0">
             <p className="ops-eyebrow">Flotta · Viaggi · Rendiconti</p>
-            <h1 id="hero-title" className="ops-title mt-5 max-w-[13ch] text-balance text-[clamp(2.75rem,5.8vw,5rem)] leading-[0.98]">
+            <HeroMotionTitle>
               Gestionale per aziende di autotrasporto
-            </h1>
-            <p className="ops-subtitle mt-6 max-w-xl text-base leading-7 sm:text-lg">
+            </HeroMotionTitle>
+            <HeroMotionLead>
               Organizza i mezzi, assegna i viaggi e importa i rendiconti. Se colleghi Geotab, puoi verificare gli abbinamenti con i dati disponibili.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/register?plan=BASE" className="ops-btn ops-btn--primary">
-                Prova Truck Radar <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
+            </HeroMotionLead>
+            <HeroMotionActions>
+              <HeroPrimaryCTA href="/register?plan=BASE">
+                Prova Truck Radar
+              </HeroPrimaryCTA>
+            </HeroMotionActions>
             <p className="mt-5 text-sm" style={{ color: "var(--text-label)" }}>
               21 giorni di prova · Nessuna carta richiesta
             </p>
           </div>
 
-          <ProductPreview />
+          <HeroPreviewWrapper>
+            <ProductPreview />
+          </HeroPreviewWrapper>
           </div>
         </section>
 
@@ -294,15 +298,7 @@ export default async function HomePage() {
             </div>
 
             <div className="relative mt-12" data-visual="route-flow">
-              <svg
-                viewBox="0 0 1000 32"
-                className="pointer-events-none absolute left-0 top-0 hidden h-8 w-full md:block"
-                role="img"
-                aria-label="Percorso dal rendiconto importato alla verifica dell’abbinamento e alla conferma del viaggio"
-              >
-                <path d="M166 16 H834" pathLength="1" fill="none" stroke="var(--surface-border)" strokeWidth="2" />
-                <path d="M166 16 H834" pathLength="1" fill="none" stroke="var(--brand)" strokeWidth="2" className="landing-route-line" />
-              </svg>
+              <RouteFlowLine />
               <ol className="grid gap-8 md:grid-cols-3 md:gap-6">
                 {flowSteps.map((step, index) => (
                   <li key={step.title} className="relative z-10 flex gap-4 md:flex-col md:items-center md:text-center">

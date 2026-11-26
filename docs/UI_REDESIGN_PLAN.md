@@ -39,14 +39,14 @@ Aggiornato: 26 novembre 2026. Pagina type: **software**. Nessuna modifica in que
 | Taste Skill | Skill locale già presente in `.agents/` e bloccata da `skills-lock.json` | Usata per copy, preview, gerarchia, responsive e gate; non copiare il kit nel bundle. |
 | Unslop | CC BY 4.0 | Usata per audit e direzione. Nessuna schermata/demo o materiale del kit è stato copiato. |
 | Vercel Web Interface Guidelines | Snapshot locale versionato | Applicate su focus, form, riduzione del movimento e stato dei dati. |
-| Motion for React | MIT; React 18/19 supportati nella release verificata | Valutato, non installato: i micro-movimenti scelti sono realizzati con CSS nativo e `prefers-reduced-motion`, senza un runtime client in più. |
-| Anime.js v4 | MIT | Valutato, non installato: il singolo percorso SVG si disegna con CSS e ha uno stato finale statico per reduced motion. |
-| Bklit UI | Componenti chart MIT; Studio proprietario. Il line chart documenta dipendenze `d3-*` e Motion | Non integrato: l’API benchmark espone aggregati, non una serie mensile attendibile. Il grafico esistente usa dati reali e non richiede una libreria. Rivalutare quando esiste lo storico mensile. |
-| Kokonut UI | Repo pubblico MIT; Pro è separato | Non integrato: nessun componente gratuito individuato aggiunge valore operativo distinto dai controlli esistenti; la libreria non è un design system per il gestionale. |
+| Motion for React | MIT; React 18/19 supportati | **Integrato** (`motion@14.14.0`): hero entrance animato (`HeroMotion.tsx`), hover/press sul CTA, chart con `pathLength` animato. `prefers-reduced-motion` gestito via `useReducedMotion`. |
+| Anime.js v4 | MIT | **Integrato** (`animejs@4.5.0`): percorso SVG del flusso rendiconto→match→assegnamento disegnato una volta al mount con easing personalizzato; fallback statico con reduced motion. Import dinamico per non pesare sul bundle iniziale. |
+| Bklit UI | Componenti chart MIT; Studio proprietario | **Integrato** (`RevenueLineChart.tsx`): line chart ispirato al line chart bklit con `d3-scale`, bezier smoothing, `motion/react` per l'animazione del tracciato. Collocato nel benchmark, dati da `/api/benchmark/monthly`. |
+| Kokonut UI | Repo pubblico MIT; Pro è separato | **Integrato** (`hold-button.tsx`): componente Hold Button (BT-05) per l'assegnazione viaggi — richiede press-and-hold da 1.5s per confermare, evita clic accidentali su azioni irreversibili. Supporto keyboard (Space/Enter) e reduced motion. |
 | ARTEX | AGPL-3.0; applicazione di penetration testing | Escluso: non è OCR né UI. |
-| Baidu Unlimited-OCR | Modello MIT, con serving Python/GPU e percorso `trust_remote_code` | Non integrato: costi/operatività non giustificati per l’uso attuale; resta il flusso esistente `unpdf` + Gemini per scansioni. |
+| Baidu Unlimited-OCR | Modello MIT, con serving Python/GPU e percorso `trust_remote_code` | Non integrato: costi/operatività non giustificati per l'uso attuale; resta il flusso esistente `unpdf` + Gemini per scansioni. |
 
-Nessun pacchetto UI/chart runtime viene aggiunto. Nessun servizio a pagamento o immagine generata viene attivato.
+Nessun pacchetto UI runtime è stato aggiunto oltre a `motion` e `animejs` (entrambi MIT, usati in modo mirato). `d3-scale` è una dipendenza transitoria leggera per il chart. Nessun servizio a pagamento o immagine generata viene attivato.
 
 ### Fonti OSS
 
@@ -58,10 +58,10 @@ Nessun pacchetto UI/chart runtime viene aggiunto. Nessun servizio a pagamento o 
 
 ## Sequenza di implementazione
 
-1. **Landing/funnel — applicato:** claim non dimostrati tolti; preview anonima senza KPI o aziende finte; BASE/PRO passano alla registrazione e l’API salva il piano scelto; `/prezzi` porta alla sezione prezzi canonica.
-2. **Home — applicato:** intestazione contestuale, un’azione primaria, coda delle eccezioni, tre metriche; rimossi pannelli duplicati di flotta/KYC/integrazioni dalla home, senza togliere le pagine di gestione.
-3. **Benchmark — applicato:** copertura e avvisi precedono i valori; il KPI di margine è stato sostituito dalla copertura; costo/km è marcato come potenzialmente stimato.
-4. **Viaggi — applicato:** ricerca per tratta, cliente, targa o autista e filtri per da assegnare, attivi e completati; assegnazione manuale invariata.
+1. **Landing/funnel — applicato:** claim non dimostrati tolti; preview anonima senza KPI o aziende finte; BASE/PRO passano alla registrazione e l'API salva il piano scelto; `/prezzi` porta alla sezione prezzi canonica; hero con Motion entrance e Anime.js route flow.
+2. **Home — applicato:** intestazione contestuale, un'azione primaria, coda delle eccezioni, tre metriche; rimossi pannelli duplicati di flotta/KYC/integrazioni dalla home, senza togliere le pagine di gestione.
+3. **Benchmark — applicato:** copertura e avvisi precedono i valori; il KPI di margine è stato sostituito dalla copertura; costo/km è marcato come potenzialmente stimato; **chart mensile bklit-style** con dati da `/api/benchmark/monthly`.
+4. **Viaggi — applicato:** ricerca per tratta, cliente, targa o autista e filtri per da assegnare, attivi e completati; **assegnazione con Kokonut UI HoldButton** (1.5s press-and-hold) al posto del click singolo.
 5. **Auth — applicato in parte:** piano visibile e inviato al server; campi con autocomplete e stati di errore più accessibili. Restano da rifinire i dettagli visuali del form.
 
 ## Verifica

@@ -534,30 +534,6 @@ details[open] > summary .faq-chevron {
 }
 
 /* ============================ Motion ============================ */
-@keyframes landing-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.landing-hero-copy,
-.landing-hero-visual {
-  animation: landing-enter 0.48s ease both;
-}
-
-.landing-hero-visual {
-  animation-delay: 90ms;
-}
-
-@keyframes route-draw {
-  to { stroke-dashoffset: 0; }
-}
-
-.landing-route-line {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: route-draw 900ms ease-out 180ms forwards;
-}
-
 @keyframes enter-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -571,16 +547,6 @@ details[open] > summary .faq-chevron {
 .pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-hero-copy,
-  .landing-hero-visual {
-    animation: none;
-  }
-
-  .landing-route-line {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
-
   *,
   *::before,
   *::after {
