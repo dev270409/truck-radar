@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarClock, Check, Loader2, Mail, ShieldCheck, Phone, Building2 } from "lucide-react";
+import { CalendarClock, Check, Loader2, Building2 } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
 import Logo from "@/components/Logo";
 
@@ -26,16 +26,16 @@ export default function ContattiPage() {
         body: JSON.stringify(form),
       });
       const raw = await res.text();
-      let data: any = {};
+      let data: { error?: string } = {};
       try {
-        data = raw ? JSON.parse(raw) : {};
+        data = raw ? (JSON.parse(raw) as { error?: string }) : {};
       } catch {
         throw new Error("Errore del server. Riprova tra qualche istante.");
       }
       if (!res.ok) throw new Error(data.error || "Errore nell'invio della richiesta.");
       setDone(true);
-    } catch (err: any) {
-      setError(err.message || "Errore nell'invio della richiesta.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Errore nell'invio della richiesta.");
     } finally {
       setLoading(false);
     }
@@ -56,36 +56,27 @@ export default function ContattiPage() {
       <section className="mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-12 lg:grid-cols-2 lg:items-start">
         <div>
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-800/60 bg-blue-950/50 px-3 py-1 text-xs font-semibold text-blue-200">
-            <CalendarClock className="h-3.5 w-3.5" /> Demo con un esperto
+            <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" /> Richiesta di demo
           </p>
           <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            Prenota una demo di Truck Radar
+            Richiedi una demo di Truck Radar
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">
-            Analizziamo insieme la tua flotta e ti mostriamo come Truck Radar si collega ai tuoi sistemi,
-            riduce i km a vuoto e tiene sotto controllo scadenze e margini.
+            Indica che cosa vuoi vedere: flotta, viaggi, rendiconti o benchmark. La richiesta viene registrata; l’invio non fissa automaticamente una data.
           </p>
           <ul className="mt-8 space-y-3 text-sm">
             {[
-              "Demo guidata sulla tua tipologia di flotta",
-              "Verifica dell'integrazione con GPS/TMS/ERP esistenti",
-              "Stima dei km a vuoto recuperabili (Smart Return)",
-              "Nessun impegno: valutiamo insieme se siamo il partner giusto",
+              "Gestione dei mezzi e delle scadenze",
+              "Creazione e assegnazione dei viaggi",
+              "Importazione dei rendiconti e verifica degli abbinamenti",
+              "Benchmark con fonti e stime distinte",
             ].map((item) => (
               <li key={item} className="flex items-start gap-3 text-slate-200">
-                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
+                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" aria-hidden="true" />
                 {item}
               </li>
             ))}
           </ul>
-          <div className="mt-8 flex flex-wrap gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" /> Dati in UE, cifrati
-            </span>
-            <span className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-blue-400" /> Risposta entro 1 giorno lavorativo
-            </span>
-          </div>
         </div>
 
         <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8">
@@ -94,9 +85,9 @@ export default function ContattiPage() {
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-950 text-emerald-400">
                 <Check className="h-7 w-7" />
               </div>
-              <h2 className="mt-5 text-xl font-bold">Richiesta inviata</h2>
+              <h2 className="mt-5 text-xl font-bold">Richiesta registrata</h2>
               <p className="mt-2 text-sm text-slate-300">
-                Grazie! Ti contatteremo al più presto per fissare la demo.
+                La richiesta non è una prenotazione e non conferma una data.
               </p>
               <Link href="/" className="mt-6 inline-block text-sm text-blue-400 hover:text-blue-300">
                 Torna alla home
@@ -105,26 +96,26 @@ export default function ContattiPage() {
           ) : (
             <form onSubmit={submit} className="space-y-5">
               {error && (
-                <div className="rounded-xl border border-red-800/80 bg-red-950/60 p-3 text-sm text-red-200">
+                <div role="alert" aria-live="polite" className="rounded-xl border border-red-800/80 bg-red-950/60 p-3 text-sm text-red-200">
                   {error}
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Nome e cognome *">
-                  <input required value={form.nome} onChange={set("nome")} placeholder="Mario Rossi" className={inputCls} />
+                  <input name="nome" autoComplete="name" required value={form.nome} onChange={set("nome")} placeholder="Nome e cognome…" className={inputCls} />
                 </Field>
                 <Field label="Email aziendale *">
-                  <input required type="email" value={form.email} onChange={set("email")} placeholder="nome@azienda.it" className={inputCls} />
+                  <input name="email" autoComplete="email" spellCheck={false} required type="email" value={form.email} onChange={set("email")} placeholder="Email aziendale…" className={inputCls} />
                 </Field>
                 <Field label="Azienda">
-                  <input value={form.azienda} onChange={set("azienda")} placeholder="Trasporti Rossi Srl" className={inputCls} />
+                  <input name="azienda" autoComplete="organization" value={form.azienda} onChange={set("azienda")} placeholder="Ragione sociale…" className={inputCls} />
                 </Field>
                 <Field label="Telefono">
-                  <input value={form.telefono} onChange={set("telefono")} placeholder="+39 ..." className={inputCls} />
+                  <input name="telefono" autoComplete="tel" type="tel" value={form.telefono} onChange={set("telefono")} placeholder="Numero con prefisso internazionale…" className={inputCls} />
                 </Field>
               </div>
               <Field label="Numero di mezzi">
-                <select value={form.mezzi} onChange={set("mezzi")} className={inputCls}>
+                <select name="mezzi" value={form.mezzi} onChange={set("mezzi")} className={inputCls}>
                   <option value="">Seleziona…</option>
                   <option value="1-5">1–5 mezzi</option>
                   <option value="6-20">6–20 mezzi</option>
@@ -133,7 +124,7 @@ export default function ContattiPage() {
                 </select>
               </Field>
               <Field label="Di cosa hai bisogno?">
-                <textarea value={form.messaggio} onChange={set("messaggio")} rows={4} placeholder="Es. gestione flotta, DDT, subappalto, integrazione con il nostro GPS…" className={inputCls} />
+                <textarea name="messaggio" value={form.messaggio} onChange={set("messaggio")} rows={4} placeholder="Descrivi la funzione o il flusso che vuoi vedere…" className={inputCls} />
               </Field>
               <button
                 type="submit"
@@ -141,10 +132,10 @@ export default function ContattiPage() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-500 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CalendarClock className="h-4 w-4" />}
-                {loading ? "Invio in corso…" : "Richiedi la demo"}
+                {loading ? "Invio in corso…" : "Invia richiesta demo"}
               </button>
               <p className="flex items-center justify-center gap-2 text-xs text-slate-400">
-                <Building2 className="h-3.5 w-3.5" /> Nessun costo, nessun impegno.
+                <Building2 className="h-3.5 w-3.5" aria-hidden="true" /> La richiesta non attiva un abbonamento.
               </p>
             </form>
           )}
@@ -157,12 +148,12 @@ export default function ContattiPage() {
 }
 
 const inputCls =
-  "w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
+  "w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</span>
+      <span className="mb-2 block text-xs font-semibold text-slate-300">{label}</span>
       {children}
     </label>
   );

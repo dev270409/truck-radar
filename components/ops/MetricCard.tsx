@@ -1,5 +1,5 @@
 /**
- * Card metrica della console operativa (min-height 138px, icona 34px in tinta).
+ * Card compatta con una metrica operativa reale.
  */
 export default function MetricCard({
   label,
@@ -7,17 +7,15 @@ export default function MetricCard({
   hint,
   tone,
   icon,
-  delay = 0,
 }: {
   label: string;
   value: string;
   hint?: React.ReactNode;
   tone: string;
   icon: React.ReactNode;
-  delay?: number;
 }) {
   return (
-    <article className="glass enter-up p-4 md:p-5" style={{ minHeight: 138, animationDelay: `${delay}ms` }}>
+    <article className="ops-card p-4 md:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="ops-label">{label}</p>

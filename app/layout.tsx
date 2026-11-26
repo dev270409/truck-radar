@@ -22,25 +22,29 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Truck Radar — Gestionale per aziende di trasporto",
+  title: "Truck Radar — Gestionale per aziende di autotrasporto",
   description:
-    "Flotta, viaggi, DDT, piano di carico, preventivi, scadenze e costi in un unico gestionale per aziende di trasporto. Prova gratis 21 giorni.",
+    "Gestisci mezzi e viaggi, importa rendiconti e consulta costi e ricavi con fonti e stime distinte. Prova gratuita di 21 giorni, senza carta.",
   applicationName: "Truck Radar",
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "https://www.truck-radar.it"),
+  other: {
+    "page-type": "software",
+    "site-kind": "software",
+  },
   openGraph: {
     type: "website",
     locale: "it_IT",
     siteName: "Truck Radar",
-    title: "Truck Radar — Il gestionale per chi muove merci",
+    title: "Truck Radar — Flotta e viaggi, in un solo gestionale",
     description:
-      "Flotta, viaggi, DDT, piano di carico, preventivi e margini in un unico posto. Prova gratis 21 giorni, senza carta.",
-    images: [{ url: "/dashboard-preview.svg", width: 720, height: 440, alt: "Dashboard Truck Radar" }],
+      "Gestisci mezzi e viaggi, importa rendiconti e consulta costi e ricavi con fonti e stime distinte.",
+    images: [{ url: "/dashboard-preview.svg", width: 1200, height: 630, alt: "Anteprima del flusso Truck Radar: rendiconto, verifica dell’abbinamento e assegnazione del viaggio" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Truck Radar — Il gestionale per chi muove merci",
+    title: "Truck Radar — Flotta e viaggi, in un solo gestionale",
     description:
-      "Flotta, viaggi, DDT, piano di carico, preventivi e margini in un unico posto.",
+      "Gestisci mezzi e viaggi, importa rendiconti e consulta costi e ricavi con fonti e stime distinte.",
     images: ["/dashboard-preview.svg"],
   },
   manifest: "/manifest.webmanifest",
@@ -74,6 +78,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="it"
+      data-type="software"
+      data-radius="soft"
+      data-buttons="solid"
       className={`${archivo.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}
       suppressHydrationWarning
     >

@@ -17,7 +17,7 @@ export default function FleetOpsPanel({ rows }: { rows: FleetVehicleRow[] }) {
   const conPosizione = rows.filter((r) => r.posizione || (r.lat != null && r.lng != null)).length;
 
   return (
-    <div className="glass enter-up p-4 md:p-5" style={{ animationDelay: "120ms" }}>
+    <div className="ops-card p-4 md:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>

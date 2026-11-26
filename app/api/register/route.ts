@@ -17,6 +17,9 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 });
+    }
     const {
       ragioneSociale,
       partitaIva,
@@ -26,7 +29,13 @@ export async function POST(req: Request) {
       password,
       nome,
       cognome,
-    } = body;
+      plan: requestedPlan,
+    } = body as Record<string, unknown>;
+
+    if (requestedPlan !== undefined && requestedPlan !== "BASE" && requestedPlan !== "PRO") {
+      return NextResponse.json({ error: "Il piano selezionato non è valido." }, { status: 400 });
+    }
+    const subscriptionPlan = requestedPlan === "PRO" ? "PRO" : "BASE";
 
     if (!ragioneSociale || !partitaIva || !email || !password || !nome || !cognome) {
       return NextResponse.json(
@@ -88,7 +97,7 @@ export async function POST(req: Request) {
           indirizzo: address,
           telefono: phone,
           subscriptionStatus: "TRIAL",
-          subscriptionPlan: "BASE",
+          subscriptionPlan,
           trialEndsAt,
         },
       });
@@ -118,13 +127,14 @@ export async function POST(req: Request) {
       });
 
       return { company, adminUser };
-    });
+    }, { timeout: 30000 });
 
     return NextResponse.json({
       success: true,
       message: "Account creato. Prova gratuita di 21 giorni attiva.",
       companyId: result.company.id,
       email: result.adminUser.email,
+      subscriptionPlan: result.company.subscriptionPlan,
       trialEndsAt: result.company.trialEndsAt,
     });
   } catch (error) {

@@ -1,9 +1,14 @@
-import { headers } from "next/headers";
 import RegisterForm from "./RegisterForm";
 
 export const dynamic = "force-dynamic";
 
-export default function RegisterPage() {
-  headers(); // Force dynamic rendering (SSR)
-  return <RegisterForm />;
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plan?: string | string[] }>;
+}) {
+  const { plan } = await searchParams;
+  const selectedPlan = Array.isArray(plan) ? plan[0] : plan;
+
+  return <RegisterForm initialPlan={selectedPlan === "PRO" ? "PRO" : "BASE"} />;
 }

@@ -31,9 +31,9 @@
   --glass-border: oklch(0.9 0.012 240);
 
   --text: oklch(0.26 0.03 250);
-  --text-soft: oklch(0.46 0.03 250);
-  --text-label: oklch(0.29 0.08 250 / 0.62);
-  --text-label-soft: oklch(0.29 0.08 250 / 0.43);
+  --text-soft: oklch(0.43 0.03 250);
+  --text-label: oklch(0.29 0.08 250 / 0.72);
+  --text-label-soft: oklch(0.29 0.08 250 / 0.6);
 
   --map-bg: oklch(0.96 0.02 226);
   --map-grid: oklch(0.29 0.08 250 / 0.12);
@@ -116,8 +116,26 @@ body {
   min-height: 100%;
 }
 
+.wrap {
+  width: min(calc(100% - 160px), 1280px);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .wrap {
+    width: calc(100% - 96px);
+  }
+}
+
+@media (max-width: 639px) {
+  .wrap {
+    width: calc(100% - 48px);
+  }
+}
+
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -199,6 +217,11 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+}
+
+:where(a, button, summary, [role="button"]):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
 }
 
 .ops-btn--primary {
@@ -511,6 +534,30 @@ details[open] > summary .faq-chevron {
 }
 
 /* ============================ Motion ============================ */
+@keyframes landing-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-hero-copy,
+.landing-hero-visual {
+  animation: landing-enter 0.48s ease both;
+}
+
+.landing-hero-visual {
+  animation-delay: 90ms;
+}
+
+@keyframes route-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.landing-route-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: route-draw 900ms ease-out 180ms forwards;
+}
+
 @keyframes enter-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -524,6 +571,16 @@ details[open] > summary .faq-chevron {
 .pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
+  .landing-hero-copy,
+  .landing-hero-visual {
+    animation: none;
+  }
+
+  .landing-route-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
   *,
   *::before,
   *::after {

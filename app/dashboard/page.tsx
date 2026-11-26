@@ -6,12 +6,10 @@ import { db } from "@/lib/db";
 import type { Vehicle, VehicleDocument } from "@prisma/client";
 import {
   Car,
-  Clock,
   ShieldCheck,
   CheckCircle2,
   FileWarning,
   CalendarClock,
-  Plug,
   ArrowRight,
   Route,
   Gauge,
@@ -25,7 +23,7 @@ import MetricCard from "@/components/ops/MetricCard";
 import FleetOpsPanel from "@/components/ops/FleetOpsPanel";
 import BarChart from "@/components/ops/BarChart";
 import { getFleetMap } from "@/lib/fleet";
-import { label, fileNameLabel } from "@/lib/labels";
+import { label } from "@/lib/labels";
 
 const daysUntil = (iso: Date) => Math.ceil((iso.getTime() - Date.now()) / 86400000);
 
@@ -42,12 +40,11 @@ export default async function DashboardPage() {
 
   const tenantDb = getTenantDb(session.user.companyId);
 
-  const [company, vehicles, users, kycDocs] = await Promise.all([
+  const [company, vehicles, kycDocs] = await Promise.all([
     db.company.findUnique({ where: { id: session.user.companyId } }),
     tenantDb.vehicles.findMany({ include: { documents: true } }) as Promise<
       Array<Vehicle & { documents: VehicleDocument[] }>
     >,
-    tenantDb.users.findMany(),
     tenantDb.kycDocuments.findMany(),
   ]);
 
@@ -59,8 +56,6 @@ export default async function DashboardPage() {
   }
 
   const availableVehicles = vehicles.filter((v) => v.status === "DISPONIBILE").length;
-  const driverCount = users.filter((u) => u.role === "AUTISTA").length;
-
   // Viaggi attivi (reali, tenant-scoped)
   let activeTrips = 0;
   let unassignedTrips = 0;
@@ -116,9 +111,7 @@ export default async function DashboardPage() {
     .sort((a, b) => new Date(a.dataScadenza).getTime() - new Date(b.dataScadenza).getTime());
   const hasExpired = expiring.some((d) => daysUntil(new Date(d.dataScadenza)) < 0);
 
-  const kycPending = kycDocs.filter((d) => d.status === "IN_ATTESA").length;
   const kycRejected = kycDocs.filter((d) => d.status === "RIFIUTATO").length;
-  const kycOk = kycDocs.length > 0 && kycPending === 0 && kycRejected === 0;
 
   const deadlineSettings = normalizeDeadlineSettings(company?.deadlineSettings);
   const alertsMissing =
@@ -147,6 +140,16 @@ export default async function DashboardPage() {
         detail: "Un documento scaduto blocca il mezzo: rinnova o aggiorna la scadenza.",
         href: "/dashboard/scadenze",
         cta: "Controlla le scadenze",
+      };
+    }
+    if (kycRejected > 0) {
+      return {
+        icon: ShieldCheck,
+        tone: DANGER,
+        title: `${kycRejected} document${kycRejected === 1 ? "o" : "i"} da correggere`,
+        detail: "Rivedi i documenti rifiutati nella verifica aziendale.",
+        href: "/dashboard/kyc",
+        cta: "Rivedi i documenti",
       };
     }
     if (unassignedTrips > 0) {
@@ -210,6 +213,19 @@ export default async function DashboardPage() {
   })();
   const NextActionIcon = nextAction.icon;
 
+  const queueItems = [
+    { label: "Viaggi da assegnare", count: unassignedTrips, href: "/dashboard/trips", tone: AMBER },
+    { label: "Ordini da confermare", count: pendingOrders, href: "/dashboard/ordini", tone: INFO },
+    { label: "Preventivi da inviare", count: pendingQuotes, href: "/dashboard/preventivi", tone: AMBER },
+    {
+      label: "Documenti in scadenza",
+      count: expiring.length,
+      href: "/dashboard/scadenze",
+      tone: hasExpired ? DANGER : AMBER,
+    },
+    { label: "Documenti da correggere", count: kycRejected, href: "/dashboard/kyc", tone: DANGER },
+  ].filter((item) => item.count > 0);
+
   // Barre: distribuzione mezzi per categoria (dato reale). Se non ci sono
   // mezzi con categoria, il grafico mostra uno stato vuoto anziché valori fittizi.
   const byCategory = vehicles.reduce<Record<string, number>>((acc, v) => {
@@ -224,21 +240,21 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="enter-up">
+      <div>
         <p className="ops-label">Console operativa</p>
-        <h1 className="font-display mt-1 text-[24px] font-bold tracking-tight" style={{ color: "var(--text)" }}>
-          Benvenuto, {session.user.nome}
+        <h1 className="font-display mt-1 text-[24px] font-semibold tracking-tight" style={{ color: "var(--text)" }}>
+          Panoramica
         </h1>
         <p className="mt-1 text-[13px]" style={{ color: "var(--text-soft)" }}>
-          Panoramica di flotta, scadenze e operazioni per{" "}
+          Flotta, scadenze e operazioni per{" "}
           <span className="font-semibold" style={{ color: BRAND }}>{company?.ragioneSociale}</span>.
         </p>
       </div>
 
       {/* Prossima azione: una sola cosa da fare */}
       <section
-        className="ops-card enter-up flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
-        style={{ animationDelay: "20ms", borderColor: "color-mix(in oklab, " + nextAction.tone + " 35%, var(--surface-border))" }}
+        className="ops-card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+        style={{ borderColor: "color-mix(in oklab, " + nextAction.tone + " 35%, var(--surface-border))" }}
       >
         <div className="flex items-start gap-3">
           <span
@@ -268,8 +284,7 @@ export default async function DashboardPage() {
       {earningsForecast.monthsUsed > 0 && (
         <Link
           href="/dashboard/trips/importa"
-          className="ops-card enter-up flex flex-wrap items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5"
-          style={{ animationDelay: "30ms" }}
+          className="ops-card flex flex-wrap items-center justify-between gap-3 p-4 transition-colors hover:border-[var(--brand)]"
         >
           <div>
             <p className="ops-label">Stima 12 mesi · rendiconti viaggi</p>
@@ -290,7 +305,7 @@ export default async function DashboardPage() {
       {alertsMissing && (
         <Link
           href="/dashboard/scadenze"
-          className="enter-up flex items-center gap-2 rounded-[12px] border p-3 text-[12px] font-semibold"
+          className="flex items-center gap-2 rounded-[12px] border p-3 text-[12px] font-semibold"
           style={{ borderColor: "var(--warning)", color: "var(--warning)", background: "var(--surface)" }}
         >
           <BellRing className="h-4 w-4 shrink-0" />
@@ -301,41 +316,45 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* Da fare oggi */}
-      <section className="enter-up" style={{ animationDelay: "40ms" }}>
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="ops-label">Da fare oggi</h2>
-          <Link href="/dashboard/trips" className="text-[11px] font-semibold" style={{ color: "var(--brand)" }}>
-            Apri operatività <ArrowRight className="inline h-3 w-3" />
-          </Link>
+      <section className="ops-card overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--surface-border)" }}>
+          <h2 className="font-display text-sm font-semibold" style={{ color: "var(--text)" }}>In coda</h2>
+          <span className="text-xs" style={{ color: "var(--text-label)" }}>Attività che richiedono un passaggio</span>
         </div>
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {[
-            { label: "Viaggi da assegnare", value: unassignedTrips, href: "/dashboard/trips", tone: unassignedTrips > 0 ? AMBER : GREEN },
-            { label: "Preventivi da inviare", value: pendingQuotes, href: "/dashboard/preventivi", tone: pendingQuotes > 0 ? AMBER : GREEN },
-            { label: "Ordini da confermare", value: pendingOrders, href: "/dashboard/ordini", tone: pendingOrders > 0 ? AMBER : GREEN },
-            { label: "Scadenze entro 30gg", value: expiring.length + kycPending, href: "/dashboard/scadenze", tone: expiring.length + kycPending > 0 ? DANGER : GREEN },
-          ].map((item) => (
-            <Link key={item.label} href={item.href} className="ops-card flex items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5">
-              <div>
-                <p className="text-[10px] font-semibold" style={{ color: "var(--text-label)" }}>{item.label}</p>
-                <p className="font-display mt-1 text-[24px] font-bold leading-none" style={{ color: item.tone }}>{item.value}</p>
-              </div>
-              <ArrowRight className="h-4 w-4" style={{ color: "var(--text-label-soft)" }} />
-            </Link>
-          ))}
-        </div>
+        {queueItems.length === 0 ? (
+          <p className="px-4 py-5 text-sm" style={{ color: "var(--text-soft)" }}>
+            Nessuna attività in coda segnalata dai dati disponibili.
+          </p>
+        ) : (
+          <ul className="divide-y" style={{ borderColor: "var(--surface-border)" }}>
+            {queueItems.map((item) => (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className="flex min-h-12 items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-[var(--surface-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--accent)]"
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.tone }} aria-hidden="true" />
+                    <span className="truncate text-sm" style={{ color: "var(--text-soft)" }}>{item.label}</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2 font-mono text-sm font-semibold tabular-nums" style={{ color: "var(--text)" }}>
+                    {item.count}
+                    <ArrowRight className="h-4 w-4" style={{ color: "var(--text-label)" }} aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      {/* Riga di 4 metric-card */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <MetricCard
-          label="Veicoli totali"
+          label="Mezzi"
           value={String(vehicles.length)}
           hint={`${availableVehicles} disponibili`}
           tone={GREEN}
           icon={<Car className="h-[18px] w-[18px]" />}
-          delay={0}
         />
         <MetricCard
           label="Viaggi attivi"
@@ -343,23 +362,13 @@ export default async function DashboardPage() {
           hint="Assegnati o in corso"
           tone={INFO}
           icon={<Route className="h-[18px] w-[18px]" />}
-          delay={60}
         />
         <MetricCard
-          label="Km Geotab (30gg)"
+          label="Km Geotab · 30 giorni"
           value={geotabKm30 > 0 ? geotabKm30.toLocaleString("it-IT") : "—"}
-          hint={geotabTrips30 > 0 ? `${geotabTrips30} viaggi registrati` : "Collega Geotab"}
+          hint={geotabTrips30 > 0 ? `${geotabTrips30} viaggi registrati` : "Nessun dato nel periodo"}
           tone={BRAND}
           icon={<Gauge className="h-[18px] w-[18px]" />}
-          delay={120}
-        />
-        <MetricCard
-          label="Stato abbonamento"
-          value={label(company?.subscriptionStatus ?? "TRIAL")}
-          hint="21 giorni di prova"
-          tone={AMBER}
-          icon={<Clock className="h-[18px] w-[18px]" />}
-          delay={180}
         />
       </div>
 
@@ -368,136 +377,59 @@ export default async function DashboardPage() {
         <FleetOpsPanel rows={fleetRows} />
         <BarChart
           title="Flotta per categoria"
-          subtitle="Distribuzione reale dei tuoi mezzi"
+          subtitle="Mezzi registrati per categoria"
           data={chartData}
           emptyMessage="Nessun mezzo con categoria registrata. Aggiungi mezzi in “Mezzi” per vedere il grafico."
         />
       </div>
 
-      {/* Flotta + Alert */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        {/* Flotta */}
-        <div className="glass enter-up p-5" style={{ animationDelay: "340ms" }}>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display flex items-center gap-2 text-[15px] font-bold" style={{ color: "var(--text)" }}>
-              <Car className="h-4 w-4" style={{ color: GREEN }} /> Flotta aziendale
+      <section className="ops-card p-4 md:p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display flex items-center gap-2 text-base font-semibold" style={{ color: "var(--text)" }}>
+              <CalendarClock className="h-4 w-4" style={{ color: hasExpired ? DANGER : AMBER }} aria-hidden="true" />
+              Scadenze dei documenti
             </h2>
-            <Link href="/dashboard/vehicles" className="text-[11px] font-semibold" style={{ color: BRAND }}>
-              Gestisci
-            </Link>
+            <p className="mt-1 text-xs" style={{ color: "var(--text-label)" }}>Documenti scaduti o in scadenza entro 30 giorni</p>
           </div>
-          {vehicles.length === 0 ? (
-            <p className="text-[13px]" style={{ color: "var(--text-soft)" }}>Nessun veicolo registrato.</p>
-          ) : (
-            <div className="space-y-2.5">
-              {vehicles.slice(0, 6).map((v) => (
-                <div
-                  key={v.id}
-                  className="flex items-center justify-between rounded-[var(--radius-base)] px-3 py-2.5"
-                  style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)" }}
-                >
+          <Link href="/dashboard/scadenze" className="ops-btn ops-btn--secondary ops-btn--sm">
+            Apri scadenze <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
+        </div>
+
+        {expiring.length === 0 ? (
+          <p className="rounded-lg px-3 py-4 text-sm" style={{ background: "var(--surface-soft)", color: "var(--text-soft)" }}>
+            Nessun documento in scadenza segnalato nei prossimi 30 giorni.
+          </p>
+        ) : (
+          <ul className="divide-y" style={{ borderColor: "var(--surface-border)" }}>
+            {expiring.slice(0, 6).map((document) => {
+              const days = daysUntil(new Date(document.dataScadenza));
+              const formattedDate = new Intl.DateTimeFormat("it-IT", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }).format(new Date(document.dataScadenza));
+
+              return (
+                <li key={document.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3">
                   <div className="min-w-0">
-                    <span className="font-display text-[13px] font-bold" style={{ color: "var(--text)" }}>{v.targa}</span>
-                    <span className="ml-2 text-[11px]" style={{ color: "var(--text-label)" }}>{v.categoria}</span>
-                    <p className="text-[11px]" style={{ color: "var(--text-label-soft)" }}>
-                      {v.portataMaxKg} kg · {v.volumeMaxM3} m³
-                    </p>
+                    <p className="font-mono text-sm font-semibold" style={{ color: "var(--text)" }}>{document.targa}</p>
+                    <p className="text-xs" style={{ color: "var(--text-label)" }}>{label(document.tipo)}</p>
                   </div>
-                  <span className={`chip ${v.status === "DISPONIBILE" ? "chip-success" : "chip-warning"}`}>
-                    {label(v.status)}
+                  <span className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-soft)" }}>
+                    <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
+                    {formattedDate}
                   </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Alert scadenze */}
-        <div className="glass enter-up p-5" style={{ animationDelay: "380ms" }}>
-          <h2 className="font-display mb-4 flex items-center gap-2 text-[15px] font-bold" style={{ color: "var(--text)" }}>
-            <FileWarning className="h-4 w-4" style={{ color: hasExpired ? DANGER : AMBER }} /> Alert documenti
-          </h2>
-          {expiring.length === 0 ? (
-            <div
-              className="flex items-center gap-2 rounded-[var(--radius-base)] p-4 text-[13px]"
-              style={{ background: "color-mix(in oklch, var(--success) 10%, transparent)", color: GREEN, border: "1px solid var(--glass-border)" }}
-            >
-              <CheckCircle2 className="h-5 w-5" />
-              Nessun documento in scadenza nei prossimi 30 giorni.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-[13px] font-bold" style={{ color: hasExpired ? DANGER : AMBER }}>
-                {expiring.length} documento{expiring.length > 1 ? "i" : ""} {hasExpired ? "scaduto/i o in scadenza" : "in scadenza entro 30 giorni"}
-              </p>
-              {expiring.slice(0, 6).map((d) => {
-                const days = daysUntil(new Date(d.dataScadenza));
-                return (
-                  <div
-                    key={d.id}
-                    className="flex items-center justify-between rounded-[var(--radius-base)] px-3 py-2"
-                    style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)" }}
-                  >
-                    <span className="font-display text-[12px] font-bold" style={{ color: "var(--text)" }}>{d.targa}</span>
-                    <span className="text-[12px]" style={{ color: "var(--text-soft)" }}>{label(d.tipo)}</span>
-                    <span className="flex items-center gap-1 text-[11px]" style={{ color: "var(--text-label)" }}>
-                      <CalendarClock className="h-3 w-3" />
-                      {new Date(d.dataScadenza).toLocaleDateString("it-IT")}
-                    </span>
-                    <span className={`chip ${days < 0 ? "chip-danger" : "chip-warning"}`}>
-                      {days < 0 ? "Scaduto" : `${days} g`}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mt-5 border-t pt-4" style={{ borderColor: "var(--glass-border)" }}>
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display flex items-center gap-2 text-[13px] font-bold" style={{ color: "var(--text)" }}>
-                <Plug className="h-4 w-4" style={{ color: BRAND }} /> Integrazioni
-              </h3>
-              <Link href="/dashboard/integrazioni" className="text-[11px] font-semibold" style={{ color: BRAND }}>
-                Collega API
-              </Link>
-            </div>
-            <p className="text-[12px]" style={{ color: "var(--text-soft)" }}>
-              Collega GPS, TMS ed ERP esistenti per arricchire i dati della flotta.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* KYC + Verifica */}
-      <div className="grid gap-5">
-        <div className="glass enter-up min-w-0 p-5" style={{ animationDelay: "420ms" }}>
-          <h2 className="font-display mb-4 flex items-center gap-2 text-[15px] font-bold" style={{ color: "var(--text)" }}>
-            <ShieldCheck className="h-4 w-4" style={{ color: BRAND }} /> Documenti legali & KYC
-          </h2>
-          {kycDocs.length === 0 ? (
-            <p className="text-[13px]" style={{ color: "var(--text-soft)" }}>Nessun documento caricato.</p>
-          ) : (
-            <div className="space-y-2.5">
-              {kycDocs.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between rounded-[var(--radius-base)] px-3 py-2.5"
-                  style={{ background: "var(--surface-soft)", border: "1px solid var(--glass-border)" }}
-                >
-                  <div className="min-w-0">
-                    <p className="text-[12px] font-bold" style={{ color: "var(--text)" }}>{label(doc.tipo)}</p>
-                    <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>{fileNameLabel(doc.fileName)}</p>
-                  </div>
-                  <span className={`chip ${doc.status === "VERIFICATO" ? "chip-success" : doc.status === "RIFIUTATO" ? "chip-danger" : "chip-info"}`}>
-                    {label(doc.status)}
+                  <span className={`chip ${days < 0 ? "chip-danger" : "chip-warning"}`}>
+                    {days < 0 ? "Scaduto" : `${days} giorni`}
                   </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

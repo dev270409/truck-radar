@@ -87,8 +87,8 @@ export default async function AbbonamentiPage() {
               <p className="text-2xl font-bold text-slate-100">{company?.subscriptionPlan ?? "BASE"}</p>
               <p className="text-xs text-slate-400 mt-1">
                 {company?.subscriptionPlan === "PRO"
-                  ? "Borsa carichi, subappalto e Smart Return completi."
-                  : "Per piccole flotte e avvio del network."}
+                  ? "Fino a 50 mezzi e 50 autisti."
+                  : "Fino a 15 mezzi e 15 autisti."}
               </p>
             </div>
             {company?.trialEndsAt && company.subscriptionStatus === "TRIAL" && (

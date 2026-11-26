@@ -120,8 +120,7 @@ export default function BenchmarkPage() {
             <BarChart3 className="h-6 w-6" style={{ color: "var(--brand)" }} /> Benchmark flotta
           </h1>
           <p className="ops-subtitle mt-1 max-w-3xl text-[13px]">
-            Costo/km, ricavo/km, margine, consumi e copertura dei rendiconti calcolati dai dati reali
-            di Geotab, rifornimenti, costi mezzi e viaggi importati. Si aggiorna a ogni nuovo dato.
+            Confronta i dati registrati. Copertura, fonti dei chilometri e stime dei costi sono indicate accanto ai valori.
           </p>
         </div>
         <Link href="/dashboard/trips/importa" className="ops-btn ops-btn--secondary ops-btn--sm">
@@ -148,21 +147,40 @@ export default function BenchmarkPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-            <Kpi label={`Km reali (${benchmark.periodMonths} mesi)`} value={kmValue(benchmark.totals.km)} tone="var(--info)" />
-            <Kpi label="Costo/km" value={eur(benchmark.totals.costPerKm)} tone="var(--warning)" />
-            <Kpi label="Ricavo/km" value={eur(benchmark.totals.revenuePerKm)} tone="var(--success)" />
-            <Kpi
-              label="Margine/km"
-              value={eur(benchmark.totals.marginPerKm)}
-              tone={(benchmark.totals.marginPerKm ?? 0) >= 0 ? "var(--success)" : "var(--danger)"}
-            />
-            <Kpi
-              label={`Stima 12 mesi · ${benchmark.forecast.monthsUsed} mesi`}
-              value={`€ ${Math.round(benchmark.forecast.projected12m).toLocaleString("it-IT")}`}
-              tone="var(--brand)"
-            />
-          </div>
+          <section className="ops-card p-4 md:p-5" aria-labelledby="coverage-heading">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 id="coverage-heading" className="font-display text-sm font-semibold" style={{ color: "var(--text)" }}>
+                  Copertura dei rendiconti
+                </h2>
+                <p className="mt-1 text-xs" style={{ color: "var(--text-label)" }}>
+                  {benchmark.totals.geotabTrips > 0
+                    ? `${benchmark.totals.paidTrips} di ${benchmark.totals.geotabTrips} viaggi Geotab collegati`
+                    : "Nessun viaggio Geotab nel periodo"}
+                </p>
+              </div>
+              <p className="font-display text-2xl font-semibold tabular-nums" style={{ color: "var(--text)" }}>
+                {benchmark.totals.geotabTrips > 0 ? `${benchmark.totals.coveragePct}%` : "—"}
+              </p>
+            </div>
+            <div
+              className="mt-3 h-2 overflow-hidden rounded-full"
+              style={{ background: "var(--surface-soft)" }}
+              role="progressbar"
+              aria-label="Copertura dei rendiconti sui viaggi Geotab"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={benchmark.totals.geotabTrips > 0 ? benchmark.totals.coveragePct : 0}
+            >
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${benchmark.totals.geotabTrips > 0 ? benchmark.totals.coveragePct : 0}%`,
+                  background: "var(--brand)",
+                }}
+              />
+            </div>
+          </section>
 
           {benchmark.warnings.length > 0 && (
             <div
@@ -179,6 +197,17 @@ export default function BenchmarkPage() {
               </ul>
             </div>
           )}
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Kpi label={`Km rilevati · ${benchmark.periodMonths} mesi`} value={kmValue(benchmark.totals.km)} tone="var(--info)" />
+            <Kpi label="Ricavo/km" value={eur(benchmark.totals.revenuePerKm)} tone="var(--success)" />
+            <Kpi label="Costo/km · può includere stime" value={eur(benchmark.totals.costPerKm)} tone="var(--warning)" />
+            <Kpi
+              label={`Stima 12 mesi · ${benchmark.forecast.monthsUsed} mesi`}
+              value={`€ ${Math.round(benchmark.forecast.projected12m).toLocaleString("it-IT")}`}
+              tone="var(--brand)"
+            />
+          </div>
 
           <section>
             <div className="mb-2 flex items-center justify-between">
@@ -222,7 +251,7 @@ export default function BenchmarkPage() {
                         {category.paidTrips}/{category.geotabTrips} viaggi collegati
                       </span>
                       <span
-                        className={`chip ${category.coveragePct >= 80 ? "chip-success" : "chip-warning"}`}
+                        className="chip chip-info"
                         style={{ fontSize: 8 }}
                       >
                         {category.coveragePct}%
@@ -241,7 +270,7 @@ export default function BenchmarkPage() {
                   Dettaglio per mezzo
                 </h2>
                 <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
-                  Confronto con la media aziendale. Carburante stimato se mancano rifornimenti.
+                  Valori indicativi: i ricavi dipendono dai viaggi collegati e i costi possono includere stime.
                 </p>
               </div>
               <span className="chip chip-brand">{benchmark.vehicles.length} mezzi</span>
@@ -293,7 +322,7 @@ export default function BenchmarkPage() {
                         {vehicle.kmPerLitro ? `${vehicle.kmPerLitro} km/l` : "—"}
                       </td>
                       <td className="text-right">
-                        <span className={`chip ${vehicle.coveragePct >= 80 ? "chip-success" : "chip-warning"}`} style={{ fontSize: 8 }}>
+                        <span className="chip chip-info" style={{ fontSize: 8 }}>
                           {vehicle.coveragePct}%
                         </span>
                       </td>

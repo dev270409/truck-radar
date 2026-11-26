@@ -59,7 +59,7 @@ function LoginForm() {
             Flotta, viaggi, DDT, piano di carico e margini in un unico posto.
           </p>
           <div className="mt-8 space-y-3 text-[13px]" style={{ color: "var(--text-soft)" }}>
-            {["Scadenze e documenti sotto controllo", "Piano di carico e preventivi collegati", "Dati separati per azienda, in UE"].map((x) => (
+            {["Flotta, documenti e scadenze", "Viaggi con mezzo e autista", "Rendiconti e abbinamenti da verificare"].map((x) => (
               <p key={x} className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" style={{ color: "var(--success)" }} /> {x}
               </p>

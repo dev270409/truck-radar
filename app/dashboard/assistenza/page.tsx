@@ -81,8 +81,7 @@ export default async function AssistenzaPage() {
                 Prova gratuita{daysLeft !== null ? ` · ${daysLeft} giorni rimasti` : ""}
               </p>
               <p className="mt-0.5 text-[12px]" style={{ color: "var(--text-soft)" }}>
-                Hai accesso a tutte le funzioni. Guarda i video mentre provi il gestionale:
-                li ritroverai qui anche dopo la prova.
+                Il piano selezionato resta attivo per 21 giorni. Le sezioni non ancora disponibili sono indicate nel menu.
               </p>
             </div>
           </div>

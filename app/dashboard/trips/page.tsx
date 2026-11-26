@@ -16,6 +16,7 @@ import {
   FileUp,
   UserPlus,
   X,
+  Search,
 } from "lucide-react";
 import { label } from "@/lib/labels";
 import TripSubnav from "@/components/TripSubnav";
@@ -58,6 +59,8 @@ interface Trip {
   driver?: { id: string; nome: string; cognome: string } | null;
 }
 
+type TripFilter = "TUTTI" | "DA_ASSEGNARE" | "ATTIVI" | "COMPLETATO";
+
 function localDateTime(date: Date) {
   const pad = (value: number) => String(value).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -79,6 +82,8 @@ export default function TripsPage() {
   const [customers, setCustomers] = useState<CustomerLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<TripFilter>("TUTTI");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [luogoRitiro, setLuogoRitiro] = useState("");
   const [luogoConsegna, setLuogoConsegna] = useState("");
@@ -171,9 +176,12 @@ export default function TripsPage() {
   };
 
   useEffect(() => {
-    fetchTrips();
-    fetchOptions();
-    fetchForecast();
+    const timer = window.setTimeout(() => {
+      void fetchTrips();
+      void fetchOptions();
+      void fetchForecast();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -315,16 +323,57 @@ export default function TripsPage() {
     }
   };
 
+  const tripCounts = trips.reduce(
+    (counts, trip) => {
+      counts.all += 1;
+      if (trip.status === "DA_ASSEGNARE") counts.unassigned += 1;
+      if (trip.status === "ASSEGNATO" || trip.status === "IN_CORSO") counts.active += 1;
+      if (trip.status === "COMPLETATO") counts.completed += 1;
+      return counts;
+    },
+    { all: 0, unassigned: 0, active: 0, completed: 0 }
+  );
+
+  const filterOptions: Array<{ value: TripFilter; label: string; count: number }> = [
+    { value: "TUTTI", label: "Tutti", count: tripCounts.all },
+    { value: "DA_ASSEGNARE", label: "Da assegnare", count: tripCounts.unassigned },
+    { value: "ATTIVI", label: "Attivi", count: tripCounts.active },
+    { value: "COMPLETATO", label: "Completati", count: tripCounts.completed },
+  ];
+
+  const normalizedSearch = searchQuery.trim().toLocaleLowerCase("it-IT");
+  const filteredTrips = trips.filter((trip) => {
+    const matchesStatus =
+      statusFilter === "TUTTI" ||
+      (statusFilter === "ATTIVI"
+        ? trip.status === "ASSEGNATO" || trip.status === "IN_CORSO"
+        : trip.status === statusFilter);
+    if (!matchesStatus) return false;
+    if (!normalizedSearch) return true;
+
+    const searchable = [
+      trip.luogoRitiro,
+      trip.luogoConsegna,
+      trip.cliente ?? "",
+      trip.vehicle?.targa ?? "",
+      trip.driver ? `${trip.driver.nome} ${trip.driver.cognome}` : "",
+    ]
+      .join(" ")
+      .toLocaleLowerCase("it-IT");
+
+    return searchable.includes(normalizedSearch);
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
-            <Route className="w-6 h-6 mr-2.5 text-blue-400" /> Gestione Viaggi
+          <h1 className="text-2xl font-semibold text-slate-100 flex items-center">
+            <Route className="w-6 h-6 mr-2.5 text-blue-400" /> Viaggi
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Crea, assegna e monitora i viaggi della tua azienda.
+            Crea i viaggi, assegna mezzo e autista e controlla lo stato.
           </p>
         </div>
 
@@ -341,7 +390,7 @@ export default function TripsPage() {
             className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center space-x-2 transition"
           >
             <Plus className="w-4 h-4" />
-            <span>Aggiungi Viaggio</span>
+            <span>Aggiungi viaggio</span>
           </button>
         </div>
       </div>
@@ -354,7 +403,7 @@ export default function TripsPage() {
           className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition hover:bg-emerald-950/30"
         >
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-200/70">
+            <p className="text-xs font-semibold text-emerald-200/70">
               Stima 12 mesi · {forecast.monthsUsed} mes{forecast.monthsUsed === 1 ? "e" : "i"}
             </p>
             <p className="font-display text-lg font-bold text-emerald-100">
@@ -362,8 +411,8 @@ export default function TripsPage() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-emerald-200/70">Affidabilità {forecast.confidence.toLowerCase()}</p>
-            <p className="text-[11px] font-semibold text-emerald-200">Apri rendiconti e analisi →</p>
+            <p className="text-xs text-emerald-200/70">Affidabilità {forecast.confidence.toLowerCase()}</p>
+            <p className="text-xs font-semibold text-emerald-200">Apri rendiconti e analisi →</p>
           </div>
         </Link>
       )}
@@ -384,12 +433,51 @@ export default function TripsPage() {
             onAction={openAddModal}
           />
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="grid gap-4 border-b border-slate-800 p-4 lg:grid-cols-[minmax(240px,1fr)_auto] lg:items-end">
+              <label htmlFor="trip-search" className="block min-w-0">
+                <span className="mb-1.5 block text-xs font-medium text-slate-300">Cerca per tratta, cliente o mezzo</span>
+                <span className="relative block">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
+                  <input
+                    id="trip-search"
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Tratta, cliente o targa…"
+                    className="ops-input pl-9"
+                  />
+                </span>
+              </label>
+
+              <div role="group" aria-label="Filtra i viaggi per stato" className="flex flex-wrap gap-2">
+                {filterOptions.map((option) => {
+                  const active = statusFilter === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setStatusFilter(option.value)}
+                      className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${
+                        active
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-500 hover:text-slate-100"
+                      }`}
+                    >
+                      {option.label} <span className="ml-1 font-mono tabular-nums">{option.count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 border-b border-slate-800">
                 <tr>
                   <th className="px-6 py-4">Tratta</th>
-                  <th className="px-6 py-4">Data Ritiro</th>
+                  <th className="px-6 py-4">Ritiro</th>
                   <th className="px-6 py-4">Merce</th>
                   <th className="px-6 py-4">Mezzo</th>
                   <th className="px-6 py-4">Autista</th>
@@ -399,7 +487,23 @@ export default function TripsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80">
-                {trips.map((t) => (
+                {filteredTrips.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-10 text-center text-sm text-slate-400">
+                      <p>Nessun viaggio corrisponde alla ricerca o al filtro scelto.</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setStatusFilter("TUTTI");
+                        }}
+                        className="mt-3 font-semibold text-blue-300 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+                      >
+                        Azzera filtri
+                      </button>
+                    </td>
+                  </tr>
+                ) : filteredTrips.map((t) => (
                   <tr key={t.id} className="hover:bg-slate-800/40 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2 text-slate-200 font-medium">
@@ -475,7 +579,8 @@ export default function TripsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
 

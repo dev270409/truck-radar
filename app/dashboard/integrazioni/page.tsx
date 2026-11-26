@@ -89,7 +89,10 @@ export default function IntegrazioniPage() {
   };
 
   useEffect(() => {
-    load();
+    const timer = window.setTimeout(() => {
+      void load();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const resetForm = () => {
@@ -210,7 +213,7 @@ export default function IntegrazioniPage() {
           <Cloud className="w-6 h-6 mr-2.5 text-blue-400" /> API & Integrazioni
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Collega i sistemi esterni (GPS, TMS, ERP, tachigrafi, borse carichi). Le credenziali sono cifrate.
+          Geotab usa una connessione reale in sola lettura. Gli altri connettori sono dimostrativi finché non è disponibile un adapter.
         </p>
       </div>
 

@@ -34,6 +34,7 @@ Aggiornato: 26 novembre 2026.
 - [`PROJECT_HEALTH_CHECK.md`](PROJECT_HEALTH_CHECK.md) — audit storico del 19 novembre; alcune condizioni sono state risolte dopo.
 - [`ONBOARDING_KYC_KYB_RESEARCH.md`](ONBOARDING_KYC_KYB_RESEARCH.md)
 - [`KYC_PROVIDER_SCHEMA.md`](KYC_PROVIDER_SCHEMA.md)
+- [`UI_REDESIGN_PLAN.md`](UI_REDESIGN_PLAN.md) — audit e direzione visuale landing/funnel/gestionale.
 - [`SELF_HOSTING.md`](SELF_HOSTING.md)
 - [`PRO_CONNECT_PRICING_RESEARCH.md`](PRO_CONNECT_PRICING_RESEARCH.md)
 - [`UI_UX_REDESIGN.md`](UI_UX_REDESIGN.md)
