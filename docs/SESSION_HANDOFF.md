@@ -18,12 +18,12 @@ Produzione `www.truck-radar.it` è collegata correttamente al branch Git `master
 | Progetto Vercel | `truck-radar` |
 | Dominio Production | `https://www.truck-radar.it` |
 | Vercel project ID | `prj_rJwSHuy5I5c5L3WQbo8BFT8cXAI9` |
-| Ultimo HEAD Git osservato | `577f42b docs: registra autisti Geotab, stime e benchmark live` |
-| Ultimo deploy osservato | `truck-radar-hkfufsv4z`, Ready, Production, 24 novembre 2026 |
+| Ultimo HEAD Git osservato | `592d31d docs: organizza handoff, mappa percorsi e stato TAROS` |
+| Ultimo deploy osservato | `truck-radar-a7qd1k2mx`, Ready, Production, 26 novembre 2026 |
 
 La root locale si chiama ancora `transport-saas` per compatibilità con Antigravity; **non rinominarla**. `package.json` e il progetto Vercel si chiamano `truck-radar`. `.vercel/project.json` è locale/gitignored e punta al progetto corretto.
 
-Il tree tracciato era pulito. Sono rimasti non tracciati `.agents/` e `skills-lock.json`: sembrano tooling locale, non rimuoverli e non committarli automaticamente. Esiste anche il worktree `giant-radiator` sotto `.kilo/worktrees/` con file `.env`: non toccare né rimuovere.
+Il tree tracciato è pulito. Sono rimasti non tracciati `.agents/` e `skills-lock.json`: sono tooling locale, non rimuoverli e non committarli automaticamente. Esiste anche il worktree `giant-radiator` sotto `.kilo/worktrees/` con file `.env`: non toccare né rimuovere.
 
 Per deploy normale:
 
@@ -62,6 +62,8 @@ Workflow/documentazione: [`GEOTAB_DRIVERS.md`](GEOTAB_DRIVERS.md).
 ## 3. Rendiconto già caricato
 
 File originale fuori repo: `C:\Users\Asus\Downloads\TAROS.pdf` (Energy Trucks, 1–31 ottobre 2026).
+
+Inventario PDF in Downloads verificato il 26 novembre: `TAROS.pdf`, due polizze `vs_sped_polizza_*.pdf` e tre PDF di ricerca NotebookLM. **Non risultano altri rendiconti mensili/provider** nella cartella Downloads; gli altri mesi andranno recuperati/caricati quando saranno disponibili. Le polizze e i PDF NotebookLM non vanno caricati come rendiconti.
 
 - 24 viaggi; 17 giornate; totale dichiarato e letto **7.790 €**.
 - Statement ID `40cd5830-d59b-441c-8ee6-80933691bf5f`.
