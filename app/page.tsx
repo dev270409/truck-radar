@@ -66,17 +66,17 @@ export default async function HomePage() {
       </header>
 
       <main id="contenuto">
-        {/* ======== HERO: camion che si carica ======== */}
+        {/* ======== HERO ======== */}
         <section aria-labelledby="hero-title" className="py-8 lg:py-16">
-          <div className="wrap grid min-h-[calc(100svh-128px)] items-center gap-8 lg:min-h-[calc(100svh-192px)] lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
+          <div className="wrap grid min-h-[calc(100svh-128px)] items-center gap-8 lg:min-h-[calc(100svh-192px)] lg:grid-cols-[0.88fr_1.12fr] lg:gap-10">
             <div className="min-w-0">
-              <p className="ops-eyebrow">Flotta · Viaggi · Rendiconti</p>
               <HeroMotionTitle>
-                Gestionale per aziende di autotrasporto
+                Flotta, rendiconti e costi. Senza fogli Excel.
               </HeroMotionTitle>
               <HeroMotionLead>
-                Organizza i mezzi, assegna i viaggi e importa i rendiconti.
-                Se colleghi Geotab, puoi verificare gli abbinamenti con i dati disponibili.
+                Importi il rendiconto del mese, il sistema riconosce i viaggi e li
+                abbinia alla flotta. Se un match è incerto, lo vedi e decidi tu.
+                Tutto il resto — scadenze, assegnazioni, carburante — sta nello stesso posto.
               </HeroMotionLead>
               <HeroMotionActions>
                 <HeroPrimaryCTA href="/register?plan=BASE">
@@ -84,22 +84,22 @@ export default async function HomePage() {
                 </HeroPrimaryCTA>
               </HeroMotionActions>
               <p className="mt-5 text-sm" style={{ color: "var(--text-label)" }}>
-                21 giorni di prova · Nessuna carta richiesta
+                21 giorni · Nessuna carta · Nessuna configurazione obbligatoria
               </p>
             </div>
 
-            {/* Camion che si carica — il momento visivo */}
+            {/* Camion che si carica */}
             <div
-              className="ops-card relative overflow-hidden p-4 md:p-6"
+              className="ops-card relative overflow-hidden p-5 md:p-7"
               style={{ background: "var(--surface)" }}
             >
-              <p className="ops-label mb-4">Piano di carico · esempio interattivo</p>
+              <p className="ops-label mb-5">Piano di carico · esempio animato</p>
               <TruckCargoVisual />
               <div
-                className="mt-4 flex items-center justify-between border-t pt-3 text-[11px]"
+                className="mt-5 flex items-center justify-between border-t pt-4 text-xs"
                 style={{ borderColor: "var(--surface-border)", color: "var(--text-label)" }}
               >
-                <span>Ogni collo è verificato prima della partenza</span>
+                <span>Misura i colli prima di partire, non dopo</span>
                 <span style={{ color: "var(--brand)" }} className="font-semibold">
                   Apri il piano di carico →
                 </span>
@@ -108,19 +108,12 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ======== FUNZIONI: lista operativa, non card ======== */}
+        {/* ======== COSA FA ======== */}
         <section id="funzioni" className="scroll-mt-20 py-16 lg:py-20">
           <div className="wrap">
-            <div className="max-w-xl">
-              <p className="ops-eyebrow">Operatività</p>
-              <h2 className="ops-title mt-3 text-balance text-3xl md:text-4xl">
-                Le attività della flotta, collegate ai viaggi
-              </h2>
-              <p className="ops-subtitle mt-4">
-                Parti dai dati che hai. Le funzioni mostrano lo stato di mezzi,
-                viaggi e rendiconti senza trasformare le stime in valori registrati.
-              </p>
-            </div>
+            <h2 className="ops-title text-balance text-3xl md:text-4xl">
+              Quattro cose, fatte bene
+            </h2>
 
             <dl
               className="mt-10 divide-y border-t"
@@ -129,37 +122,36 @@ export default async function HomePage() {
               {[
                 {
                   icon: Route,
-                  term: "Mezzi e scadenze",
-                  desc: "Registra i veicoli, tieni sotto controllo revisioni, bollo, assicurazione e patenti. Un avviso prima che scada.",
+                  term: "Scadenze dei mezzi",
+                  desc: "Revisioni, bollo, assicurazione, tachigrafo, patenti. Quando un documento sta per scadere, lo sai con anticipo — non quando ti fermano.",
                 },
                 {
                   icon: FileText,
-                  term: "Rendiconti e Geotab",
-                  desc: "Importa i PDF dei rendiconti. Se hai Geotab collegato, i viaggi riconosciuti vengono abbinati automaticamente. I casi incerti li verifichi tu.",
+                  term: "Rendiconti importati",
+                  desc: "Carichi il PDF del rendiconto. Il sistema legge le righe, riconosce le tratte e — se hai Geotab — abbina i viaggi. Quelli ambigui li controlli tu, uno per uno.",
                 },
                 {
                   icon: Fuel,
-                  term: "Costi e carburante",
-                  desc: "Registra i rifornimenti o lascia che il sistema stimi il consumo di categoria. Vedi sempre quale numero è reale e quale è stimato.",
+                  term: "Costo per chilometro",
+                  desc: "Registri i rifornimenti oppure lasci che il consumo venga stimato per categoria. In entrambi i casi, sai quale numero è reale e quale è un'approssimazione.",
                 },
                 {
                   icon: Boxes,
                   term: "Assegnazione",
-                  desc: "Dalla lista dei viaggi scegli mezzo e autista. Un'assegnazione richiede una conferma deliberata: niente clic accidentali.",
+                  desc: "Dalla lista scegli mezzo e autista. La conferma richiede un'azione deliberata — tieni premuto il bottone. Niente assegnazioni sbagliate per un clic distratto.",
                 },
               ].map(({ icon: Icon, term, desc }) => (
                 <div
                   key={term}
-                  className="grid gap-3 py-6 sm:grid-cols-[200px_1fr] sm:gap-8"
-                  style={{ borderColor: "var(--surface-border)" }}
+                  className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-10"
                 >
-                  <dt className="flex items-start gap-2.5">
+                  <dt className="flex items-start gap-3">
                     <Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--brand)" }} aria-hidden="true" />
                     <span className="font-display text-base font-semibold" style={{ color: "var(--text)" }}>
                       {term}
                     </span>
                   </dt>
-                  <dd className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+                  <dd className="max-w-xl text-sm leading-7" style={{ color: "var(--text-soft)" }}>
                     {desc}
                   </dd>
                 </div>
@@ -168,7 +160,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ======== FLUSSO: rendiconto → match → viaggio ======== */}
+        {/* ======== FLUSSO ======== */}
         <section
           id="flusso"
           data-theme="dark"
@@ -177,13 +169,12 @@ export default async function HomePage() {
         >
           <div className="wrap">
             <div className="max-w-2xl">
-              <p className="ops-eyebrow">Dal documento al viaggio</p>
-              <h2 className="ops-title mt-3 text-balance text-3xl text-[var(--text)] md:text-4xl">
-                Verifica gli abbinamenti
+              <h2 className="ops-title text-balance text-3xl text-[var(--text)] md:text-4xl">
+                Dal rendiconto al viaggio, in tre passaggi
               </h2>
               <p className="ops-subtitle mt-4 text-[var(--text-soft)]">
-                Importazione, confronto con la flotta e conferma avvengono in passaggi
-                distinti. I casi incerti non vengono assegnati in automatico.
+                Nessun passo è automatico al cento per cento. Il sistema propone,
+                tu confermi. I casi dubbii restano dubbi fino a quando non li risolvi.
               </p>
             </div>
 
@@ -192,16 +183,16 @@ export default async function HomePage() {
               <ol className="grid gap-8 md:grid-cols-3 md:gap-6">
                 {[
                   {
-                    title: "Importa il rendiconto",
-                    text: "Il PDF viene letto e le righe estratte restano disponibili per il controllo.",
+                    title: "Carica il PDF",
+                    text: "Il rendiconto viene letto e le righe estratte restano visibili per il controllo.",
                   },
                   {
-                    title: "Verifica gli abbinamenti",
-                    text: "I suggerimenti Geotab non sostituiscono la conferma quando un match è incerto.",
+                    title: "Controlla i match",
+                    text: "Geotab suggerisce l'abbinamento. Se è incerto, il sistema non decide per te.",
                   },
                   {
-                    title: "Conferma il viaggio",
-                    text: "I viaggi confermati entrano nella lista, pronti per l'assegnazione.",
+                    title: "Assegna e parti",
+                    text: "Il viaggio confermato entra nella lista. Mezzo e autista si scelgono da lì.",
                   },
                 ].map((step, index) => (
                   <li
@@ -229,77 +220,16 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ======== DATI: fonte per fonte ======== */}
-        <section className="py-16 lg:py-20">
-          <div className="wrap grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
-            <div className="max-w-md">
-              <p className="ops-eyebrow">Fonti dei dati</p>
-              <h2 className="ops-title mt-3 text-balance text-3xl md:text-4xl">
-                Copertura del benchmark
-              </h2>
-              <p className="ops-subtitle mt-4">
-                Ricavi, chilometri e costi possono arrivare da fonti diverse.
-                Truck Radar li distingue e segnala quando un dato è una stima
-                o copre solo una parte dei viaggi.
-              </p>
-            </div>
-
-            <dl className="divide-y border-y" style={{ borderColor: "var(--surface-border)" }}>
-              {[
-                {
-                  icon: Route,
-                  title: "Chilometri",
-                  source: "Geotab collegato o km registrati nei viaggi",
-                  detail: "Ogni mezzo ha la sua fonte. Se manca Geotab, i km vengono dai viaggi registrati.",
-                },
-                {
-                  icon: FileText,
-                  title: "Ricavi",
-                  source: "Rendiconti importati e collegati ai viaggi",
-                  detail: "Solo importi confermati. I tracciati senza rendiconto non generano ricavi fantasma.",
-                },
-                {
-                  icon: Fuel,
-                  title: "Carburante",
-                  source: "Rifornimenti registrati o stima indicata",
-                  detail: "Quando mancano i rifornimenti, il consumo è stimato per categoria. È scritto chiaramente.",
-                },
-              ].map(({ icon: Icon, title, source, detail }) => (
-                <div
-                  key={title}
-                  className="grid gap-2 py-5 sm:grid-cols-[140px_1fr] sm:gap-6"
-                >
-                  <dt className="flex items-center gap-2 font-display text-base font-semibold" style={{ color: "var(--text)" }}>
-                    <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} aria-hidden="true" />
-                    {title}
-                  </dt>
-                  <dd>
-                    <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{source}</p>
-                    <p className="mt-1 text-xs leading-5" style={{ color: "var(--text-label)" }}>{detail}</p>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-
-        {/* ======== PREZZI: tabella, non card ======== */}
+        {/* ======== PREZZI ======== */}
         <section
           id="prezzi"
           className="scroll-mt-20 py-16 lg:py-20"
           style={{ background: "var(--surface-soft)" }}
         >
           <div className="wrap">
-            <div className="max-w-2xl">
-              <p className="ops-eyebrow">Prezzi</p>
-              <h2 className="ops-title mt-3 text-balance text-3xl md:text-4xl">
-                Piani e prezzi per la flotta
-              </h2>
-              <p className="ops-subtitle mt-4">
-                La prova dura 21 giorni e non richiede una carta. Il piano scelto
-                viene applicato anche alla registrazione.
-              </p>
-            </div>
+            <h2 className="ops-title text-balance text-3xl md:text-4xl">
+              Due piani, nessuna sorpresa
+            </h2>
 
             <div className="mt-8 overflow-x-auto">
               <table className="w-full text-sm">
@@ -359,41 +289,42 @@ export default async function HomePage() {
             </div>
 
             <p className="mt-4 text-xs" style={{ color: "var(--text-label)" }}>
-              Oltre 50 mezzi: contattaci per un piano su misura.
+              Oltre 50 mezzi: scrivici, troviamo il piano giusto.
             </p>
           </div>
         </section>
 
-        {/* ======== FAQ: risposte aperte, non accordion ======== */}
+        {/* ======== FAQ ======== */}
         <section className="py-16 lg:py-20">
           <div className="wrap">
-            <p className="ops-eyebrow">Domande frequenti</p>
-            <h2 className="ops-title mt-3 text-balance text-3xl md:text-4xl">Domande sulla prova</h2>
+            <h2 className="ops-title text-balance text-3xl md:text-4xl">
+              Le cose che ci chiedono al telefono
+            </h2>
             <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  q: "Serve una carta per iniziare?",
-                  a: "No. La registrazione avvia la prova senza chiedere una carta di pagamento.",
+                  q: "Serve una carta?",
+                  a: "No. La registrazione avvia la prova e non chiede alcun pagamento.",
+                },
+                {
+                  q: "Devo collegare Geotab?",
+                  a: "No, funziona anche senza. Se lo colleghi, hai abbinamenti automatici e benchmark più precisi.",
                 },
                 {
                   q: "Quanto dura la prova?",
-                  a: "21 giorni sul piano scelto. Alla scadenza decidi se attivare un abbonamento.",
+                  a: "21 giorni sul piano che scegli. Poi decidi se attivare l'abbonamento o no.",
                 },
                 {
-                  q: "È necessario collegare Geotab?",
-                  a: "No. Puoi gestire mezzi e viaggi senza. Se è collegato, i dati disponibili servono per abbinamenti e benchmark.",
+                  q: "E se ho già un gestionale?",
+                  a: "Puoi importare mezzi, clienti e viaggi da CSV. Nessuno ti obbliga a migrare tutto il primo giorno.",
                 },
                 {
-                  q: "Il benchmark mostra anche stime?",
-                  a: "Sì. Quando mancano i rifornimenti, il carburante è stimato e indicato. Copertura e fonti restano visibili.",
+                  q: "I miei dati dove finiscono?",
+                  a: "Ogni azienda ha il suo spazio separato. Le credenziali delle integrazioni sono cifrate. Puoi esportare quando vuoi.",
                 },
                 {
-                  q: "Che cosa succede dopo la prova?",
-                  a: "Completa la verifica aziendale richiesta nell'account e attiva il piano dalla sezione Abbonamento.",
-                },
-                {
-                  q: "Funziona da telefono?",
-                  a: "Sì. La dashboard funziona da browser, come PWA. L'area autista è progettata per il telefono.",
+                  q: "Funziona dal telefono?",
+                  a: "Sì, dal browser. L'area autista è pensata per l'uso in movimento.",
                 },
               ].map((faq) => (
                 <article key={faq.q}>
