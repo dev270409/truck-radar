@@ -424,7 +424,7 @@ export default function AnagraficaPage() {
               <Building2 className="h-6 w-6" />
             </span>
             <div>
-              <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+              <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
                 {q.trim()
                   ? `Nessun risultato per "${q.trim()}"`
                   : tab === "FORNITORE"
@@ -731,7 +731,7 @@ export default function AnagraficaPage() {
                     value={form.province}
                     onChange={(event) => updateField("province", event.target.value.toUpperCase())}
                     maxLength={4}
-                    className="ops-input uppercase"
+                    className="ops-input "
                     placeholder="BO"
                   />
                 </Field>
@@ -749,7 +749,7 @@ export default function AnagraficaPage() {
                     value={form.country}
                     onChange={(event) => updateField("country", event.target.value.toUpperCase())}
                     maxLength={2}
-                    className="ops-input uppercase"
+                    className="ops-input "
                     placeholder="IT"
                   />
                 </Field>
@@ -864,7 +864,7 @@ export default function AnagraficaPage() {
                     value={addressForm.province}
                     onChange={(event) => setAddressForm((current) => ({ ...current, province: event.target.value.toUpperCase() }))}
                     maxLength={4}
-                    className="ops-input uppercase"
+                    className="ops-input "
                     placeholder="Prov."
                     aria-label="Provincia"
                   />
@@ -906,7 +906,7 @@ function Metric({
           {icon}
         </span>
       </div>
-      <p className="font-display mt-2 text-2xl font-bold" style={{ color: "var(--text)" }}>
+      <p className="font-display mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
         {value.toLocaleString("it-IT")}
       </p>
     </div>

@@ -119,7 +119,7 @@ interface TripShare {
 }
 
 const statusStyles: Record<string, string> = {
-  DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
+  DA_ASSEGNARE: "bg-[var(--surface-soft)] text-[var(--text-soft)] border border-[var(--surface-border)]",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
   IN_CORSO: "bg-amber-950 text-amber-300 border border-amber-800/60",
   COMPLETATO: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
@@ -375,7 +375,7 @@ export default function TripDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+      <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         <span>Caricamento viaggio...</span>
       </div>
@@ -384,7 +384,7 @@ export default function TripDetailPage() {
 
   if (!trip) {
     return (
-      <div className="p-12 text-center text-slate-500">
+      <div className="p-12 text-center text-[var(--text-label-soft)]">
         Viaggio non trovato o non accessibile.
       </div>
     );
@@ -399,17 +399,17 @@ export default function TripDetailPage() {
         <div>
           <Link
             href="/dashboard/trips"
-            className="inline-flex items-center text-xs text-slate-400 hover:text-slate-200 mb-2 transition"
+            className="inline-flex items-center text-xs text-[var(--text-label)] hover:text-[var(--text)] mb-2 transition"
           >
             <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Torna ai viaggi
           </Link>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Route className="w-6 h-6 mr-2.5 text-blue-400" />
             {trip.luogoRitiro} → {trip.luogoConsegna}
           </h1>
-          <p className="text-sm text-slate-400 mt-1">{trip.tipoMerce}</p>
+          <p className="text-sm text-[var(--text-label)] mt-1">{trip.tipoMerce}</p>
         </div>
-        <span className={`text-xs font-bold px-4 py-2 rounded-full ${statusStyles[trip.status]}`}>
+        <span className={`text-xs font-semibold px-4 py-2 rounded-full ${statusStyles[trip.status]}`}>
           {label(trip.status)}
         </span>
       </div>
@@ -427,56 +427,56 @@ export default function TripDetailPage() {
         {/* Info generali */}
         <div className="lg:col-span-2 space-y-6">
           {/* Route info */}
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
               <MapPin className="w-5 h-5 mr-2 text-blue-400" /> Tratta e Pianificazione
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="flex items-center text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   <MapPin className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Ritiro
                 </label>
-                <p className="text-sm text-slate-100 font-medium capitalize">{trip.luogoRitiro}</p>
-                <p className="text-xs font-mono text-slate-400 mt-0.5">
+                <p className="text-sm text-[var(--text)] font-medium capitalize">{trip.luogoRitiro}</p>
+                <p className="text-xs font-mono text-[var(--text-label)] mt-0.5">
                   {new Date(trip.dataRitiro).toLocaleString("it-IT")}
                 </p>
               </div>
               <div>
-                <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="flex items-center text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   <MapPin className="w-3.5 h-3.5 mr-1 text-rose-400" /> Consegna
                 </label>
-                <p className="text-sm text-slate-100 font-medium capitalize">{trip.luogoConsegna}</p>
-                <p className="text-xs font-mono text-slate-400 mt-0.5">
+                <p className="text-sm text-[var(--text)] font-medium capitalize">{trip.luogoConsegna}</p>
+                <p className="text-xs font-mono text-[var(--text-label)] mt-0.5">
                   {new Date(trip.dataConsegna).toLocaleString("it-IT")}
                 </p>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-800 grid grid-cols-3 gap-4">
+            <div className="mt-4 pt-4 border-t border-[var(--surface-border)] grid grid-cols-3 gap-4">
               <div className="flex items-start space-x-2">
-                <Package className="w-4 h-4 text-slate-400 mt-0.5" />
+                <Package className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
                 <div>
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold">Merce</p>
-                  <p className="text-sm text-slate-200">{trip.tipoMerce}</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Merce</p>
+                  <p className="text-sm text-[var(--text)]">{trip.tipoMerce}</p>
+                  <p className="text-xs text-[var(--text-label)]">
                     {trip.pesoKg} kg · {trip.volumeM3} m³
                   </p>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
-                <CalendarDays className="w-4 h-4 text-slate-400 mt-0.5" />
+                <CalendarDays className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
                 <div>
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold">Cliente</p>
-                  <p className="text-sm text-slate-200">{trip.cliente || "—"}</p>
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Cliente</p>
+                  <p className="text-sm text-[var(--text)]">{trip.cliente || "—"}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
-                <Euro className="w-4 h-4 text-slate-400 mt-0.5" />
+                <Euro className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
                 <div>
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold">Margine</p>
-                  <p className={`text-sm font-bold ${margin != null && margin >= 0 ? "text-emerald-300" : "text-slate-200"}`}>
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Margine</p>
+                  <p className={`text-sm font-semibold ${margin != null && margin >= 0 ? "text-emerald-300" : "text-[var(--text)]"}`}>
                     {margin != null ? `€ ${margin.toFixed(2)}` : "—"}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[var(--text-label)]">
                     Ricavo € {trip.prezzo ?? 0} · Costo € {trip.costo ?? 0}
                   </p>
                 </div>
@@ -494,19 +494,19 @@ export default function TripDetailPage() {
           />
 
           {/* Assegnazione */}
-          <form onSubmit={handleAssign} className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <form onSubmit={handleAssign} className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
               <Truck className="w-5 h-5 mr-2 text-emerald-400" /> Assegnazione & Economia
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="flex items-center text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   <Truck className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Mezzo assegnato
                 </label>
                 <select
                   value={vehicleId}
                   onChange={(e) => setVehicleId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none font-mono text-xs"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none font-mono text-xs"
                 >
                   <option value="">-- Nessun mezzo --</option>
                   {vehicles.map((v) => (
@@ -517,13 +517,13 @@ export default function TripDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="flex items-center text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   <User className="w-3.5 h-3.5 mr-1 text-indigo-400" /> Autista assegnato
                 </label>
                 <select
                   value={driverId}
                   onChange={(e) => setDriverId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-xs"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none text-xs"
                 >
                   <option value="">-- Nessun autista --</option>
                   {drivers.map((d) => (
@@ -534,53 +534,53 @@ export default function TripDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   Cliente
                 </label>
                 <input
                   type="text"
                   value={cliente}
                   onChange={(e) => setCliente(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Prezzo (€)
                   </label>
                   <input
                     type="number"
                     value={prezzo}
                     onChange={(e) => setPrezzo(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Costo (€)
                   </label>
                   <input
                     type="number"
                     value={costo}
                     onChange={(e) => setCosto(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
               <div className="md:col-span-2">
-                <label className="flex items-center text-xs font-semibold text-slate-300 uppercase mb-1">
-                  <StickyNote className="w-3.5 h-3.5 mr-1 text-slate-400" /> Note
+                <label className="flex items-center text-xs font-semibold text-[var(--text-soft)]  mb-1">
+                  <StickyNote className="w-3.5 h-3.5 mr-1 text-[var(--text-label)]" /> Note
                 </label>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none resize-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none resize-none"
                 />
               </div>
             </div>
-            <div className="flex justify-end pt-4 border-t border-slate-800 mt-4">
+            <div className="flex justify-end pt-4 border-t border-[var(--surface-border)] mt-4">
               <button
                 type="submit"
                 disabled={saving}
@@ -593,12 +593,12 @@ export default function TripDetailPage() {
           </form>
 
           {/* Cambio stato */}
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
               <ArrowRight className="w-5 h-5 mr-2 text-blue-400" /> Variazioni di stato
             </h3>
             {allowed.length === 0 ? (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-[var(--text-label-soft)]">
                 Nessuna transizione disponibile per lo stato corrente.
               </p>
             ) : (
@@ -608,7 +608,7 @@ export default function TripDetailPage() {
                   value={eventNote}
                   onChange={(e) => setEventNote(e.target.value)}
                   placeholder="Nota per questa variazione (opzionale)"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 />
                 <div className="flex flex-wrap gap-2">
                   {allowed.map((st) => (
@@ -630,12 +630,12 @@ export default function TripDetailPage() {
             )}
           </div>
         {/* Documenti DDT */}
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
               <FileText className="w-5 h-5 mr-2 text-emerald-400" /> Documenti DDT
             </h3>
             {documents.length === 0 ? (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-[var(--text-label-soft)]">
                 Nessun documento DDT inviato dall'autista.
               </p>
             ) : (
@@ -643,14 +643,14 @@ export default function TripDetailPage() {
                 {documents.map((doc) => (
                   <li
                     key={doc.id}
-                    className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5"
+                    className="flex items-center justify-between bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2.5"
                   >
                     <div className="flex items-center space-x-3 min-w-0">
                       <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-100 capitalize">{label(doc.tipo)}</p>
-                        {doc.note && <p className="text-xs text-slate-400 truncate">{doc.note}</p>}
-                        <p className="text-[11px] font-mono text-slate-500 mt-0.5">
+                        <p className="text-sm font-semibold text-[var(--text)] capitalize">{label(doc.tipo)}</p>
+                        {doc.note && <p className="text-xs text-[var(--text-label)] truncate">{doc.note}</p>}
+                        <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                           {new Date(doc.createdAt).toLocaleString("it-IT")}
                         </p>
                       </div>
@@ -670,37 +670,37 @@ Apri
           </div>
 
           {/* Tracking */}
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
               <MapPin className="w-5 h-5 mr-2 text-blue-400" /> Tracking consegna
             </h3>
             {trackEvents.length === 0 ? (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-[var(--text-label-soft)]">
                 Nessun evento di tracking da parte dell'autista.
               </p>
             ) : (
               <>
-                <div className="mb-4 p-3 bg-slate-950 border border-slate-800 rounded-xl">
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold">Ultima posizione</p>
-                  <p className="text-sm font-semibold text-slate-100 capitalize">
+                <div className="mb-4 p-3 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl">
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Ultima posizione</p>
+                  <p className="text-sm font-semibold text-[var(--text)] capitalize">
                     {trackEvents[trackEvents.length - 1].posizione || "—"}
                   </p>
-                  <p className="text-[11px] font-mono text-slate-500 mt-0.5">
+                  <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                     {new Date(trackEvents[trackEvents.length - 1].createdAt).toLocaleString("it-IT")}
                   </p>
                 </div>
-                <ol className="relative border-l border-slate-800 ml-2 space-y-4">
+                <ol className="relative border-l border-[var(--surface-border)] ml-2 space-y-4">
                   {trackEvents.map((ev) => (
                     <li key={ev.id} className="ml-4">
                       <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-bold text-blue-300">
+                        <span className="text-xs font-semibold text-blue-300">
                           {ev.eventType.replace("_", " ")}
                         </span>
-                        {ev.posizione && <span className="text-xs text-slate-300">{ev.posizione}</span>}
+                        {ev.posizione && <span className="text-xs text-[var(--text-soft)]">{ev.posizione}</span>}
                       </div>
-                      {ev.note && <p className="text-xs text-slate-400 mt-0.5">{ev.note}</p>}
-                      <p className="text-[11px] font-mono text-slate-500 mt-0.5">
+                      {ev.note && <p className="text-xs text-[var(--text-label)] mt-0.5">{ev.note}</p>}
+                      <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                         {new Date(ev.createdAt).toLocaleString("it-IT")}
                       </p>
                     </li>
@@ -711,11 +711,11 @@ Apri
         </div>
 
         {/* Vista Committente (§53) */}
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-base font-bold text-slate-100 mb-1 flex items-center">
+        <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-1 flex items-center">
             <Share2 className="w-5 h-5 mr-2 text-sky-400" /> Vista Committente
           </h3>
-          <p className="text-xs text-slate-400 mb-4">
+          <p className="text-xs text-[var(--text-label)] mb-4">
             Condividi con il committente una pagina di tracking (posizione, stato consegna, DDT) senza dargli accesso al pannello.
           </p>
 
@@ -725,7 +725,7 @@ Apri
               value={shareNote}
               onChange={(e) => setShareNote(e.target.value)}
               placeholder="Nota per il committente (opzionale)"
-              className="flex-1 min-w-52 bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-sm"
+              className="flex-1 min-w-52 bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none text-sm"
             />
             <button
               onClick={createShare}
@@ -744,17 +744,17 @@ Apri
           )}
 
           {shares.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-[var(--text-label-soft)]">
               Nessun link condiviso per questo viaggio.
             </p>
           ) : (
             <ul className="space-y-2.5">
               {shares.map((s) => (
-                <li key={s.id} className="flex items-center justify-between flex-wrap gap-2 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3">
+                <li key={s.id} className="flex items-center justify-between flex-wrap gap-2 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-mono text-slate-300 break-all">{s.url}</p>
-                    {s.note && <p className="text-[11px] text-slate-400 mt-0.5">{s.note}</p>}
-                    <p className="text-[10px] font-mono text-slate-500 mt-0.5">
+                    <p className="text-xs font-mono text-[var(--text-soft)] break-all">{s.url}</p>
+                    {s.note && <p className="text-[11px] text-[var(--text-label)] mt-0.5">{s.note}</p>}
+                    <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                       creato il {new Date(s.createdAt).toLocaleString("it-IT")} ·{" "}
                       <span className={s.enabled ? "text-emerald-400" : "text-red-400"}>
                         {s.enabled ? "attivo" : "disattivato"}
@@ -764,7 +764,7 @@ Apri
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => copyShare(s.url)}
-                      className="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg"
+                      className="text-xs bg-[var(--surface-strong)] border border-[var(--surface-border)] hover:bg-[var(--surface-border)] text-[var(--text)] px-2.5 py-1.5 rounded-lg"
                       title="Copia link"
                     >
                       {copiedShare === s.url ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -801,8 +801,8 @@ Apri
         </div>
 
         {/* Subappalto & Vettori */}
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+        <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
             <Handshake className="w-5 h-5 mr-2 text-purple-400" /> Subappalto & Vettori
           </h3>
 
@@ -825,20 +825,20 @@ Apri
                   {subProposals.map((p) => (
                     <div
                       key={p.id}
-                      className="flex items-center justify-between flex-wrap gap-2 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3"
+                      className="flex items-center justify-between flex-wrap gap-2 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-4 py-3"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-slate-100">
+                        <p className="text-sm font-semibold text-[var(--text)]">
                           {p.carrier?.ragioneSociale ?? "Vettore"}
                         </p>
-                        <p className="text-[11px] text-slate-400">
+                        <p className="text-[11px] text-[var(--text-label)]">
                           {p.price != null ? `€ ${p.price.toLocaleString("it-IT")}` : "prezzo da definire"} ·{" "}
                           {new Date(p.createdAt).toLocaleString("it-IT")}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span
-                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                          className={`text-[11px] font-semibold  px-2 py-0.5 rounded ${
                             p.status === "CONFERMATO"
                               ? "bg-emerald-950 text-emerald-300"
                               : p.status === "RIFIUTATO"
@@ -877,23 +877,23 @@ Apri
               )}
 
               {subSuggestions.length === 0 ? (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-[var(--text-label-soft)]">
                   Nessun vettore verificato disponibile sul network per questo viaggio.
                 </p>
               ) : (
                 <>
-                  <p className="text-xs text-slate-400 mb-3">
+                  <p className="text-xs text-[var(--text-label)] mb-3">
                     Suggerimenti dal network (solo analisi: la decisione resta tua). Scegli un vettore e proponi il subappalto.
                   </p>
                   <div className="space-y-2.5">
                     {subSuggestions.map((s) => (
                       <div
                         key={s.companyId}
-                        className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3"
+                        className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-4 py-3"
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-semibold text-slate-100">
+                            <p className="text-sm font-semibold text-[var(--text)]">
                               {s.name}
                               {s.rating != null && (
                                 <span className="ml-2 inline-flex items-center text-amber-300">
@@ -903,7 +903,7 @@ Apri
                                 </span>
                               )}
                             </p>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[11px] text-[var(--text-label)]">
                               P.IVA {s.partitaIva} · {s.vehicles} mezzi disponibili, {s.compatibili} compatibili · cap. {s.capacityKg.toLocaleString("it-IT")} kg
                               {!s.capacitaOk && (
                                 <span className="ml-2 text-red-400 font-semibold">capacità insufficiente</span>
@@ -915,7 +915,7 @@ Apri
                           <input
                             type="number"
                             placeholder="Prezzo €"
-                            className="w-32 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-slate-100"
+                            className="w-32 bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text)]"
                             value={subPrices[s.companyId] ?? ""}
                             onChange={(e) =>
                               setSubPrices((m) => ({ ...m, [s.companyId]: e.target.value }))
@@ -940,28 +940,28 @@ Apri
       </div>
 
         {/* Timeline eventi */}
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl h-fit">
-          <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+        <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl h-fit">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
             <History className="w-5 h-5 mr-2 text-blue-400" /> Cronologia
           </h3>
           {trip.events.length === 0 ? (
-            <p className="text-sm text-slate-500">Nessun evento registrato.</p>
+            <p className="text-sm text-[var(--text-label-soft)]">Nessun evento registrato.</p>
           ) : (
-            <ol className="relative border-l border-slate-800 ml-2 space-y-5">
+            <ol className="relative border-l border-[var(--surface-border)] ml-2 space-y-5">
               {trip.events.map((ev) => (
                 <li key={ev.id} className="ml-4">
                   <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                   <div className="flex items-center space-x-2 text-xs">
-                    <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
+                    <span className={`font-semibold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
                       {label(ev.fromStatus)}
                     </span>
-                    <ArrowRight className="w-3 h-3 text-slate-500" />
-                    <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
+                    <ArrowRight className="w-3 h-3 text-[var(--text-label-soft)]" />
+                    <span className={`font-semibold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
                       {label(ev.toStatus)}
                     </span>
                   </div>
-                  {ev.note && <p className="text-xs text-slate-400 mt-1">{ev.note}</p>}
-                  <p className="text-[11px] font-mono text-slate-500 mt-1">
+                  {ev.note && <p className="text-xs text-[var(--text-label)] mt-1">{ev.note}</p>}
+                  <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-1">
                     {new Date(ev.createdAt).toLocaleString("it-IT")}
                   </p>
                 </li>

@@ -79,10 +79,10 @@ export default async function DashboardLayout({
     <>
       <div className="border-b pb-4" style={{ borderColor: "var(--glass-border)" }}>
         <p className="ops-label">Azienda</p>
-        <h2 className="font-display mt-1 truncate text-[14px] font-bold" style={{ color: INK }}>
+        <h2 className="font-display mt-1 truncate text-[14px] font-semibold" style={{ color: INK }}>
           {company?.ragioneSociale || "Truck Radar"}
         </h2>
-        <p className="truncate font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+        <p className="truncate font-mono text-[11px]" style={{ color: "var(--text-label-soft)" }}>
           P.IVA {company?.partitaIva || "N/A"}
         </p>
       </div>
@@ -96,11 +96,11 @@ export default async function DashboardLayout({
           <div className="mt-2.5 grid grid-cols-2 gap-2">
             <div className="rounded-[8px] px-2 py-1.5" style={{ background: "var(--surface)" }}>
               <p className="text-[9px] font-semibold" style={{ color: "var(--text-label-soft)" }}>Mezzi</p>
-              <p className="font-display text-[13px] font-bold" style={{ color: INK }}>{vehicleCount}/{planLimits.vehicleLimit}</p>
+              <p className="font-display text-[13px] font-semibold" style={{ color: INK }}>{vehicleCount}/{planLimits.vehicleLimit}</p>
             </div>
             <div className="rounded-[8px] px-2 py-1.5" style={{ background: "var(--surface)" }}>
               <p className="text-[9px] font-semibold" style={{ color: "var(--text-label-soft)" }}>Autisti</p>
-              <p className="font-display text-[13px] font-bold" style={{ color: INK }}>{driverCount}/{planLimits.driverLimit}</p>
+              <p className="font-display text-[13px] font-semibold" style={{ color: INK }}>{driverCount}/{planLimits.driverLimit}</p>
             </div>
           </div>
           <div className="mt-2.5 flex items-center justify-between border-t pt-2.5" style={{ borderColor: "var(--glass-border)" }}>

@@ -296,10 +296,10 @@ export default function DocumentInboxPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <Inbox className="mr-2.5 h-6 w-6 text-sky-400" /> Documenti in arrivo
           </h1>
-          <p className="mt-1 max-w-2xl text-sm text-slate-400">
+          <p className="mt-1 max-w-2xl text-sm text-[var(--text-label)]">
             Una coda unica per DDT, fatture, ordini di ritiro, POD e scadenze. Carica il file, assegna il tipo e collegalo a viaggio o mezzo.
           </p>
         </div>
@@ -322,8 +322,8 @@ export default function DocumentInboxPage({
             onClick={() => setFilter(card.key)}
             className={`ops-card p-4 text-left transition ${filter === card.key ? "ring-1 ring-sky-500/60" : ""}`}
           >
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${card.tone}`}>{card.label}</p>
-            <p className="mt-1 text-2xl font-bold text-slate-100">{counts[card.key] ?? 0}</p>
+            <p className={`text-[11px] font-semibold   ${card.tone}`}>{card.label}</p>
+            <p className="mt-1 text-2xl font-semibold text-[var(--text)]">{counts[card.key] ?? 0}</p>
           </button>
         ))}
       </div>
@@ -331,11 +331,11 @@ export default function DocumentInboxPage({
       <section className="ops-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="flex items-center text-sm font-bold text-slate-100">
+            <h2 className="flex items-center text-sm font-semibold text-[var(--text)]">
               <Upload className="mr-2 h-4 w-4 text-sky-400" /> Carica un documento
             </h2>
-            <p className="mt-1 text-xs leading-5 text-slate-400">
-              PDF o foto fino a 8 MB. Il file entra in <strong className="text-slate-200">Da classificare</strong>; non viene inviato a nessun provider AI finché non attivi l&apos;automazione Pro.
+            <p className="mt-1 text-xs leading-5 text-[var(--text-label)]">
+              PDF o foto fino a 8 MB. Il file entra in <strong className="text-[var(--text)]">Da classificare</strong>; non viene inviato a nessun provider AI finché non attivi l&apos;automazione Pro.
             </p>
           </div>
           <UploadButton
@@ -347,7 +347,7 @@ export default function DocumentInboxPage({
             appearance={{
               button:
                 "bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold rounded-xl px-4 py-2.5",
-              allowedContent: "text-[10px] text-slate-500",
+              allowedContent: "text-[11px] text-[var(--text-label-soft)]",
             }}
             onClientUploadComplete={(res) => {
               const file = res[0];
@@ -364,13 +364,13 @@ export default function DocumentInboxPage({
       </section>
 
       {!features.aiDocumentIntake && (
-        <section className="rounded-2xl border border-amber-800/60 bg-amber-950/20 p-5">
+        <section className="rounded-xl border border-amber-800/60 bg-amber-950/20 p-5">
           <div className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-950/60 text-amber-300">
               <Lock className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-sm font-bold text-amber-100">L&apos;automazione completa è nel piano Pro</h2>
+              <h2 className="text-sm font-semibold text-amber-100">L&apos;automazione completa è nel piano Pro</h2>
               <p className="mt-1 max-w-3xl text-xs leading-5 text-amber-100/80">
                 In Pro la casella email e il numero aziendale alimentano questa coda: classificazione AI, estrazione dei campi e collegamento automatico. In Base puoi comunque caricare e archiviare i documenti manualmente.
               </p>
@@ -405,7 +405,7 @@ export default function DocumentInboxPage({
             className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
               filter === f.key
                 ? "bg-sky-600 text-white"
-                : "border border-slate-700 text-slate-300 hover:border-slate-500"
+                : "border border-[var(--surface-border)] text-[var(--text-soft)] hover:border-[var(--text-label)]"
             }`}
           >
             {f.label}
@@ -415,23 +415,23 @@ export default function DocumentInboxPage({
         <button
           type="button"
           onClick={() => { setFilter("ALL"); load(); }}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-slate-500"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[var(--surface-border)] px-3 py-1.5 text-xs font-semibold text-[var(--text-soft)] hover:border-[var(--text-label)]"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Aggiorna
         </button>
       </div>
 
       {loading ? (
-        <div className="ops-card flex items-center justify-center gap-2 p-12 text-slate-400">
+        <div className="ops-card flex items-center justify-center gap-2 p-12 text-[var(--text-label)]">
           <Loader2 className="h-5 w-5 animate-spin" /> Caricamento documenti...
         </div>
       ) : filtered.length === 0 ? (
         <div className="ops-card p-12 text-center">
-          <FileText className="mx-auto h-10 w-10 text-slate-600" />
-          <p className="mt-3 text-sm font-semibold text-slate-200">
+          <FileText className="mx-auto h-10 w-10 text-[var(--text-label-soft)]" />
+          <p className="mt-3 text-sm font-semibold text-[var(--text)]">
             {items.length === 0 ? "Nessun documento in arrivo." : "Nessun documento in questo stato."}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-[var(--text-label-soft)]">
             {items.length === 0
               ? "Carica il primo PDF o la prima foto per iniziare."
               : "Cambia filtro o aggiorna la coda."}
@@ -444,20 +444,20 @@ export default function DocumentInboxPage({
             return (
               <article key={item.id} className="ops-card p-4">
                 <div className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-950/70 text-sky-300">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--surface-soft)] text-sky-300">
                     <FileText className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="min-w-0 truncate text-sm font-semibold text-slate-100">{item.fileName}</p>
-                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${STATUS_STYLES[item.status] ?? "border-slate-700 bg-slate-800 text-slate-300"}`}>
+                      <p className="min-w-0 truncate text-sm font-semibold text-[var(--text)]">{item.fileName}</p>
+                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold  ${STATUS_STYLES[item.status] ?? "border-[var(--surface-border)] bg-[var(--surface-strong)] text-[var(--text-soft)]"}`}>
                         {label(item.status)}
                       </span>
                     </div>
-                    <p className="mt-1 text-[11px] text-slate-400">
+                    <p className="mt-1 text-[11px] text-[var(--text-label)]">
                       {item.docType ? label(item.docType) : "Tipo da assegnare"} · {SOURCE_LABELS[item.source] ?? item.source} · {fmtDate(item.createdAt)}
                     </p>
-                    <p className="mt-1 truncate text-[11px] text-slate-500">
+                    <p className="mt-1 truncate text-[11px] text-[var(--text-label-soft)]">
                       {linked || "Nessun collegamento"}
                       {item.docNumber ? ` · ${item.docNumber}` : ""}
                       {item.amount != null ? ` · ${fmtAmount(item.amount)}` : ""}
@@ -466,18 +466,18 @@ export default function DocumentInboxPage({
                   <button
                     type="button"
                     onClick={() => openEdit(item)}
-                    className="shrink-0 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-sky-500"
+                    className="shrink-0 rounded-lg border border-[var(--surface-border)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] hover:border-sky-500"
                   >
                     Gestisci
                   </button>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-800/80 pt-3">
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--surface-border)] pt-3">
                   <a
                     href={item.fileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-sky-500"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] hover:border-sky-500"
                   >
                     <ExternalLink className="h-3.5 w-3.5" /> Apri file
                   </a>
@@ -497,7 +497,7 @@ export default function DocumentInboxPage({
                       type="button"
                       onClick={() => quickStatus(item, "DA_CLASSIFICARE")}
                       disabled={busy === item.id}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-sky-500 disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-1.5 text-xs font-semibold text-[var(--text-soft)] hover:border-sky-500 disabled:opacity-50"
                     >
                       <RefreshCw className="h-3.5 w-3.5" /> Riapri
                     </button>
@@ -523,20 +523,20 @@ export default function DocumentInboxPage({
           onClick={closeEdit}
         >
           <div
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl"
+            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5 "
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2 className="truncate text-base font-bold text-slate-100">{editing.fileName}</h2>
-                <p className="mt-1 text-xs text-slate-400">
+                <h2 className="truncate text-base font-semibold text-[var(--text)]">{editing.fileName}</h2>
+                <p className="mt-1 text-xs text-[var(--text-label)]">
                   Classifica il documento e collegalo a un viaggio o a un mezzo.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={closeEdit}
-                className="grid h-8 w-8 place-items-center rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500"
+                className="grid h-8 w-8 place-items-center rounded-lg border border-[var(--surface-border)] text-[var(--text-soft)] hover:border-[var(--text-label)]"
                 aria-label="Chiudi"
               >
                 <X className="h-4 w-4" />
@@ -545,11 +545,11 @@ export default function DocumentInboxPage({
 
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Tipo documento</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Tipo documento</label>
                 <select
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 >
                   <option value="">Da classificare</option>
                   {DOC_INBOX_TYPES.map((type) => (
@@ -558,49 +558,49 @@ export default function DocumentInboxPage({
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Numero documento</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Numero documento</label>
                 <input
                   value={docNumber}
                   onChange={(e) => setDocNumber(e.target.value)}
                   placeholder="Es. 2026/184"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Data documento</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Data documento</label>
                 <input
                   type="date"
                   value={docDate}
                   onChange={(e) => setDocDate(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Importo</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Importo</label>
                 <input
                   type="number"
                   step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0,00"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Cliente / fornitore</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Cliente / fornitore</label>
                 <input
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Ragione sociale"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Viaggio</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Viaggio</label>
                 <select
                   value={tripId}
                   onChange={(e) => setTripId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 >
                   <option value="">Nessun viaggio</option>
                   {trips.map((trip) => (
@@ -611,11 +611,11 @@ export default function DocumentInboxPage({
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Mezzo</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Mezzo</label>
                 <select
                   value={vehicleId}
                   onChange={(e) => setVehicleId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 >
                   <option value="">Nessun mezzo</option>
                   {vehicles.map((vehicle) => (
@@ -624,18 +624,18 @@ export default function DocumentInboxPage({
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Note</label>
+                <label className="mb-1 block text-[11px] font-semibold   text-[var(--text-label)]">Note</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Annotazioni per la revisione"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 />
               </div>
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-800 pt-4">
+            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[var(--surface-border)] pt-4">
               <button
                 type="button"
                 onClick={() => save()}
@@ -665,7 +665,7 @@ export default function DocumentInboxPage({
                 type="button"
                 onClick={() => remove(editing)}
                 disabled={busy === editing.id}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:border-red-800 disabled:opacity-50"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text-soft)] hover:border-red-800 disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" /> Elimina
               </button>

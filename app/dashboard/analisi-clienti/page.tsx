@@ -29,7 +29,7 @@ const statusStyle: Record<string, string> = {
   FERMO: "border-red-800 bg-red-950 text-red-300",
   "IN CALO": "border-amber-800 bg-amber-950 text-amber-300",
   "IN CRESCITA": "border-emerald-800 bg-emerald-950 text-emerald-300",
-  STABILE: "border-slate-700 bg-slate-900 text-slate-300",
+  STABILE: "border-[var(--surface-border)] bg-[var(--surface)] text-[var(--text-soft)]",
   NUOVO: "border-sky-800 bg-sky-950 text-sky-300",
 };
 
@@ -152,10 +152,10 @@ export default function AnalisiClientiPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <FileSpreadsheet className="mr-2.5 h-6 w-6 text-amber-400" /> Analisi clienti
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Carica le bolle esportate dal gestionale: chi è fermo, chi cala, chi cresce.</p>
+          <p className="mt-1 text-sm text-[var(--text-label)]">Carica le bolle esportate dal gestionale: chi è fermo, chi cala, chi cresce.</p>
         </div>
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -175,37 +175,37 @@ export default function AnalisiClientiPage() {
 
       {error && <div className="rounded-xl border border-amber-800/60 bg-amber-950/40 p-3 text-sm text-amber-200">{error}</div>}
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-slate-100">File bolle</h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <h2 className="font-semibold text-[var(--text)]">File bolle</h2>
+            <p className="mt-1 text-xs text-[var(--text-label-soft)]">
               Colonne riconosciute: cliente, data, fatturato/importo, peso. I file vengono letti nel browser e non inviati ai server.
             </p>
           </div>
-          {fileName && <span className="rounded-full border border-slate-700 px-2 py-1 text-xs text-slate-300">{fileNameLabel(fileName)}</span>}
+          {fileName && <span className="rounded-full border border-[var(--surface-border)] px-2 py-1 text-xs text-[var(--text-soft)]">{fileNameLabel(fileName)}</span>}
         </div>
         {rows.length > 0 && (
           <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Clienti</p>
-              <p className="mt-1 text-xl font-bold text-slate-100">{summary.total}</p>
+            <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+              <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Clienti</p>
+              <p className="mt-1 text-xl font-semibold text-[var(--text)]">{summary.total}</p>
             </div>
             <div className="rounded-xl border border-red-800/60 bg-red-950/30 p-3">
-              <p className="flex items-center text-[10px] font-bold uppercase tracking-wide text-red-300"><UserX className="mr-1 h-3 w-3" /> Fermi</p>
-              <p className="mt-1 text-xl font-bold text-red-200">{summary.fermi}</p>
+              <p className="flex items-center text-[11px] font-semibold   text-red-300"><UserX className="mr-1 h-3 w-3" /> Fermi</p>
+              <p className="mt-1 text-xl font-semibold text-red-200">{summary.fermi}</p>
             </div>
             <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-3">
-              <p className="flex items-center text-[10px] font-bold uppercase tracking-wide text-amber-300"><TrendingDown className="mr-1 h-3 w-3" /> In calo</p>
-              <p className="mt-1 text-xl font-bold text-amber-200">{summary.calo}</p>
+              <p className="flex items-center text-[11px] font-semibold   text-amber-300"><TrendingDown className="mr-1 h-3 w-3" /> In calo</p>
+              <p className="mt-1 text-xl font-semibold text-amber-200">{summary.calo}</p>
             </div>
             <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/30 p-3">
-              <p className="flex items-center text-[10px] font-bold uppercase tracking-wide text-emerald-300"><TrendingUp className="mr-1 h-3 w-3" /> In crescita</p>
-              <p className="mt-1 text-xl font-bold text-emerald-200">{summary.crescita}</p>
+              <p className="flex items-center text-[11px] font-semibold   text-emerald-300"><TrendingUp className="mr-1 h-3 w-3" /> In crescita</p>
+              <p className="mt-1 text-xl font-semibold text-emerald-200">{summary.crescita}</p>
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Fatturato</p>
-              <p className="mt-1 text-xl font-bold text-slate-100">{eur(summary.revenue)}</p>
+            <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+              <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Fatturato</p>
+              <p className="mt-1 text-xl font-semibold text-[var(--text)]">{eur(summary.revenue)}</p>
             </div>
           </div>
         )}
@@ -217,14 +217,14 @@ export default function AnalisiClientiPage() {
             <div key={a.customer} className="ops-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-100">{a.customer}</p>
-                  <p className="text-[11px] text-slate-500">{a.lastDate.toLocaleDateString("it-IT")} · {a.daysSinceLast} gg</p>
+                  <p className="truncate text-sm font-semibold text-[var(--text)]">{a.customer}</p>
+                  <p className="text-[11px] text-[var(--text-label-soft)]">{a.lastDate.toLocaleDateString("it-IT")} · {a.daysSinceLast} gg</p>
                 </div>
-                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusStyle[a.status]}`}>{a.status}</span>
+                <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusStyle[a.status]}`}>{a.status}</span>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
-                <div><p className="text-[10px] text-slate-500">Fatturato</p><p className="text-sm font-bold text-slate-100">{eur(a.revenue)}</p></div>
-                <div><p className="text-[10px] text-slate-500">Variazione 90 gg</p><p className={`text-sm font-bold ${a.growthPct == null ? "text-sky-300" : a.growthPct >= 0 ? "text-emerald-300" : "text-red-300"}`}>{a.growthPct == null ? "nuovo" : `${a.growthPct > 0 ? "+" : ""}${Math.round(a.growthPct)}%`}</p></div>
+                <div><p className="text-[11px] text-[var(--text-label-soft)]">Fatturato</p><p className="text-sm font-semibold text-[var(--text)]">{eur(a.revenue)}</p></div>
+                <div><p className="text-[11px] text-[var(--text-label-soft)]">Variazione 90 gg</p><p className={`text-sm font-semibold ${a.growthPct == null ? "text-sky-300" : a.growthPct >= 0 ? "text-emerald-300" : "text-red-300"}`}>{a.growthPct == null ? "nuovo" : `${a.growthPct > 0 ? "+" : ""}${Math.round(a.growthPct)}%`}</p></div>
               </div>
             </div>
           ))}
@@ -232,15 +232,15 @@ export default function AnalisiClientiPage() {
       )}
 
       {analysis.length > 0 && (
-        <div className="hidden overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/70 md:block">
-          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-100">Allarmi commerciali</p>
-            <button type="button" onClick={exportAnalysis} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-200 hover:border-indigo-500">
+        <div className="hidden overflow-x-auto rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] md:block">
+          <div className="flex items-center justify-between border-b border-[var(--surface-border)] px-4 py-3">
+            <p className="text-sm font-semibold text-[var(--text)]">Allarmi commerciali</p>
+            <button type="button" onClick={exportAnalysis} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text)] hover:border-indigo-500">
               <Download className="h-3.5 w-3.5" /> Esporta
             </button>
           </div>
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-[var(--surface-border)] text-[11px]   text-[var(--text-label-soft)]">
               <tr>
                 <th className="px-4 py-3">Cliente</th>
                 <th className="px-4 py-3">Stato</th>
@@ -253,18 +253,18 @@ export default function AnalisiClientiPage() {
             </thead>
             <tbody>
               {analysis.map((a) => (
-                <tr key={a.customer} className="border-b border-slate-800/60 last:border-0">
-                  <td className="px-4 py-3 font-semibold text-slate-100">{a.customer}</td>
+                <tr key={a.customer} className="border-b border-[var(--surface-border)] last:border-0">
+                  <td className="px-4 py-3 font-semibold text-[var(--text)]">{a.customer}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${statusStyle[a.status]}`}>{a.status}</span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusStyle[a.status]}`}>{a.status}</span>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">
+                  <td className="px-4 py-3 text-[var(--text-soft)]">
                     {a.lastDate.toLocaleDateString("it-IT")}
-                    <span className="ml-1 text-xs text-slate-500">({a.daysSinceLast} gg)</span>
+                    <span className="ml-1 text-xs text-[var(--text-label-soft)]">({a.daysSinceLast} gg)</span>
                   </td>
-                  <td className="px-4 py-3 text-right text-slate-300">{a.shipments}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-100">{eur(a.revenue)}</td>
-                  <td className="px-4 py-3 text-right text-slate-400">{eur(a.currentRevenue)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-soft)]">{a.shipments}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[var(--text)]">{eur(a.revenue)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-label)]">{eur(a.currentRevenue)}</td>
                   <td className={`px-4 py-3 text-right font-semibold ${a.growthPct == null ? "text-sky-300" : a.growthPct >= 0 ? "text-emerald-300" : "text-red-300"}`}>
                     {a.growthPct == null ? "nuovo" : `${a.growthPct > 0 ? "+" : ""}${Math.round(a.growthPct)}%`}
                   </td>
@@ -276,7 +276,7 @@ export default function AnalisiClientiPage() {
       )}
 
       {rows.length > 0 && (
-        <p className="flex items-start gap-2 text-xs text-slate-500">
+        <p className="flex items-start gap-2 text-xs text-[var(--text-label-soft)]">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-none" />
           Analisi calcolata su 90 giorni rispetto ai 90 precedenti, usando come riferimento la data più recente del file. I dati sono elaborati solo nel browser.
         </p>

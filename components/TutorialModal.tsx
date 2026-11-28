@@ -42,7 +42,7 @@ export default function TutorialModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="tutorial-title"
-        className="w-full max-w-4xl overflow-hidden rounded-2xl"
+        className="w-full max-w-4xl overflow-hidden rounded-xl"
         style={{
           background: "var(--surface)",
           border: "1px solid var(--surface-border)",
@@ -56,7 +56,7 @@ export default function TutorialModal({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold"
+                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold"
                 style={{
                   background: "color-mix(in oklab, var(--brand) 12%, transparent)",
                   color: "var(--brand)",

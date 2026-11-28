@@ -32,7 +32,7 @@ export default function EmptyState({
         <Icon className="h-6 w-6" />
       </span>
       <div className="max-w-md">
-        <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+        <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
           {title}
         </p>
         {description ? (

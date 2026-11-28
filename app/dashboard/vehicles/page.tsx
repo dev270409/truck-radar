@@ -285,20 +285,20 @@ export default function VehiclesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Car className="w-6 h-6 mr-2.5 text-emerald-400" /> Gestione Flotta Veicoli
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Veicoli, stato operativo e documenti con scadenze.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/dashboard/analytics?scope=veicolo" className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
+          <Link href="/dashboard/analytics?scope=veicolo" className="bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text)] text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
             <BarChart3 className="w-4 h-4" /><span>Analisi mezzi</span>
           </Link>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center space-x-2 transition"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl   flex items-center space-x-2 transition"
           >
             <Plus className="w-4 h-4" />
             <span>Aggiungi Veicolo</span>
@@ -308,21 +308,21 @@ export default function VehiclesPage() {
 
       {alerts.length > 0 && (
         <div
-          className={`p-4 rounded-2xl border flex items-start space-x-3 ${
+          className={`p-4 rounded-xl border flex items-start space-x-3 ${
             hasExpired ? "bg-red-950/60 border-red-800/60" : "bg-amber-950/60 border-amber-800/60"
           }`}
         >
           <FileWarning className={`w-5 h-5 flex-shrink-0 mt-0.5 ${hasExpired ? "text-red-400" : "text-amber-400"}`} />
           <div className="text-sm">
-            <p className={`font-bold ${hasExpired ? "text-red-200" : "text-amber-200"}`}>
+            <p className={`font-semibold ${hasExpired ? "text-red-200" : "text-amber-200"}`}>
               {alerts.length} documenti {hasExpired ? "scaduti o in scadenza" : "in scadenza"}
             </p>
             <ul className="mt-1 space-y-0.5 text-xs">
               {alerts.map((d) => {
                 const b = docBadge(d.dataScadenza);
                 return (
-                  <li key={d.id} className="text-slate-300">
-                    <span className="font-mono font-bold">{d.targa}</span> · {label(d.tipo)} ·{" "}
+                  <li key={d.id} className="text-[var(--text-soft)]">
+                    <span className="font-mono font-semibold">{d.targa}</span> · {label(d.tipo)} ·{" "}
                     {new Date(d.dataScadenza).toLocaleDateString("it-IT")}{" "}
                     <span className={`ml-1 px-1.5 py-0.5 rounded font-semibold ${b.cls}`}>{b.label}</span>
                   </li>
@@ -334,27 +334,27 @@ export default function VehiclesPage() {
       )}
 
       {geotabSnapshotAt && (
-        <section className="overflow-hidden rounded-2xl border border-sky-800/60 bg-slate-900/80">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-5 py-4">
+        <section className="overflow-hidden rounded-xl border border-sky-800/60 bg-[var(--surface)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--surface-border)] px-5 py-4">
             <div>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">Dispositivi Geotab · sola lettura</h2>
-              <p className="mt-1 text-[11px] text-slate-400">Non sono ancora veicoli Truck Radar: categoria, portata e volume vanno confermati prima dell&apos;import.</p>
+              <h2 className="text-sm font-semibold   text-[var(--text)]">Dispositivi Geotab · sola lettura</h2>
+              <p className="mt-1 text-[11px] text-[var(--text-label)]">Non sono ancora veicoli Truck Radar: categoria, portata e volume vanno confermati prima dell&apos;import.</p>
             </div>
-            {geotabSnapshotAt && <span className="text-[10px] text-slate-400">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
+            {geotabSnapshotAt && <span className="text-[11px] text-[var(--text-label)]">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
           </div>
           {geotabDevices.length === 0 ? (
-            <p className="px-5 py-6 text-sm text-slate-400">Lettura completata ma nessun dispositivo è visibile all&apos;utente API. Verifica database, gruppi e permessi in MyGeotab.</p>
+            <p className="px-5 py-6 text-sm text-[var(--text-label)]">Lettura completata ma nessun dispositivo è visibile all&apos;utente API. Verifica database, gruppi e permessi in MyGeotab.</p>
           ) : unmatchedGeotabDevices.length === 0 ? (
             <p className="px-5 py-6 text-sm text-emerald-200">Tutti i dispositivi Geotab sono associati a un mezzo Truck Radar tramite targa.</p>
           ) : <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/70 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            <table className="w-full text-left text-sm text-[var(--text-soft)]">
+              <thead className="bg-[var(--surface-soft)] text-[11px] font-semibold   text-[var(--text-label)]">
                 <tr><th className="px-5 py-3">Targa</th><th className="px-5 py-3">Dispositivo</th><th className="px-5 py-3">VIN</th><th className="px-5 py-3">Posizione</th><th className="px-5 py-3">Stato dispositivo</th></tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-[var(--surface-border)]">
                 {unmatchedGeotabDevices.map((device) => (
                   <tr key={device.geotabId}>
-                    <td className="px-5 py-3 font-mono font-bold text-slate-100">{device.licensePlate || "—"}</td>
+                    <td className="px-5 py-3 font-mono font-semibold text-[var(--text)]">{device.licensePlate || "—"}</td>
                     <td className="px-5 py-3">{device.name || "—"}</td>
                     <td className="px-5 py-3 font-mono text-xs">{device.vehicleIdentificationNumber || "—"}</td>
                     <td className="px-5 py-3 text-xs">{device.latitude != null && device.longitude != null ? `${device.latitude.toFixed(5)}, ${device.longitude.toFixed(5)}` : "Nessuna posizione recente"}</td>
@@ -367,9 +367,9 @@ export default function VehiclesPage() {
         </section>
       )}
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden ">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+          <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
             <Loader2 className="w-5 h-5 animate-spin" />
             <span>Caricamento veicoli in corso...</span>
           </div>
@@ -383,8 +383,8 @@ export default function VehiclesPage() {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+            <table className="w-full text-left text-sm text-[var(--text-soft)]">
+              <thead className="bg-black/60 text-xs font-semibold text-[var(--text-label)]   border-b border-[var(--surface-border)]">
                 <tr>
                   <th className="px-6 py-4">Targa</th>
                   <th className="px-6 py-4">Categoria</th>
@@ -397,14 +397,14 @@ export default function VehiclesPage() {
                   <th className="px-6 py-4">Azioni</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-[var(--surface-border)]">
                 {vehicles.map((v) => {
                   const geo = geotabByLocalVehicle.get(v.id);
                   return (
-                  <tr key={v.id} className="hover:bg-slate-800/40 transition">
-                    <td className="px-6 py-4 font-mono font-bold text-slate-100">{v.targa}</td>
+                  <tr key={v.id} className="hover:bg-[var(--surface-soft)] transition">
+                    <td className="px-6 py-4 font-mono font-semibold text-[var(--text)]">{v.targa}</td>
                     <td className="px-6 py-4">
-                      <span className="bg-slate-800 text-slate-200 px-2.5 py-1 rounded-md text-xs font-semibold">
+                      <span className="bg-[var(--surface-strong)] text-[var(--text)] px-2.5 py-1 rounded-md text-xs font-semibold">
                         {label(v.categoria)}
                       </span>
                     </td>
@@ -412,7 +412,7 @@ export default function VehiclesPage() {
                     <td className="px-6 py-4">{v.volumeMaxM3} m³</td>
                     <td className="px-6 py-4">
                       <span
-                        className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        className={`text-xs font-semibold px-3 py-1 rounded-full ${
                           v.status === "DISPONIBILE"
                             ? "bg-emerald-950 text-emerald-300 border border-emerald-800/60"
                             : v.status === "IN_MANUTENZIONE"
@@ -430,9 +430,9 @@ export default function VehiclesPage() {
                             ? `${geo.latitude.toFixed(4)}, ${geo.longitude.toFixed(4)}${geo.speedKph != null ? ` · ${geo.speedKph.toFixed(0)} km/h` : ""}`
                             : "Collegato · GPS assente"}
                         </span>
-                      ) : <span className="text-slate-500">—</span>}
+                      ) : <span className="text-[var(--text-label-soft)]">—</span>}
                     </td>
-                    <td className="px-6 py-4 text-xs text-slate-400 font-mono">
+                    <td className="px-6 py-4 text-xs text-[var(--text-label)] font-mono">
                       {v.drivers && v.drivers.length > 0
                         ? `${v.drivers[0].nome} ${v.drivers[0].cognome}`
                         : "Nessun Autista"}
@@ -450,7 +450,7 @@ export default function VehiclesPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => openEdit(v)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700"
+                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-strong)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text)] transition hover:bg-[var(--surface-border)]"
                           title="Modifica mezzo"
                         >
                           <Pencil className="w-3.5 h-3.5" /> Modifica
@@ -476,9 +476,9 @@ export default function VehiclesPage() {
 
       {/* Edit Vehicle Modal */}
       {editVehicle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
-            <h3 className="flex items-center text-lg font-bold text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 ">
+          <div className="w-full max-w-md space-y-4 rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-6 ">
+            <h3 className="flex items-center text-lg font-semibold text-[var(--text)]">
               <Pencil className="mr-2 h-5 w-5 text-emerald-400" /> Modifica Veicolo {editVehicle.targa}
             </h3>
             {editError && (
@@ -486,21 +486,21 @@ export default function VehiclesPage() {
             )}
             <form onSubmit={handleEditVehicle} className="space-y-4 text-sm">
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Targa Veicolo *</label>
+                <label className="mb-1 block text-xs font-semibold  text-[var(--text-soft)]">Targa Veicolo *</label>
                 <input
                   type="text"
                   required
                   value={editTarga}
                   onChange={(e) => setEditTarga(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-mono text-slate-100 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 font-mono text-[var(--text)] outline-none focus:border-[var(--success)]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Categoria *</label>
+                <label className="mb-1 block text-xs font-semibold  text-[var(--text-soft)]">Categoria *</label>
                 <select
                   value={editCategoria}
                   onChange={(e) => setEditCategoria(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 text-[var(--text)] outline-none focus:border-[var(--success)]"
                 >
                   <option value="FRIGO">FRIGO</option>
                   <option value="TELONATO">TELONATO</option>
@@ -511,32 +511,32 @@ export default function VehiclesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Portata Max (Kg)</label>
+                  <label className="mb-1 block text-xs font-semibold  text-[var(--text-soft)]">Portata Max (Kg)</label>
                   <input
                     type="number"
                     required
                     value={editPortata}
                     onChange={(e) => setEditPortata(e.target.value)}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 text-[var(--text)] outline-none focus:border-[var(--success)]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Volume Max (M³)</label>
+                  <label className="mb-1 block text-xs font-semibold  text-[var(--text-soft)]">Volume Max (M³)</label>
                   <input
                     type="number"
                     required
                     value={editVolume}
                     onChange={(e) => setEditVolume(e.target.value)}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 text-[var(--text)] outline-none focus:border-[var(--success)]"
                   />
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase text-slate-300">Stato</label>
+                <label className="mb-1 block text-xs font-semibold  text-[var(--text-soft)]">Stato</label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 text-[var(--text)] outline-none focus:border-[var(--success)]"
                 >
                   <option value="DISPONIBILE">DISPONIBILE</option>
                   <option value="IN_VIAGGIO">IN_VIAGGIO</option>
@@ -544,11 +544,11 @@ export default function VehiclesPage() {
                   <option value="NON_IDONEO">NON_IDONEO</option>
                 </select>
               </div>
-              <div className="flex justify-end space-x-3 border-t border-slate-800 pt-3">
+              <div className="flex justify-end space-x-3 border-t border-[var(--surface-border)] pt-3">
                 <button
                   type="button"
                   onClick={() => setEditVehicle(null)}
-                  className="rounded-xl bg-slate-800 px-4 py-2 font-medium text-slate-300 hover:bg-slate-700"
+                  className="rounded-xl bg-[var(--surface-strong)] px-4 py-2 font-medium text-[var(--text-soft)] hover:bg-[var(--surface-border)]"
                 >
                   Annulla
                 </button>
@@ -567,9 +567,9 @@ export default function VehiclesPage() {
 
       {/* Add Vehicle Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-slate-100 flex items-center">
+        <div className="fixed inset-0 bg-black/60  z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl w-full max-w-md p-6  space-y-4">
+            <h3 className="text-lg font-semibold text-[var(--text)] flex items-center">
               <Car className="w-5 h-5 mr-2 text-emerald-400" /> Nuovo Veicolo Flotta
             </h3>
             {error && (
@@ -577,22 +577,22 @@ export default function VehiclesPage() {
             )}
             <form onSubmit={handleAddVehicle} className="space-y-4 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Targa Veicolo *</label>
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Targa Veicolo *</label>
                 <input
                   type="text"
                   required
                   value={targa}
                   onChange={(e) => setTarga(e.target.value)}
                   placeholder="AB123CD"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 font-mono outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] font-mono outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Categoria *</label>
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Categoria *</label>
                 <select
                   value={categoria}
                   onChange={(e) => setCategoria(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 >
                   <option value="FRIGO">FRIGO</option>
                   <option value="TELONATO">TELONATO</option>
@@ -603,43 +603,43 @@ export default function VehiclesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Portata Max (Kg)</label>
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Portata Max (Kg)</label>
                   <input
                     type="number"
                     required
                     value={portataMaxKg}
                     onChange={(e) => setPortataMaxKg(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Volume Max (M³)</label>
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Volume Max (M³)</label>
                   <input
                     type="number"
                     required
                     value={volumeMaxM3}
                     onChange={(e) => setVolumeMaxM3(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Stato Iniziale</label>
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Stato Iniziale</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 >
                   <option value="DISPONIBILE">DISPONIBILE</option>
                   <option value="IN_MANUTENZIONE">IN_MANUTENZIONE</option>
                   <option value="NON_IDONEO">NON_IDONEO</option>
                 </select>
               </div>
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+              <div className="flex justify-end space-x-3 pt-3 border-t border-[var(--surface-border)]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium"
+                  className="px-4 py-2 bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text-soft)] rounded-xl font-medium"
                 >
                   Annulla
                 </button>
@@ -658,13 +658,13 @@ export default function VehiclesPage() {
 
       {/* Documents Modal */}
       {docVehicle && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60  z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl w-full max-w-lg p-6  space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-100 flex items-center">
+              <h3 className="text-lg font-semibold text-[var(--text)] flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-blue-400" /> Documenti — {docVehicle.targa}
               </h3>
-              <button onClick={() => setDocVehicle(null)} className="text-slate-400 hover:text-white transition">
+              <button onClick={() => setDocVehicle(null)} className="text-[var(--text-label)] hover:text-white transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -674,12 +674,12 @@ export default function VehiclesPage() {
             )}
 
             {docLoading ? (
-              <div className="p-8 text-center text-slate-400 flex items-center justify-center space-x-2">
+              <div className="p-8 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>Caricamento documenti...</span>
               </div>
             ) : docs.length === 0 ? (
-              <p className="text-sm text-slate-500">Nessun documento registrato per questo veicolo.</p>
+              <p className="text-sm text-[var(--text-label-soft)]">Nessun documento registrato per questo veicolo.</p>
             ) : (
               <div className="space-y-2">
                 {docs.map((d) => {
@@ -687,14 +687,14 @@ export default function VehiclesPage() {
                   return (
                     <div
                       key={d.id}
-                      className="p-3.5 bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-between"
+                      className="p-3.5 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl flex items-center justify-between"
                     >
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold text-slate-200">{label(d.tipo)}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${b.cls}`}>{b.label}</span>
+                          <span className="text-sm font-semibold text-[var(--text)]">{label(d.tipo)}</span>
+                          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${b.cls}`}>{b.label}</span>
                         </div>
-                        <p className="text-xs font-mono text-slate-400 mt-0.5">
+                        <p className="text-xs font-mono text-[var(--text-label)] mt-0.5">
                           <CalendarClock className="w-3 h-3 inline mr-1" />
                           {new Date(d.dataScadenza).toLocaleDateString("it-IT")}
                         </p>
@@ -725,15 +725,15 @@ export default function VehiclesPage() {
               </div>
             )}
 
-            <form onSubmit={handleAddDoc} className="space-y-3 pt-3 border-t border-slate-800 text-sm">
-              <p className="text-xs font-semibold text-slate-300 uppercase">Aggiungi documento</p>
+            <form onSubmit={handleAddDoc} className="space-y-3 pt-3 border-t border-[var(--surface-border)] text-sm">
+              <p className="text-xs font-semibold text-[var(--text-soft)] ">Aggiungi documento</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Tipo *</label>
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Tipo *</label>
                   <select
                     value={docTipo}
                     onChange={(e) => setDocTipo(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-3 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-3 py-2 text-[var(--text)] outline-none"
                   >
                     {DOC_TYPES.map((t) => (
                       <option key={t} value={t}>{t}</option>
@@ -741,13 +741,13 @@ export default function VehiclesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">Scadenza *</label>
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">Scadenza *</label>
                   <input
                     type="date"
                     required
                     value={docScadenza}
                     onChange={(e) => setDocScadenza(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-3 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-3 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
@@ -757,8 +757,8 @@ export default function VehiclesPage() {
                   endpoint="vehicleDocument"
                   appearance={{
                     button:
-                      "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl px-3 py-2",
-                    allowedContent: "text-[10px] text-slate-500",
+                      "bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text)] text-xs font-medium rounded-xl px-3 py-2",
+                    allowedContent: "text-[11px] text-[var(--text-label-soft)]",
                   }}
                   onClientUploadComplete={(res) => {
                       const f = res[0];

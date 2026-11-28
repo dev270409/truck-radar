@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { Calculator, Download, Loader2, MapPin, Navigation, Plus, Route, Save, Trash2, Wand2 } from "lucide-react";
@@ -220,10 +220,10 @@ export default function GiriPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="flex items-center text-2xl font-bold text-slate-100">
+        <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
           <Route className="mr-2.5 h-6 w-6 text-sky-400" /> Giri e costi del viaggio
         </h1>
-        <p className="mt-1 text-sm text-slate-400">Incolla le tappe, ottimizza i chilometri e calcola costo reale e prezzo consigliato.</p>
+        <p className="mt-1 text-sm text-[var(--text-label)]">Incolla le tappe, ottimizza i chilometri e calcola costo reale e prezzo consigliato.</p>
       </div>
 
       <TripSubnav active="giri" />
@@ -233,28 +233,28 @@ export default function GiriPage() {
 
       <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
         <div className="space-y-5">
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-100">Tappe</h2>
-              <span className="text-xs text-slate-500">Una per riga Â· Nome|Indirizzo|lat|lng</span>
+              <h2 className="font-semibold text-[var(--text)]">Tappe</h2>
+              <span className="text-xs text-[var(--text-label-soft)]">Una per riga Â· Nome|Indirizzo|lat|lng</span>
             </div>
             <textarea
               value={raw}
               onChange={(e) => setRaw(e.target.value)}
               rows={8}
               placeholder={"Sede|Via E. da Rotterdam 5, Ferrara|44.8381|11.6198\nCliente A|Via Roma 1, Bologna\nCliente B|Via Milano 10, Verona"}
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+              className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
             />
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <button type="button" onClick={handleGeocode} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-sky-500 disabled:opacity-50">
+              <button type="button" onClick={handleGeocode} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-sky-500 disabled:opacity-50">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} Geocodifica
               </button>
-              <label className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+              <label className="inline-flex items-center gap-1.5 text-xs text-[var(--text-label)]">
                 <input type="checkbox" checked={returnToDepot} onChange={(e) => setReturnToDepot(e.target.checked)} /> ritorno alla sede
               </label>
-              <label className="text-xs text-slate-400">
+              <label className="text-xs text-[var(--text-label)]">
                 Partenza:{" "}
-                <select value={startIndex} onChange={(e) => setStartIndex(Number(e.target.value))} className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-slate-200">
+                <select value={startIndex} onChange={(e) => setStartIndex(Number(e.target.value))} className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1 text-[var(--text)]">
                   {(stops.length > 0 ? stops : parseLines(raw)).map((s, i) => (
                     <option key={`${s.name}-${i}`} value={i}>{i + 1}. {s.name}</option>
                   ))}
@@ -264,26 +264,26 @@ export default function GiriPage() {
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />} Ottimizza giro
               </button>
               {mapsUrl && (
-                <a href={mapsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-sky-500">
+                <a href={mapsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-sky-500">
                   <Navigation className="h-4 w-4" /> Google Maps
                 </a>
               )}
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 font-semibold text-slate-100">Tappe ottimizzate</h2>
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 font-semibold text-[var(--text)]">Tappe ottimizzate</h2>
             {(optimized.length > 0 ? optimized : stops).length === 0 ? (
-              <p className="text-sm text-slate-500">Nessuna tappa. Incolla gli indirizzi e ottimizza.</p>
+              <p className="text-sm text-[var(--text-label-soft)]">Nessuna tappa. Incolla gli indirizzi e ottimizza.</p>
             ) : (
               <ol className="space-y-2">
                 {(optimized.length > 0 ? optimized : stops).map((s, i) => (
-                  <li key={`${s.name}-${i}`} className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                    <span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-sky-950 text-xs font-bold text-sky-300">{i + 1}</span>
+                  <li key={`${s.name}-${i}`} className="flex items-start gap-3 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                    <span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-sky-950 text-xs font-semibold text-sky-300">{i + 1}</span>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-100">{s.name}</p>
-                      <p className="truncate text-xs text-slate-500">{s.address}</p>
-                      {s.lat != null && s.lng != null && <p className="text-[10px] text-slate-600">{s.lat.toFixed(4)}, {s.lng.toFixed(4)}</p>}
+                      <p className="text-sm font-semibold text-[var(--text)]">{s.name}</p>
+                      <p className="truncate text-xs text-[var(--text-label-soft)]">{s.address}</p>
+                      {s.lat != null && s.lng != null && <p className="text-[11px] text-[var(--text-label-soft)]">{s.lat.toFixed(4)}, {s.lng.toFixed(4)}</p>}
                     </div>
                   </li>
                 ))}
@@ -293,58 +293,58 @@ export default function GiriPage() {
         </div>
 
         <div className="space-y-5">
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]">
               <Calculator className="mr-2 h-4 w-4 text-emerald-400" /> Costo viaggio
             </h2>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <label className="text-xs text-slate-400">Km totali
-                <input value={totalKm} onChange={(e) => setTotalKm(Number(e.target.value))} type="number" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Km totali
+                <input value={totalKm} onChange={(e) => setTotalKm(Number(e.target.value))} type="number" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Gasolio â‚¬/l
-                <input value={fuelPrice} onChange={(e) => setFuelPrice(e.target.value)} type="number" step="0.01" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Gasolio â‚¬/l
+                <input value={fuelPrice} onChange={(e) => setFuelPrice(e.target.value)} type="number" step="0.01" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Consumo km/l
-                <input value={kmPerL} onChange={(e) => setKmPerL(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Consumo km/l
+                <input value={kmPerL} onChange={(e) => setKmPerL(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Pedaggi â‚¬
-                <input value={toll} onChange={(e) => setToll(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Pedaggi â‚¬
+                <input value={toll} onChange={(e) => setToll(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Autista â‚¬/h
-                <input value={driverHourly} onChange={(e) => setDriverHourly(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Autista â‚¬/h
+                <input value={driverHourly} onChange={(e) => setDriverHourly(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Ore guida
-                <input value={drivingHours} onChange={(e) => setDrivingHours(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Ore guida
+                <input value={drivingHours} onChange={(e) => setDrivingHours(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Ore pause
-                <input value={breaksHours} onChange={(e) => setBreaksHours(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Ore pause
+                <input value={breaksHours} onChange={(e) => setBreaksHours(e.target.value)} type="number" step="0.1" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Altri costi â‚¬
-                <input value={otherCosts} onChange={(e) => setOtherCosts(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Altri costi â‚¬
+                <input value={otherCosts} onChange={(e) => setOtherCosts(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Ricarico %
-                <input value={markup} onChange={(e) => setMarkup(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Ricarico %
+                <input value={markup} onChange={(e) => setMarkup(e.target.value)} type="number" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
-              <label className="text-xs text-slate-400">Nome giro
-                <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-slate-100" />
+              <label className="text-xs text-[var(--text-label)]">Nome giro
+                <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2.5 py-2 text-[var(--text)]" />
               </label>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Gasolio</p>
-                <p className="mt-1 text-lg font-bold text-slate-100">{eur(cost.fuelCost)}</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Gasolio</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--text)]">{eur(cost.fuelCost)}</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Autista</p>
-                <p className="mt-1 text-lg font-bold text-slate-100">{eur(cost.driverCost)}</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Autista</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--text)]">{eur(cost.driverCost)}</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Costo totale</p>
-                <p className="mt-1 text-lg font-bold text-slate-100">{eur(cost.totalCost)}</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Costo totale</p>
+                <p className="mt-1 text-lg font-semibold text-[var(--text)]">{eur(cost.totalCost)}</p>
               </div>
               <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/30 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-400">Prezzo consigliato</p>
-                <p className="mt-1 text-lg font-bold text-emerald-200">{eur(cost.suggestedPrice)}</p>
+                <p className="text-[11px] font-semibold   text-emerald-400">Prezzo consigliato</p>
+                <p className="mt-1 text-lg font-semibold text-emerald-200">{eur(cost.suggestedPrice)}</p>
               </div>
             </div>
             <button type="button" onClick={save} disabled={saving} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50">
@@ -352,22 +352,22 @@ export default function GiriPage() {
             </button>
           </section>
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-100">Giri salvati</h2>
-              <a href="/api/export?type=customers" className="text-xs text-slate-500 hover:text-slate-300"><Download className="inline h-3.5 w-3.5" /> clienti</a>
+              <h2 className="font-semibold text-[var(--text)]">Giri salvati</h2>
+              <a href="/api/export?type=customers" className="text-xs text-[var(--text-label-soft)] hover:text-[var(--text-soft)]"><Download className="inline h-3.5 w-3.5" /> clienti</a>
             </div>
             {saved.length === 0 ? (
-              <p className="text-sm text-slate-500">Nessun giro salvato.</p>
+              <p className="text-sm text-[var(--text-label-soft)]">Nessun giro salvato.</p>
             ) : (
               <div className="space-y-2">
                 {saved.map((r) => (
-                  <div key={r.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                  <div key={r.id} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-100">{r.name}</p>
-                      <p className="text-xs text-slate-500">{r.stopCount} tappe Â· {r.totalKm} km Â· {eur(r.suggestedPrice)}</p>
+                      <p className="truncate text-sm font-semibold text-[var(--text)]">{r.name}</p>
+                      <p className="text-xs text-[var(--text-label-soft)]">{r.stopCount} tappe Â· {r.totalKm} km Â· {eur(r.suggestedPrice)}</p>
                     </div>
-                    <button type="button" onClick={() => remove(r.id)} className="text-slate-500 hover:text-red-400" aria-label="Elimina giro">
+                    <button type="button" onClick={() => remove(r.id)} className="text-[var(--text-label-soft)] hover:text-red-400" aria-label="Elimina giro">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

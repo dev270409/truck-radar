@@ -181,77 +181,77 @@ export default function TripCostBreakdown({
   const marginPct = prezzo != null && prezzo > 0 ? (margin! / prezzo) * 100 : null;
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+    <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 font-semibold text-slate-100">
+          <h2 className="flex items-center gap-2 font-semibold text-[var(--text)]">
             <Calculator className="h-5 w-5 text-amber-400" /> Costi e margine del viaggio
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-[var(--text-label-soft)]">
             Seleziona le spese, calcola il costo approssimativo e confrontalo con il ricavo.
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Margine</p>
-          <p className={`text-xl font-bold ${margin == null ? "text-slate-400" : margin >= 0 ? "text-emerald-300" : "text-red-300"}`}>
+          <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Margine</p>
+          <p className={`text-xl font-semibold ${margin == null ? "text-[var(--text-label)]" : margin >= 0 ? "text-emerald-300" : "text-red-300"}`}>
             {margin == null ? "—" : eur(margin)}
           </p>
-          <p className="text-[10px] text-slate-500">{marginPct == null ? "Ricavo non inserito" : `${marginPct.toFixed(1)}% del ricavo`}</p>
+          <p className="text-[11px] text-[var(--text-label-soft)]">{marginPct == null ? "Ricavo non inserito" : `${marginPct.toFixed(1)}% del ricavo`}</p>
         </div>
       </div>
 
       {error && <div className="mt-3 rounded-lg border border-red-800/60 bg-red-950/40 p-2.5 text-xs text-red-200">{error}</div>}
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className={`rounded-xl border p-3 ${fuelOn ? "border-amber-800/60 bg-amber-950/20" : "border-slate-800 bg-slate-950/50"}`}>
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+        <div className={`rounded-xl border p-3 ${fuelOn ? "border-amber-800/60 bg-amber-950/20" : "border-[var(--surface-border)] bg-[var(--surface-soft)]"}`}>
+          <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
             <input type="checkbox" checked={fuelOn} onChange={(e) => setFuelOn(e.target.checked)} />
             <Fuel className="h-3.5 w-3.5 text-amber-400" /> Gasolio
           </label>
           <div className="mt-2 grid grid-cols-3 gap-2">
-            <input value={km} onChange={(e) => setKm(e.target.value)} type="number" min="0" placeholder="km" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
-            <input value={kmPerL} onChange={(e) => setKmPerL(e.target.value)} type="number" min="0" step="0.1" placeholder="km/l" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
-            <input value={fuelPrice} onChange={(e) => setFuelPrice(e.target.value)} type="number" min="0" step="0.01" placeholder="€/l" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
+            <input value={km} onChange={(e) => setKm(e.target.value)} type="number" min="0" placeholder="km" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
+            <input value={kmPerL} onChange={(e) => setKmPerL(e.target.value)} type="number" min="0" step="0.1" placeholder="km/l" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
+            <input value={fuelPrice} onChange={(e) => setFuelPrice(e.target.value)} type="number" min="0" step="0.01" placeholder="€/l" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
           </div>
-          <p className="mt-1.5 text-[11px] text-slate-400">Stima: {eur(fuelAmount)}</p>
+          <p className="mt-1.5 text-[11px] text-[var(--text-label)]">Stima: {eur(fuelAmount)}</p>
         </div>
 
-        <div className={`rounded-xl border p-3 ${tollOn ? "border-sky-800/60 bg-sky-950/20" : "border-slate-800 bg-slate-950/50"}`}>
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+        <div className={`rounded-xl border p-3 ${tollOn ? "border-sky-800/60 bg-sky-950/20" : "border-[var(--surface-border)] bg-[var(--surface-soft)]"}`}>
+          <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
             <input type="checkbox" checked={tollOn} onChange={(e) => setTollOn(e.target.checked)} />
             <ReceiptText className="h-3.5 w-3.5 text-sky-400" /> Pedaggi
           </label>
-          <input value={toll} onChange={(e) => setToll(e.target.value)} type="number" min="0" step="0.01" placeholder="€ pedaggi" className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
+          <input value={toll} onChange={(e) => setToll(e.target.value)} type="number" min="0" step="0.01" placeholder="€ pedaggi" className="mt-2 w-full rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
         </div>
 
-        <div className={`rounded-xl border p-3 ${driverOn ? "border-violet-800/60 bg-violet-950/20" : "border-slate-800 bg-slate-950/50"}`}>
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+        <div className={`rounded-xl border p-3 ${driverOn ? "border-violet-800/60 bg-violet-950/20" : "border-[var(--surface-border)] bg-[var(--surface-soft)]"}`}>
+          <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
             <input type="checkbox" checked={driverOn} onChange={(e) => setDriverOn(e.target.checked)} />
             <User className="h-3.5 w-3.5 text-violet-400" /> Autista
           </label>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <input value={hours} onChange={(e) => setHours(e.target.value)} type="number" min="0" step="0.5" placeholder="ore" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
-            <input value={hourly} onChange={(e) => setHourly(e.target.value)} type="number" min="0" step="0.5" placeholder="€/h" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
+            <input value={hours} onChange={(e) => setHours(e.target.value)} type="number" min="0" step="0.5" placeholder="ore" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
+            <input value={hourly} onChange={(e) => setHourly(e.target.value)} type="number" min="0" step="0.5" placeholder="€/h" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
           </div>
-          <p className="mt-1.5 text-[11px] text-slate-400">Stima: {eur(driverAmount)}</p>
+          <p className="mt-1.5 text-[11px] text-[var(--text-label)]">Stima: {eur(driverAmount)}</p>
         </div>
 
-        <div className={`rounded-xl border p-3 ${ferryOn ? "border-teal-800/60 bg-teal-950/20" : "border-slate-800 bg-slate-950/50"}`}>
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+        <div className={`rounded-xl border p-3 ${ferryOn ? "border-teal-800/60 bg-teal-950/20" : "border-[var(--surface-border)] bg-[var(--surface-soft)]"}`}>
+          <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
             <input type="checkbox" checked={ferryOn} onChange={(e) => setFerryOn(e.target.checked)} />
             <Wallet className="h-3.5 w-3.5 text-teal-400" /> Traghetto / tunnel
           </label>
-          <input value={ferry} onChange={(e) => setFerry(e.target.value)} type="number" min="0" step="0.01" placeholder="€" className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
+          <input value={ferry} onChange={(e) => setFerry(e.target.value)} type="number" min="0" step="0.01" placeholder="€" className="mt-2 w-full rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
         </div>
 
-        <div className={`rounded-xl border p-3 md:col-span-2 ${otherOn ? "border-slate-600 bg-slate-800/40" : "border-slate-800 bg-slate-950/50"}`}>
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+        <div className={`rounded-xl border p-3 md:col-span-2 ${otherOn ? "border-[var(--surface-border)] bg-[var(--surface-strong)]" : "border-[var(--surface-border)] bg-[var(--surface-soft)]"}`}>
+          <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
             <input type="checkbox" checked={otherOn} onChange={(e) => setOtherOn(e.target.checked)} />
             Altro costo
           </label>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <input value={otherLabel} onChange={(e) => setOtherLabel(e.target.value)} placeholder="Descrizione" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
-            <input value={otherAmount} onChange={(e) => setOtherAmount(e.target.value)} type="number" min="0" step="0.01" placeholder="€" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100" />
+            <input value={otherLabel} onChange={(e) => setOtherLabel(e.target.value)} placeholder="Descrizione" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
+            <input value={otherAmount} onChange={(e) => setOtherAmount(e.target.value)} type="number" min="0" step="0.01" placeholder="€" className="rounded border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-xs text-[var(--text)]" />
           </div>
         </div>
       </div>
@@ -266,20 +266,20 @@ export default function TripCostBreakdown({
         Aggiungi spese selezionate
       </button>
 
-      <div className="mt-5 border-t border-slate-800 pt-4">
+      <div className="mt-5 border-t border-[var(--surface-border)] pt-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold text-slate-200">Costi registrati</span>
-          <span className="font-bold text-slate-100">{loading ? "..." : eur(total)}</span>
+          <span className="font-semibold text-[var(--text)]">Costi registrati</span>
+          <span className="font-semibold text-[var(--text)]">{loading ? "..." : eur(total)}</span>
         </div>
         {items.length === 0 ? (
-          <p className="mt-2 text-xs text-slate-500">Nessun costo analitico. Aggiungi gasolio, pedaggi o autista per calcolare il margine.</p>
+          <p className="mt-2 text-xs text-[var(--text-label-soft)]">Nessun costo analitico. Aggiungi gasolio, pedaggi o autista per calcolare il margine.</p>
         ) : (
-          <ul className="mt-2 divide-y divide-slate-800/80">
+          <ul className="mt-2 divide-y divide-[var(--surface-border)]">
             {items.map((item) => (
               <li key={item.id} className="flex items-center justify-between gap-3 py-2 text-xs">
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-200">{COST_LABELS[item.tipo] ?? item.tipo}{item.label ? ` · ${item.label}` : ""}</p>
-                  <p className="text-slate-500">
+                  <p className="font-semibold text-[var(--text)]">{COST_LABELS[item.tipo] ?? item.tipo}{item.label ? ` · ${item.label}` : ""}</p>
+                  <p className="text-[var(--text-label-soft)]">
                     {item.quantity > 0 ? `${item.quantity} ${item.unit ?? ""} · ` : ""}{eur(item.amount)}
                   </p>
                 </div>
@@ -290,13 +290,13 @@ export default function TripCostBreakdown({
             ))}
           </ul>
         )}
-        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-slate-800 pt-3 text-xs">
+        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[var(--surface-border)] pt-3 text-xs">
           <div>
-            <p className="text-slate-500">Ricavo viaggio</p>
-            <p className="font-semibold text-slate-100">{prezzo != null ? eur(prezzo) : "Non inserito"}</p>
+            <p className="text-[var(--text-label-soft)]">Ricavo viaggio</p>
+            <p className="font-semibold text-[var(--text)]">{prezzo != null ? eur(prezzo) : "Non inserito"}</p>
           </div>
           <div>
-            <p className="text-slate-500">Costo totale</p>
+            <p className="text-[var(--text-label-soft)]">Costo totale</p>
             <p className="font-semibold text-amber-300">{eur(total)}</p>
           </div>
         </div>

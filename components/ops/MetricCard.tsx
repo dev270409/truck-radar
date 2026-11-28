@@ -19,7 +19,7 @@ export default function MetricCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="ops-label">{label}</p>
-          <p className="font-display mt-2 text-[26px] font-bold leading-none tracking-tight" style={{ color: "var(--text)" }}>
+          <p className="font-display mt-2 text-[26px] font-semibold leading-none tracking-tight" style={{ color: "var(--text)" }}>
             {value}
           </p>
           {hint && <div className="mt-2 text-[11px] font-semibold" style={{ color: tone }}>{hint}</div>}

@@ -92,10 +92,10 @@ export default function FlottaPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+        <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
           <MapIcon className="w-6 h-6 mr-2.5 text-blue-400" /> Flotta Live
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-label)] mt-1">
           Mezzi locali e dispositivi Geotab. La posizione Geotab riflette l&apos;ultima lettura manuale, non un polling live.
         </p>
         </div>
@@ -123,29 +123,29 @@ export default function FlottaPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {Object.entries(STATUS_META).map(([k, m]) => (
-          <div key={k} className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-            <p className={`text-3xl font-bold ${m.cls}`}>{stats.byStatus[k] ?? 0}</p>
-            <p className="text-xs text-slate-400 mt-1 flex items-center">
+          <div key={k} className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-4">
+            <p className={`text-3xl font-semibold ${m.cls}`}>{stats.byStatus[k] ?? 0}</p>
+            <p className="text-xs text-[var(--text-label)] mt-1 flex items-center">
               <span className="w-2 h-2 rounded-full mr-2" style={{ background: m.color }} />
               {m.label}
             </p>
           </div>
         ))}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:hidden">
-          <p className="text-3xl font-bold text-emerald-300">{stats.withPos}</p>
-          <p className="text-xs text-slate-400 mt-1 flex items-center">
+        <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-4 md:hidden">
+          <p className="text-3xl font-semibold text-emerald-300">{stats.withPos}</p>
+          <p className="text-xs text-[var(--text-label)] mt-1 flex items-center">
             <Satellite className="w-3 h-3 mr-1.5 text-emerald-400" /> Con posizione
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-950/60 border border-red-800 text-red-200 text-sm rounded-2xl">{error}</div>
+        <div className="p-4 bg-red-950/60 border border-red-800 text-red-200 text-sm rounded-xl">{error}</div>
       )}
 
       {/* Map */}
       {loading ? (
-        <div className="h-[420px] flex items-center justify-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400 space-x-2">
+        <div className="h-[420px] flex items-center justify-center bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl text-[var(--text-label)] space-x-2">
           <Loader2 className="w-5 h-5 animate-spin" />
           <span>Caricamento flotta...</span>
         </div>
@@ -154,32 +154,32 @@ export default function FlottaPage() {
       )}
 
       {/* Vehicle list */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden ">
+        <div className="px-6 py-4 border-b border-[var(--surface-border)] flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-[var(--text)]   flex items-center">
             <Car className="w-4 h-4 mr-2 text-emerald-400" /> Dettaglio mezzi ({vehicles.length})
           </h2>
           <div className="flex items-center space-x-3">
-            <span className="text-xs text-slate-400 flex items-center">
+            <span className="text-xs text-[var(--text-label)] flex items-center">
               <Navigation className="w-3.5 h-3.5 mr-1 text-blue-400" /> {stats.withPos} con posizione
             </span>
-            <span className="text-xs text-slate-400 flex items-center">
+            <span className="text-xs text-[var(--text-label)] flex items-center">
               <PlayCircle className="w-3.5 h-3.5 mr-1 text-green-400" /> {stats.active} in corridoio di viaggio
             </span>
           </div>
         </div>
         {loading ? (
-          <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+          <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
             <Loader2 className="w-5 h-5 animate-spin" /> <span>Caricamento...</span>
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-12 text-center text-[var(--text-label-soft)]">
             Nessun veicolo registrato. Aggiungi un veicolo dalla sezione &quot;Mezzi&quot; della flotta.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+            <table className="w-full text-left text-sm text-[var(--text-soft)]">
+              <thead className="bg-black/60 text-xs font-semibold text-[var(--text-label)]   border-b border-[var(--surface-border)]">
                 <tr>
                   <th className="px-6 py-4">Targa</th>
                   <th className="px-6 py-4">Categoria</th>
@@ -188,43 +188,43 @@ export default function FlottaPage() {
                   <th className="px-6 py-4">Viaggio / Autista</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-[var(--surface-border)]">
                 {sorted.map((v) => {
-                  const meta = STATUS_META[v.status] ?? { cls: "text-slate-300" };
+                  const meta = STATUS_META[v.status] ?? { cls: "text-[var(--text-soft)]" };
                   return (
                     <tr
                       key={v.id}
-                      className={`hover:bg-slate-800/40 transition ${
+                      className={`hover:bg-[var(--surface-soft)] transition ${
                         selected === v.id ? "bg-blue-950/40" : ""
                       }`}
                     >
-                      <td className="px-6 py-4 font-mono font-bold text-slate-100">{v.targa}</td>
+                      <td className="px-6 py-4 font-mono font-semibold text-[var(--text)]">{v.targa}</td>
                       <td className="px-6 py-4">
-                        <span className="bg-slate-800 text-slate-200 px-2.5 py-1 rounded-md text-xs font-semibold">
+                        <span className="bg-[var(--surface-strong)] text-[var(--text)] px-2.5 py-1 rounded-md text-xs font-semibold">
                           {label(v.categoria)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-xs font-bold ${meta.cls}`}>{meta.label ?? label(v.status)}</span>
+                        <span className={`text-xs font-semibold ${meta.cls}`}>{meta.label ?? label(v.status)}</span>
                       </td>
-                      <td className="px-6 py-4 text-xs text-slate-400">
+                      <td className="px-6 py-4 text-xs text-[var(--text-label)]">
                         {v.lat != null && v.lng != null ? (
                           <span className="flex items-center">
                             <Satellite className="w-3.5 h-3.5 mr-1.5 text-emerald-400" />
                             {v.posizione || `${v.lat.toFixed(4)}, ${v.lng!.toFixed(4)}`}
                           </span>
                         ) : (
-                          <span className="text-slate-500">Nessun segnale GPS</span>
+                          <span className="text-[var(--text-label-soft)]">Nessun segnale GPS</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-xs">
                         {v.tripId ? (
                           <div>
-                            <span className="text-slate-200 font-semibold">
+                            <span className="text-[var(--text)] font-semibold">
                               {v.luogoRitiro} → {v.luogoConsegna}
                             </span>
                             {v.driverNome && (
-                              <p className="text-slate-400 mt-0.5">
+                              <p className="text-[var(--text-label)] mt-0.5">
                                 <Wrench className="w-3 h-3 inline mr-1" />
                                 {v.driverNome} {v.driverCognome}
                               </p>
@@ -233,12 +233,12 @@ export default function FlottaPage() {
                         ) : v.source === "GEOTAB" ? (
                           <div>
                             <span className="text-sky-300 font-semibold">Geotab · sola lettura</span>
-                            {v.driverNome && <p className="text-slate-400 mt-0.5">Autista: {v.driverNome} {v.driverCognome}</p>}
+                            {v.driverNome && <p className="text-[var(--text-label)] mt-0.5">Autista: {v.driverNome} {v.driverCognome}</p>}
                             {v.status === "IN_VIAGGIO" && <p className="mt-0.5 text-blue-300">Veicolo in marcia secondo Geotab</p>}
                             {v.isDeviceCommunicating === false && <p className="text-amber-300 mt-0.5">Dispositivo non sta comunicando</p>}
                           </div>
                         ) : (
-                          <span className="text-slate-500">Nessun viaggio attivo</span>
+                          <span className="text-[var(--text-label-soft)]">Nessun viaggio attivo</span>
                         )}
                       </td>
                     </tr>

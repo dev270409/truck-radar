@@ -68,7 +68,7 @@ function localDateTime(date: Date) {
 }
 
 const statusStyles: Record<string, string> = {
-  DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
+  DA_ASSEGNARE: "bg-[var(--surface-soft)] text-[var(--text-soft)] border border-[var(--surface-border)]",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
   IN_CORSO: "bg-amber-950 text-amber-300 border border-amber-800/60",
   COMPLETATO: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
@@ -370,10 +370,10 @@ export default function TripsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Route className="w-6 h-6 mr-2.5 text-blue-400" /> Viaggi
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Crea i viaggi, assegna mezzo e autista e controlla lo stato.
           </p>
         </div>
@@ -381,7 +381,7 @@ export default function TripsPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/dashboard/trips/importa"
-            className="bg-slate-800 hover:bg-slate-700 text-slate-100 text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-700 flex items-center space-x-2 transition"
+            className="bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text)] text-sm font-semibold px-4 py-2.5 rounded-xl border border-[var(--surface-border)] flex items-center space-x-2 transition"
           >
             <FileUp className="w-4 h-4" />
             <span className="hidden sm:inline">Importa rendiconto</span>
@@ -401,7 +401,7 @@ export default function TripsPage() {
       {forecast && forecast.monthsUsed > 0 && (
         <Link
           href="/dashboard/trips/importa"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition-colors hover:bg-emerald-950/30"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-800/50 bg-emerald-950/20 px-4 py-3 transition-colors hover:bg-emerald-950/30"
         >
           <div>
             <p className="text-xs font-semibold text-emerald-200/70">
@@ -419,9 +419,9 @@ export default function TripsPage() {
       )}
 
       {/* Trips Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden ">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+          <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
             <Loader2 className="w-5 h-5 animate-spin" />
             <span>Caricamento viaggi in corso...</span>
           </div>
@@ -435,11 +435,11 @@ export default function TripsPage() {
           />
         ) : (
           <>
-            <div className="grid gap-4 border-b border-slate-800 p-4 lg:grid-cols-[minmax(240px,1fr)_auto] lg:items-end">
+            <div className="grid gap-4 border-b border-[var(--surface-border)] p-4 lg:grid-cols-[minmax(240px,1fr)_auto] lg:items-end">
               <label htmlFor="trip-search" className="block min-w-0">
-                <span className="mb-1.5 block text-xs font-medium text-slate-300">Cerca per tratta, cliente o mezzo</span>
+                <span className="mb-1.5 block text-xs font-medium text-[var(--text-soft)]">Cerca per tratta, cliente o mezzo</span>
                 <span className="relative block">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-label-soft)]" aria-hidden="true" />
                   <input
                     id="trip-search"
                     type="search"
@@ -463,7 +463,7 @@ export default function TripsPage() {
                       className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${
                         active
                           ? "border-blue-500 bg-blue-600 text-white"
-                          : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-500 hover:text-slate-100"
+                          : "border-[var(--surface-border)] bg-[var(--surface-soft)] text-[var(--text-soft)] hover:border-[var(--text-label)] hover:text-[var(--text)]"
                       }`}
                     >
                       {option.label} <span className="ml-1 font-mono tabular-nums">{option.count}</span>
@@ -474,8 +474,8 @@ export default function TripsPage() {
             </div>
 
             <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 border-b border-slate-800">
+            <table className="w-full text-left text-sm text-[var(--text-soft)]">
+              <thead className="bg-black/60 text-xs font-semibold text-[var(--text-label)] border-b border-[var(--surface-border)]">
                 <tr>
                   <th className="px-6 py-4">Tratta</th>
                   <th className="px-6 py-4">Ritiro</th>
@@ -487,10 +487,10 @@ export default function TripsPage() {
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-[var(--surface-border)]">
                 {filteredTrips.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-10 text-center text-sm text-slate-400">
+                    <td colSpan={8} className="px-6 py-10 text-center text-sm text-[var(--text-label)]">
                       <p>Nessun viaggio corrisponde alla ricerca o al filtro scelto.</p>
                       <button
                         type="button"
@@ -505,30 +505,30 @@ export default function TripsPage() {
                     </td>
                   </tr>
                 ) : filteredTrips.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-800/40 transition">
+                  <tr key={t.id} className="hover:bg-[var(--surface-soft)] transition">
                     <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2 text-slate-200 font-medium">
+                      <div className="flex items-center space-x-2 text-[var(--text)] font-medium">
                         <span className="capitalize">{t.luogoRitiro}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                        <ArrowRight className="w-3.5 h-3.5 text-[var(--text-label-soft)]" />
                         <span className="capitalize">{t.luogoConsegna}</span>
                       </div>
                       {t.cliente && (
-                        <p className="text-[11px] text-slate-500 mt-0.5">Cliente: {t.cliente}</p>
+                        <p className="text-[11px] text-[var(--text-label-soft)] mt-0.5">Cliente: {t.cliente}</p>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-xs font-mono text-slate-400">
+                    <td className="px-6 py-4 text-xs font-mono text-[var(--text-label)]">
                       {new Date(t.dataRitiro).toLocaleDateString("it-IT")}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-slate-200">{t.tipoMerce}</p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[var(--text)]">{t.tipoMerce}</p>
+                      <p className="text-[11px] text-[var(--text-label-soft)]">
                         {t.pesoKg} kg · {t.volumeM3} m³
                       </p>
                     </td>
-                    <td className="px-6 py-4 text-xs font-mono text-slate-300">
+                    <td className="px-6 py-4 text-xs font-mono text-[var(--text-soft)]">
                       {t.vehicle ? t.vehicle.targa : "—"}
                     </td>
-                    <td className="px-6 py-4 text-xs text-slate-300">
+                    <td className="px-6 py-4 text-xs text-[var(--text-soft)]">
                       {t.driver ? `${t.driver.nome} ${t.driver.cognome}` : "—"}
                     </td>
                     <td className="px-6 py-4">
@@ -537,7 +537,7 @@ export default function TripsPage() {
                           € {(t.prezzo - (t.costo ?? 0)).toFixed(2)}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-500">—</span>
+                        <span className="text-xs text-[var(--text-label-soft)]">—</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -562,7 +562,7 @@ export default function TripsPage() {
                           onClick={() => duplicateTrip(t)}
                           title="Duplica viaggio con date +1 giorno"
                           aria-label={`Duplica viaggio ${t.luogoRitiro} - ${t.luogoConsegna}`}
-                          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-300 hover:text-slate-100 bg-slate-800/60 border border-slate-700 px-2.5 py-1.5 rounded-lg transition"
+                          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-[var(--text-soft)] hover:text-[var(--text)] bg-[var(--surface-strong)] border border-[var(--surface-border)] px-2.5 py-1.5 rounded-lg transition"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           <span className="hidden xl:inline">Duplica</span>
@@ -587,14 +587,14 @@ export default function TripsPage() {
 
       {/* Quick assign modal */}
       {assignTrip && (
-        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-100 flex items-center">
+                <h3 className="text-lg font-semibold text-[var(--text)] flex items-center">
                   <UserPlus className="w-5 h-5 mr-2 text-emerald-400" /> Assegna viaggio
                 </h3>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-[var(--text-label)]">
                   {assignTrip.luogoRitiro} → {assignTrip.luogoConsegna} ·{" "}
                   {new Date(assignTrip.dataRitiro).toLocaleDateString("it-IT")}
                 </p>
@@ -603,7 +603,7 @@ export default function TripsPage() {
                 type="button"
                 onClick={() => setAssignTrip(null)}
                 aria-label="Chiudi"
-                className="rounded-lg border border-slate-700 p-2 text-slate-400 hover:text-slate-200"
+                className="rounded-lg border border-[var(--surface-border)] p-2 text-[var(--text-label)] hover:text-[var(--text)]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -616,17 +616,17 @@ export default function TripsPage() {
             )}
 
             {suggestionsLoading && (
-              <p className="flex items-center gap-2 text-[11px] text-slate-400">
+              <p className="flex items-center gap-2 text-[11px] text-[var(--text-label)]">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" /> Calcolo dei consigli…
               </p>
             )}
 
             {suggestions && (
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-xs font-semibold text-slate-400">Consigliati</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-xs font-semibold text-[var(--text-label)]">Consigliati</p>
                 {suggestions.vehicles.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-[10px] font-semibold text-slate-500">Mezzi</p>
+                    <p className="text-[11px] font-semibold text-[var(--text-label-soft)]">Mezzi</p>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {suggestions.vehicles.map((vehicle) => (
                         <button
@@ -637,21 +637,21 @@ export default function TripsPage() {
                           className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition ${
                             assignVehicleId === vehicle.id
                               ? "border-emerald-600 bg-emerald-950/60 text-emerald-200"
-                              : "border-slate-700 bg-slate-900 text-slate-300 hover:border-emerald-700"
+                              : "border-[var(--surface-border)] bg-[var(--surface)] text-[var(--text-soft)] hover:border-emerald-700"
                           }`}
                         >
                           {vehicle.targa} · {label(vehicle.categoria)}
                         </button>
                       ))}
                     </div>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                    <p className="mt-1 text-[11px] text-[var(--text-label-soft)]">
                       {suggestions.vehicles[0].reasons.slice(0, 2).join(" · ")}
                     </p>
                   </div>
                 )}
                 {suggestions.drivers.length > 0 ? (
                   <div className="mt-2">
-                    <p className="text-[10px] font-semibold text-slate-500">Autisti</p>
+                    <p className="text-[11px] font-semibold text-[var(--text-label-soft)]">Autisti</p>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {suggestions.drivers.map((driver) => (
                         <button
@@ -662,19 +662,19 @@ export default function TripsPage() {
                           className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition ${
                             assignDriverId === driver.id
                               ? "border-emerald-600 bg-emerald-950/60 text-emerald-200"
-                              : "border-slate-700 bg-slate-900 text-slate-300 hover:border-emerald-700"
+                              : "border-[var(--surface-border)] bg-[var(--surface)] text-[var(--text-soft)] hover:border-emerald-700"
                           }`}
                         >
                           {driver.nome}
                         </button>
                       ))}
                     </div>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                    <p className="mt-1 text-[11px] text-[var(--text-label-soft)]">
                       {suggestions.drivers[0].reasons.slice(0, 2).join(" · ")}
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-2 text-[10px] text-amber-300">
+                  <p className="mt-2 text-[11px] text-amber-300">
                     {suggestions.note ?? "Nessun autista consigliato."}
                   </p>
                 )}
@@ -683,14 +683,14 @@ export default function TripsPage() {
 
             <form onSubmit={saveAssign} className="space-y-3 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                   Autista *
                 </label>
                 <select
                   required
                   value={assignDriverId}
                   onChange={(e) => setAssignDriverId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 >
                   <option value="">-- Seleziona autista --</option>
                   {drivers.map((driver) => (
@@ -702,13 +702,13 @@ export default function TripsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                   Mezzo (opzionale)
                 </label>
                 <select
                   value={assignVehicleId}
                   onChange={(e) => setAssignVehicleId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2 text-slate-100 outline-none font-mono text-xs"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2 text-[var(--text)] outline-none font-mono text-xs"
                 >
                   <option value="">-- Nessun mezzo --</option>
                   {vehicles.map((vehicle) => (
@@ -719,7 +719,7 @@ export default function TripsPage() {
                 </select>
               </div>
 
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[var(--text-label-soft)]">
                 Se il viaggio è nel passato viene segnato come completato. L&apos;autista lo vede
                 subito nella sua area personale.
               </p>
@@ -728,7 +728,7 @@ export default function TripsPage() {
                 <button
                   type="button"
                   onClick={() => setAssignTrip(null)}
-                  className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300"
+                  className="rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm text-[var(--text-soft)]"
                   disabled={assignSaving}
                 >
                   Annulla
@@ -762,9 +762,9 @@ export default function TripsPage() {
 
       {/* Add Trip Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-slate-100 flex items-center">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-[var(--text)] flex items-center">
               <Route className="w-5 h-5 mr-2 text-blue-400" /> Nuovo viaggio
             </h3>
 
@@ -777,7 +777,7 @@ export default function TripsPage() {
             <form onSubmit={handleCreate} className="space-y-4 text-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
+                  <label className="flex items-center text-xs font-semibold text-[var(--text-soft)] mb-1">
                     <MapPin className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Luogo di Ritiro *
                   </label>
                   <input
@@ -786,11 +786,11 @@ export default function TripsPage() {
                     value={luogoRitiro}
                     onChange={(e) => setLuogoRitiro(e.target.value)}
                     placeholder="Es. Milano"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
+                  <label className="flex items-center text-xs font-semibold text-[var(--text-soft)] mb-1">
                     <MapPin className="w-3.5 h-3.5 mr-1 text-rose-400" /> Luogo di Consegna *
                   </label>
                   <input
@@ -799,14 +799,14 @@ export default function TripsPage() {
                     value={luogoConsegna}
                     onChange={(e) => setLuogoConsegna(e.target.value)}
                     placeholder="Es. Bari"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Data & Ora Ritiro *
                   </label>
                   <input
@@ -814,11 +814,11 @@ export default function TripsPage() {
                     required
                     value={dataRitiro}
                     onChange={(e) => setDataRitiro(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Data & Ora Consegna *
                   </label>
                   <input
@@ -826,13 +826,13 @@ export default function TripsPage() {
                     required
                     value={dataConsegna}
                     onChange={(e) => setDataConsegna(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                   Tipologia Merce *
                 </label>
                 <input
@@ -841,35 +841,35 @@ export default function TripsPage() {
                   value={tipoMerce}
                   onChange={(e) => setTipoMerce(e.target.value)}
                   placeholder="Es. Frutta fresca"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Peso (kg)
                   </label>
                   <input
                     type="number"
                     value={pesoKg}
                     onChange={(e) => setPesoKg(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Volume (m³)
                   </label>
                   <input
                     type="number"
                     value={volumeM3}
                     onChange={(e) => setVolumeM3(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     <Euro className="w-3 h-3 inline mr-1" /> Prezzo (€)
                   </label>
                   <input
@@ -877,11 +877,11 @@ export default function TripsPage() {
                     value={prezzo}
                     onChange={(e) => setPrezzo(e.target.value)}
                     placeholder="0.00"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Costo (€)
                   </label>
                   <input
@@ -889,20 +889,20 @@ export default function TripsPage() {
                     value={costo}
                     onChange={(e) => setCosto(e.target.value)}
                     placeholder="0.00"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Anagrafica cliente
                   </label>
                   <select
                     value={customerId}
                     onChange={(e) => selectCustomer(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-xs"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none text-xs"
                   >
                     <option value="">Cliente occasionale / nuovo</option>
                     {customers.map((customer) => (
@@ -914,7 +914,7 @@ export default function TripsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)] mb-1">
                     Cliente (opzionale)
                   </label>
                   <input
@@ -925,20 +925,20 @@ export default function TripsPage() {
                       setCustomerId("");
                     }}
                     placeholder="Ragione sociale cliente"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
+                  <label className="flex items-center text-xs font-semibold text-[var(--text-soft)] mb-1">
                     <Truck className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Mezzo (opzionale)
                   </label>
                   <select
                     value={vehicleId}
                     onChange={(e) => setVehicleId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none font-mono text-xs"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none font-mono text-xs"
                   >
                     <option value="">-- Nessun mezzo --</option>
                     {vehicles.map((v) => (
@@ -949,13 +949,13 @@ export default function TripsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="flex items-center text-xs font-semibold text-slate-300 mb-1">
+                  <label className="flex items-center text-xs font-semibold text-[var(--text-soft)] mb-1">
                     <User className="w-3.5 h-3.5 mr-1 text-indigo-400" /> Autista (opzionale)
                   </label>
                   <select
                     value={driverId}
                     onChange={(e) => setDriverId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2 text-slate-100 outline-none text-xs"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none text-xs"
                   >
                     <option value="">-- Nessun autista --</option>
                     {drivers.map((d) => (
@@ -967,11 +967,11 @@ export default function TripsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+              <div className="flex justify-end space-x-3 pt-3 border-t border-[var(--surface-border)]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium"
+                  className="px-4 py-2 bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text-soft)] rounded-xl font-medium"
                 >
                   Annulla
                 </button>

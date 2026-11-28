@@ -81,26 +81,26 @@ function Original_IspezioniPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+        <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
           <ClipboardCheck className="w-6 h-6 mr-2.5 text-emerald-400" /> Check-list Ispezioni
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-label)] mt-1">
           Template pre-partenza per gli autisti e storico esiti verificati in sede.
         </p>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-950/60 border border-red-800 text-red-200 text-sm rounded-2xl">{error}</div>
+        <div className="p-4 bg-red-950/60 border border-red-800 text-red-200 text-sm rounded-xl">{error}</div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Template editor */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide mb-4">
+        <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-6 ">
+          <h2 className="text-sm font-semibold text-[var(--text)]   mb-4">
             Template pre-partenza
           </h2>
           {loading ? (
-            <div className="p-8 text-center text-slate-400 flex items-center justify-center space-x-2">
+            <div className="p-8 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
               <Loader2 className="w-4 h-4 animate-spin" /> <span>Caricamento...</span>
             </div>
           ) : (
@@ -111,7 +111,7 @@ function Original_IspezioniPage() {
                     <input
                       value={label}
                       onChange={(e) => updateItem(idx, e.target.value)}
-                      className="flex-1 bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-slate-100 text-sm outline-none"
+                      className="flex-1 bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-3 py-2 text-[var(--text)] text-sm outline-none"
                     />
                     <button
                       onClick={() => setItemsInput((prev) => prev.filter((_, i) => i !== idx))}
@@ -142,16 +142,16 @@ function Original_IspezioniPage() {
         </div>
 
         {/* Inspection log */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide mb-4">
+        <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-6 ">
+          <h2 className="text-sm font-semibold text-[var(--text)]   mb-4">
             Esiti ispezioni recenti
           </h2>
           {loading ? (
-            <div className="p-8 text-center text-slate-400 flex items-center justify-center space-x-2">
+            <div className="p-8 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
               <Loader2 className="w-4 h-4 animate-spin" /> <span>Caricamento...</span>
             </div>
           ) : inspections.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-[var(--text-label-soft)]">
               Nessuna ispezione registrata. Gli autisti compileranno la check-list dall&apos;app.
             </p>
           ) : (
@@ -159,12 +159,12 @@ function Original_IspezioniPage() {
               {inspections.map((ins) => {
                 const failCount = ins.items.filter((i) => !i.ok).length;
                 return (
-                  <div key={ins.id} className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl">
+                  <div key={ins.id} className="p-3.5 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="font-mono font-bold text-slate-100 text-sm">{ins.targa ?? ins.vehicleId}</span>
+                        <span className="font-mono font-semibold text-[var(--text)] text-sm">{ins.targa ?? ins.vehicleId}</span>
                         <span
-                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded ${
+                          className={`text-[11px] font-semibold px-2.5 py-0.5 rounded ${
                             ins.esito === "OK"
                               ? "bg-emerald-950 text-emerald-300 border border-emerald-800/60"
                               : "bg-red-950 text-red-300 border border-red-800/60"
@@ -173,19 +173,19 @@ function Original_IspezioniPage() {
                           {label(ins.esito)}
                         </span>
                       </div>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-[var(--text-label-soft)]">
                         {new Date(ins.createdAt).toLocaleDateString("it-IT")} {new Date(ins.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1.5">
+                    <p className="text-xs text-[var(--text-label)] mt-1.5">
                       {ins.templateName || "Check-list pre-partenza"} · {ins.items.length} voci
                       {failCount > 0 && (
-                        <span className="ml-1 text-red-300 font-bold flex items-center inline">
+                        <span className="ml-1 text-red-300 font-semibold flex items-center inline">
                           <ShieldAlert className="w-3 h-3 mr-1" /> {failCount} criticità
                         </span>
                       )}
                     </p>
-                    {ins.note && <p className="text-xs text-slate-500 mt-1 italic">{ins.note}</p>}
+                    {ins.note && <p className="text-xs text-[var(--text-label-soft)] mt-1 italic">{ins.note}</p>}
                   </div>
                 );
               })}

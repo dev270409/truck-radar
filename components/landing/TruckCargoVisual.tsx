@@ -50,15 +50,18 @@ const CARGO_PLAN: Array<Omit<CargoItem, "id" | "x" | "y">> = [
 
 function buildCargoSequence(): CargoItem[] {
   const items: CargoItem[] = [];
+  const scale = 0.84;
   let x = TRAILER_X + 8;
   CARGO_PLAN.forEach((plan, index) => {
+    const w = Math.round(plan.w * scale);
     items.push({
       ...plan,
+      w,
       id: `cargo-${index}`,
       x,
       y: FLOOR_Y - plan.h,
     });
-    x += plan.w + 5;
+    x += w + 4;
   });
   return items;
 }
@@ -120,32 +123,37 @@ function CargoGlyph({ item }: { item: CargoItem }) {
   }
 }
 
+const CARGO_SEQUENCE: CargoItem[] = buildCargoSequence();
+
 export function TruckCargoVisual() {
   const reduceMotion = useReducedMotion();
   const truckRef = useRef<SVGGElement>(null);
-  const [phase, setPhase] = useState<"arriving" | "loading" | "departing" | "idle">("idle");
-  const [cargoIndex, setCargoIndex] = useState(0);
-  const [cargoList, setCargoList] = useState<CargoItem[]>([]);
-  const sequence = useRef<CargoItem[]>(buildCargoSequence());
+  // Prima impressione: il camion è già carico. Il ciclo parte dopo qualche secondo.
+  const [phase, setPhase] = useState<"ready" | "arriving" | "loading" | "departing" | "idle">("ready");
+  const [cycle, setCycle] = useState(0);
+  const [cargoIndex, setCargoIndex] = useState(CARGO_SEQUENCE.length);
+  const [cargoList, setCargoList] = useState<CargoItem[]>(CARGO_SEQUENCE);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const metersUsed = cargoList.reduce((sum, c) => sum + c.meters, 0);
   const isFull = metersUsed >= 5.0;
 
   useEffect(() => {
-    if (reduceMotion) {
-      setCargoList(sequence.current);
-      setCargoIndex(sequence.current.length);
-      setPhase("loading");
-      return;
-    }
+    if (reduceMotion) return;
 
     let running = true;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     timeoutsRef.current = timeouts;
 
+    const reset = () => {
+      setCargoList([]);
+      setCargoIndex(0);
+      setCycle((c) => c + 1);
+      setPhase("idle");
+    };
+
     const loadNext = (index: number) => {
-      if (!running || index >= sequence.current.length) {
+      if (!running || index >= CARGO_SEQUENCE.length) {
         // Camion pieno → parte
         timeouts.push(
           setTimeout(() => {
@@ -160,17 +168,13 @@ export function TruckCargoVisual() {
                 ease: "inOutQuad",
                 complete: () => {
                   if (!running) return;
-                  setCargoList([]);
-                  setCargoIndex(0);
-                  setPhase("idle");
+                  reset();
                   timeouts.push(setTimeout(() => startCycle(), 600));
                 },
               });
             }).catch(() => {
               if (!running) return;
-              setCargoList([]);
-              setCargoIndex(0);
-              setPhase("idle");
+              reset();
               timeouts.push(setTimeout(() => startCycle(), 600));
             });
           }, 800)
@@ -180,7 +184,7 @@ export function TruckCargoVisual() {
 
       // Aggiunge il collo
       setCargoIndex(index + 1);
-      setCargoList(sequence.current.slice(0, index + 1));
+      setCargoList(CARGO_SEQUENCE.slice(0, index + 1));
 
       // Prossimo collo dopo un intervallo variabile
       const delay = 500 + Math.random() * 300;
@@ -212,7 +216,8 @@ export function TruckCargoVisual() {
       });
     };
 
-    timeouts.push(setTimeout(startCycle, 400));
+    // Lascia vedere il carico pieno per qualche secondo, poi parte.
+    timeouts.push(setTimeout(() => loadNext(CARGO_SEQUENCE.length), 2600));
 
     return () => {
       running = false;
@@ -221,8 +226,16 @@ export function TruckCargoVisual() {
   }, [reduceMotion]);
 
   return (
-    <div className="relative w-full" role="img" aria-label="Camion che si carica di colli: un esempio del piano di carico">
-      <svg viewBox={`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`} className="w-full" style={{ maxHeight: 240 }}>
+    <div
+      className="relative w-full min-w-0"
+      role="img"
+      aria-label="Camion che si carica di colli: un esempio del piano di carico"
+    >
+      <svg
+        viewBox={`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`}
+        className="block w-full max-w-full"
+        style={{ maxHeight: 240 }}
+      >
         <defs>
           {/* Ombra ellittica sotto il camion */}
           <radialGradient id="truck-shadow" cx="50%" cy="50%">
@@ -297,7 +310,7 @@ export function TruckCargoVisual() {
               <motion.g
                 key={item.id}
                 initial={
-                  reduceMotion
+                  reduceMotion || cycle === 0
                     ? false
                     : { y: -80, opacity: 0, scale: 0.7, rotate: 3 }
                 }
@@ -338,6 +351,7 @@ export function TruckCargoVisual() {
             height={5}
             rx="2.5"
             fill={isFull ? "var(--success)" : "var(--brand)"}
+            initial={false}
             animate={{ width: Math.max((metersUsed / MAX_METERS) * TRAILER_W, 0) }}
             transition={{ type: "spring", stiffness: 120, damping: 20 }}
           />
@@ -369,6 +383,7 @@ export function TruckCargoVisual() {
         style={{ color: "var(--text-label)" }}
       >
         <span>
+          {phase === "ready" && "Carico completo · pronto alla partenza"}
           {phase === "arriving" && "Mezzo in arrivo…"}
           {phase === "loading" && "Caricamento in corso…"}
           {phase === "departing" && "Carico completato · in partenza"}

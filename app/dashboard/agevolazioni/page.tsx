@@ -76,22 +76,22 @@ export default function AgevolazioniPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="flex items-center text-2xl font-bold text-slate-100">
+        <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
           <BadgePercent className="mr-2.5 h-6 w-6 text-amber-400" /> Agevolazioni e incentivi
         </h1>
-        <p className="mt-1 max-w-3xl text-sm text-slate-400">
+        <p className="mt-1 max-w-3xl text-sm text-[var(--text-label)]">
           Catalogo di lavoro per accise, bonus carburante, pedaggi, investimenti e bandi. Le scadenze cambiano: la fonte ufficiale resta il bando.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-sky-800/60 bg-sky-950/30 p-5">
+      <section className="rounded-xl border border-sky-800/60 bg-sky-950/30 p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-950/70 text-sky-300">
               <Mail className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-sm font-bold text-sky-100">Consorzio Italia e mail periodiche</h2>
+              <h2 className="text-sm font-semibold text-sky-100">Consorzio Italia e mail periodiche</h2>
               <p className="mt-1 max-w-2xl text-xs leading-5 text-sky-100/80">
                 In arrivo: inoltro delle email del Consorzio a <span className="font-mono">agevolazioni@in.truck-radar.it</span>.
                 La prossima fase le classificherà e creerà scadenze e checklist automatiche. Oggi il catalogo è manuale.
@@ -110,15 +110,15 @@ export default function AgevolazioniPage() {
           return (
             <article key={item.title} className="ops-card flex flex-col p-5">
               <div className="flex items-start justify-between gap-3">
-                <span className={`grid h-10 w-10 place-items-center rounded-xl bg-slate-950/70 ${item.tone}`}>
+                <span className={`grid h-10 w-10 place-items-center rounded-xl bg-[var(--surface-soft)] ${item.tone}`}>
                   <Icon className="h-5 w-5" />
                 </span>
-                <span className="rounded-full border border-slate-700 bg-slate-950 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">
+                <span className="rounded-full border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-0.5 text-[11px] font-semibold  text-[var(--text-label)]">
                   {item.category}
                 </span>
               </div>
-              <h2 className="mt-3 text-sm font-bold text-slate-100">{item.title}</h2>
-              <p className="mt-2 flex-1 text-xs leading-5 text-slate-400">{item.summary}</p>
+              <h2 className="mt-3 text-sm font-semibold text-[var(--text)]">{item.title}</h2>
+              <p className="mt-2 flex-1 text-xs leading-5 text-[var(--text-label)]">{item.summary}</p>
               <p className="mt-3 flex items-start gap-1.5 text-[11px] leading-4 text-amber-200">
                 <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {item.action}
               </p>
@@ -135,11 +135,11 @@ export default function AgevolazioniPage() {
         })}
       </div>
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-slate-100">
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
           <FileCheck2 className="h-4 w-4 text-emerald-400" /> Prossimi automatismi
         </h2>
-        <ul className="mt-3 grid gap-2 text-xs leading-5 text-slate-400 md:grid-cols-2">
+        <ul className="mt-3 grid gap-2 text-xs leading-5 text-[var(--text-label)] md:grid-cols-2">
           <li>Import email Consorzio Italia e classificazione AI.</li>
           <li>Scadenze e promemoria per ogni opportunità.</li>
           <li>Checklist documenti e stato pratica.</li>

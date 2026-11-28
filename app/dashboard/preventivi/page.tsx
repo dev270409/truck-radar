@@ -32,7 +32,7 @@ interface Quote {
 }
 
 const statusStyle: Record<string, string> = {
-  BOZZA: "bg-slate-800 text-slate-300 border-slate-600",
+  BOZZA: "bg-[var(--surface-strong)] text-[var(--text-soft)] border-[var(--surface-border)]",
   INVIATO: "bg-sky-950 text-sky-300 border-sky-800",
   ACCETTATO: "bg-emerald-950 text-emerald-300 border-emerald-800",
   RIFIUTATO: "bg-red-950 text-red-300 border-red-800",
@@ -186,15 +186,15 @@ export default function PreventiviPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <FileText className="mr-2.5 h-6 w-6 text-emerald-400" /> Preventivi
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Prezzo, costo, margine e registro modifiche. Il preventivo accettato diventa ordine.</p>
+          <p className="mt-1 text-sm text-[var(--text-label)]">Prezzo, costo, margine e registro modifiche. Il preventivo accettato diventa ordine.</p>
         </div>
         <div className="flex gap-2">
           <a
             href="/api/export?type=quotes"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500"
+            className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500"
           >
             <Download className="h-4 w-4" /> Esporta CSV
           </a>
@@ -211,14 +211,14 @@ export default function PreventiviPage() {
       {error && <div className="rounded-xl border border-red-800/60 bg-red-950/40 p-3 text-sm text-red-200">{error}</div>}
 
       {showForm && (
-        <form onSubmit={create} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <form onSubmit={create} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
           <div className="grid gap-3 md:grid-cols-3">
             <div className="col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
               <select
                 value={customerId}
                 onChange={(e) => selectCustomer(e.target.value)}
                 aria-label="Seleziona cliente dall'anagrafica"
-                className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                className="flex-1 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
               >
                 <option value="">Cliente occasionale / nuovo — compila i campi sotto</option>
                 {customers.map((c) => (
@@ -229,27 +229,27 @@ export default function PreventiviPage() {
                 Gestisci anagrafica
               </a>
             </div>
-            <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Telefono" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input required placeholder="Ritiro *" value={pickup} onChange={(e) => setPickup(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input required placeholder="Consegna *" value={delivery} onChange={(e) => setDelivery(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Merce" value={goods} onChange={(e) => setGoods(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Peso kg" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Volume m³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Metri lineari" value={linearM} onChange={(e) => setLinearM(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Costo €" value={cost} onChange={(e) => setCost(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <textarea placeholder="Note" value={notes} onChange={(e) => setNotes(e.target.value)} className="col-span-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" rows={2} />
+            <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Telefono" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input required placeholder="Ritiro *" value={pickup} onChange={(e) => setPickup(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input required placeholder="Consegna *" value={delivery} onChange={(e) => setDelivery(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Merce" value={goods} onChange={(e) => setGoods(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Peso kg" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Volume m³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Metri lineari" value={linearM} onChange={(e) => setLinearM(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Costo €" value={cost} onChange={(e) => setCost(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <textarea placeholder="Note" value={notes} onChange={(e) => setNotes(e.target.value)} className="col-span-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" rows={2} />
           </div>
           <div className="mt-3 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[var(--text-label-soft)]">
               Margine: <b className="text-emerald-300">{eur(Number(price) - Number(cost))}</b>
               {Number(price) > 0 ? ` (${Math.round(((Number(price) - Number(cost)) / Number(price)) * 100)}%)` : ""}
             </p>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300">Annulla</button>
+              <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm text-[var(--text-soft)]">Annulla</button>
               <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Salva preventivo
               </button>
@@ -260,7 +260,7 @@ export default function PreventiviPage() {
 
       <div className="space-y-3 md:hidden">
         {loading ? (
-          <div className="ops-card flex items-center justify-center p-8 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
+          <div className="ops-card flex items-center justify-center p-8 text-[var(--text-label)]"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
           <div className="ops-card">
             <EmptyState
@@ -276,19 +276,19 @@ export default function PreventiviPage() {
             <div key={q.id} className="ops-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-100">{q.customerName}</p>
-                  <p className="text-xs text-slate-500">{q.pickup} → {q.delivery}</p>
+                  <p className="truncate text-sm font-semibold text-[var(--text)]">{q.customerName}</p>
+                  <p className="text-xs text-[var(--text-label-soft)]">{q.pickup} → {q.delivery}</p>
                 </div>
-                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusStyle[q.status] ?? statusStyle.BOZZA}`}>{label(q.status)}</span>
+                <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusStyle[q.status] ?? statusStyle.BOZZA}`}>{label(q.status)}</span>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
                 <div>
-                  <p className="text-[10px] font-semibold text-slate-500">Prezzo</p>
-                  <p className="text-sm font-bold text-slate-100">{eur(q.price)}</p>
+                  <p className="text-[11px] font-semibold text-[var(--text-label-soft)]">Prezzo</p>
+                  <p className="text-sm font-semibold text-[var(--text)]">{eur(q.price)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-slate-500">Margine</p>
-                  <p className={`text-sm font-bold ${margin(q) >= 0 ? "text-emerald-300" : "text-red-300"}`}>{eur(margin(q))}</p>
+                  <p className="text-[11px] font-semibold text-[var(--text-label-soft)]">Margine</p>
+                  <p className={`text-sm font-semibold ${margin(q) >= 0 ? "text-emerald-300" : "text-red-300"}`}>{eur(margin(q))}</p>
                 </div>
               </div>
               <div className="mt-3 flex justify-end gap-2">
@@ -297,7 +297,7 @@ export default function PreventiviPage() {
                     <CheckCircle2 className="h-3.5 w-3.5" /> Accetta
                   </button>
                 )}
-                <button type="button" onClick={() => remove(q.id)} className="rounded-lg border border-slate-700 p-2 text-slate-400 hover:text-red-300" aria-label="Elimina">
+                <button type="button" onClick={() => remove(q.id)} className="rounded-lg border border-[var(--surface-border)] p-2 text-[var(--text-label)] hover:text-red-300" aria-label="Elimina">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -306,9 +306,9 @@ export default function PreventiviPage() {
         )}
       </div>
 
-      <div className="hidden overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/70 md:block">
+      <div className="hidden overflow-x-auto rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] md:block">
         {loading ? (
-          <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
+          <div className="flex items-center justify-center p-10 text-[var(--text-label)]"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
           <EmptyState
             icon={FileText}
@@ -319,7 +319,7 @@ export default function PreventiviPage() {
           />
         ) : (
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-[var(--surface-border)] text-[11px]   text-[var(--text-label-soft)]">
               <tr>
                 <th className="px-4 py-3">Cliente</th>
                 <th className="px-4 py-3">Tratta</th>
@@ -332,19 +332,19 @@ export default function PreventiviPage() {
             </thead>
             <tbody>
               {items.map((q) => (
-                <tr key={q.id} className="border-b border-slate-800/60 last:border-0">
+                <tr key={q.id} className="border-b border-[var(--surface-border)] last:border-0">
                   <td className="px-4 py-3">
-                    <p className="font-semibold text-slate-100">{q.customerName}</p>
-                    <p className="text-xs text-slate-500">{q.customerEmail || q.customerPhone || "—"}</p>
+                    <p className="font-semibold text-[var(--text)]">{q.customerName}</p>
+                    <p className="text-xs text-[var(--text-label-soft)]">{q.customerEmail || q.customerPhone || "—"}</p>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">{q.pickup} → {q.delivery}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-100">{eur(q.price)}</td>
-                  <td className="px-4 py-3 text-right text-slate-400">{eur(q.cost)}</td>
+                  <td className="px-4 py-3 text-[var(--text-soft)]">{q.pickup} → {q.delivery}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[var(--text)]">{eur(q.price)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-label)]">{eur(q.cost)}</td>
                   <td className={`px-4 py-3 text-right font-semibold ${margin(q) >= 0 ? "text-emerald-300" : "text-red-300"}`}>
-                    {eur(margin(q))}<span className="ml-1 text-xs font-normal text-slate-500">{Math.round(marginPct(q))}%</span>
+                    {eur(margin(q))}<span className="ml-1 text-xs font-normal text-[var(--text-label-soft)]">{Math.round(marginPct(q))}%</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${statusStyle[q.status] ?? statusStyle.BOZZA}`}>{label(q.status)}</span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusStyle[q.status] ?? statusStyle.BOZZA}`}>{label(q.status)}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
@@ -353,7 +353,7 @@ export default function PreventiviPage() {
                           <CheckCircle2 className="h-4 w-4" />
                         </button>
                       )}
-                      <button type="button" onClick={() => remove(q.id)} className="rounded-lg border border-slate-700 p-2 text-slate-400 hover:text-red-300" title="Elimina">
+                      <button type="button" onClick={() => remove(q.id)} className="rounded-lg border border-[var(--surface-border)] p-2 text-[var(--text-label)] hover:text-red-300" title="Elimina">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>

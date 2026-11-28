@@ -228,7 +228,7 @@ export default function GeotabDriversPage() {
       <section className="ops-card overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
           <div>
-            <p className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+            <p className="font-display text-[14px] font-semibold" style={{ color: "var(--text)" }}>
               Conducenti rilevati
             </p>
             <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -281,7 +281,7 @@ export default function GeotabDriversPage() {
                       </td>
                       <td>
                         <p className="font-semibold" style={{ color: "var(--text)" }}>{item.driverName}</p>
-                        <p className="font-mono text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+                        <p className="font-mono text-[11px]" style={{ color: "var(--text-label-soft)" }}>
                           Geotab ID {item.geotabDriverId}
                         </p>
                       </td>
@@ -350,7 +350,7 @@ export default function GeotabDriversPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="ops-label">Esito</p>
-              <h2 className="font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>
+              <h2 className="font-display text-[16px] font-semibold" style={{ color: "var(--text)" }}>
                 {result.created.length} account creati · {result.linked.length} collegati
               </h2>
               <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -372,7 +372,7 @@ export default function GeotabDriversPage() {
             <div key={credential.geotabDriverId} className="ops-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+                  <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
                     {credential.driverName}
                   </p>
                   <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -397,7 +397,7 @@ export default function GeotabDriversPage() {
                 </div>
                 <div className="rounded-[10px] border p-2.5" style={{ borderColor: "var(--surface-border)", background: "var(--surface-soft)" }}>
                   <p className="ops-label flex items-center gap-1"><KeyRound className="h-3 w-3" /> Password temporanea</p>
-                  <p className="mt-1 break-all font-mono text-[12px] font-bold" style={{ color: "var(--text)" }}>
+                  <p className="mt-1 break-all font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>
                     {credential.password}
                   </p>
                 </div>

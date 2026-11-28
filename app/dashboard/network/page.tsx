@@ -41,7 +41,7 @@ function Original_NetworkPage() {
 
   if (!directory) {
     return (
-      <div className="flex items-center space-x-2 text-slate-400 text-sm p-8">
+      <div className="flex items-center space-x-2 text-[var(--text-label)] text-sm p-8">
         <Loader2 className="w-4 h-4 animate-spin" /> Caricamento network...
       </div>
     );
@@ -51,10 +51,10 @@ function Original_NetworkPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Globe className="w-6 h-6 mr-2.5 text-blue-400" /> Network
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Directory delle aziende verificate con reputazione e badge.
             {directory.length} aziende nel network.
           </p>
@@ -69,23 +69,23 @@ function Original_NetworkPage() {
         {directory.map((c) => (
           <div
             key={c.companyId}
-            className={`p-5 bg-slate-900 border rounded-2xl ${c.isMine ? "border-emerald-700/70" : "border-slate-800"}`}
+            className={`p-5 bg-[var(--surface)] border rounded-xl ${c.isMine ? "border-emerald-700/70" : "border-[var(--surface-border)]"}`}
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-100">{c.name}</h3>
+              <h3 className="text-base font-semibold text-[var(--text)]">{c.name}</h3>
               {c.isMine && (
-                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                <span className="text-[11px] font-semibold  px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
                   TU
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">P.IVA {c.partitaIva}</p>
-            {c.indirizzo && <p className="text-xs text-slate-500">{c.indirizzo}</p>}
+            <p className="text-xs text-[var(--text-label-soft)] mt-0.5">P.IVA {c.partitaIva}</p>
+            {c.indirizzo && <p className="text-xs text-[var(--text-label-soft)]">{c.indirizzo}</p>}
 
-            <div className="mt-3 flex items-center space-x-4 text-xs text-slate-400">
+            <div className="mt-3 flex items-center space-x-4 text-xs text-[var(--text-label)]">
               <span className="flex items-center">
                 <Star className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                <b className="text-slate-100">{c.reputation.toFixed(1)}</b>
+                <b className="text-[var(--text)]">{c.reputation.toFixed(1)}</b>
                 <span className="ml-1">({c.reviewsCount})</span>
               </span>
               <span className="flex items-center">
@@ -101,7 +101,7 @@ function Original_NetworkPage() {
                 {c.badges.map((b) => (
                   <span
                     key={b}
-                    className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800/60 inline-flex items-center"
+                    className="text-[11px] font-semibold  px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800/60 inline-flex items-center"
                   >
                     <Award className="w-3 h-3 mr-1" /> {badgeLabel[b] ?? b}
                   </span>

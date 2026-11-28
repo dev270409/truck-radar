@@ -66,29 +66,29 @@ export default function StripeCheckoutCard() {
   return (
     <div className="glass p-6 enter-up">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-slate-100 flex items-center">
+        <h3 className="text-base font-semibold text-[var(--text)] flex items-center">
           <CreditCard className="w-5 h-5 mr-2 text-sky-400" /> Abbonamento Aziendale
         </h3>
         {!ready && (
-          <span className="text-[9px] font-extrabold uppercase tracking-wider bg-amber-950 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full">
+          <span className="text-[9px] font-semibold   bg-amber-950 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full">
             In arrivo
           </span>
         )}
       </div>
 
       {cfg === null ? (
-        <div className="flex items-center justify-center py-6 text-slate-400 text-sm space-x-2">
+        <div className="flex items-center justify-center py-6 text-[var(--text-label)] text-sm space-x-2">
           <Loader2 className="w-4 h-4 animate-spin" /> Caricamento...
         </div>
       ) : ready ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-2">
+            <div className="p-4 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl flex flex-col gap-2">
               <div className="flex items-center space-x-2">
-                <Building2 className="w-4 h-4 text-slate-400" />
-                <p className="font-bold text-slate-100 text-sm">Piano BASE</p>
+                <Building2 className="w-4 h-4 text-[var(--text-label)]" />
+                <p className="font-semibold text-[var(--text)] text-sm">Piano BASE</p>
               </div>
-              <p className="text-xs text-slate-400">Per piccole flotte e avvio del network.</p>
+              <p className="text-xs text-[var(--text-label)]">Per piccole flotte e avvio del network.</p>
               <button
                 onClick={() => start("BASE")}
                 disabled={busy !== null}
@@ -98,12 +98,12 @@ export default function StripeCheckoutCard() {
                 <span>Attiva BASE</span>
               </button>
             </div>
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-2">
+            <div className="p-4 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl flex flex-col gap-2">
               <div className="flex items-center space-x-2">
                 <Zap className="w-4 h-4 text-indigo-300" />
-                <p className="font-bold text-slate-100 text-sm">Piano PRO</p>
+                <p className="font-semibold text-[var(--text)] text-sm">Piano PRO</p>
               </div>
-              <p className="text-xs text-slate-400">Borsa carichi, subappalto e Smart Return completi.</p>
+              <p className="text-xs text-[var(--text-label)]">Borsa carichi, subappalto e Smart Return completi.</p>
               <button
                 onClick={() => start("PRO")}
                 disabled={busy !== null}
@@ -123,11 +123,11 @@ export default function StripeCheckoutCard() {
         </>
       ) : (
         <>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[var(--text-soft)] leading-relaxed">
             La gestione dell'abbonamento a pagamento sarè  disponibile quando Stripe verrè  attivato in modalitè 
             live (vedi roadmap di deploy §9). Continuando con l'account in Trial non verrai addebitato.
           </p>
-          <p className="text-xs text-slate-500 mt-3 flex items-start space-x-2">
+          <p className="text-xs text-[var(--text-label-soft)] mt-3 flex items-start space-x-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span>Il pagamento avviene su Stripe: i fondi non passano mai dai conti Truck Radar.</span>
           </p>

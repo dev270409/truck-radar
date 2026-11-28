@@ -189,7 +189,7 @@ function IsoView({ placed, cargo }: { placed: PlacedItem[]; cargo: { lengthCm: n
   const scale = Math.min(720 / Math.max(1, maxX - minX), 380 / Math.max(1, maxY - minY));
 
   return (
-    <svg viewBox="0 0 780 430" className="w-full rounded-xl border border-slate-800 bg-slate-950/60">
+    <svg viewBox="0 0 780 430" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)]">
       <g transform={`translate(${30 - minX * scale}, ${20 - minY * scale}) scale(${scale})`}>
         {boxes.map(({ item, p }, idx) => {
           const color = item.fragile ? "#f97316" : ["#38bdf8", "#34d399", "#a78bfa", "#f472b6", "#facc15"][idx % 5];
@@ -212,7 +212,7 @@ function IsoView({ placed, cargo }: { placed: PlacedItem[]; cargo: { lengthCm: n
 function TopView({ placed, cargo }: { placed: PlacedItem[]; cargo: { lengthCm: number; widthCm: number } }) {
   const scale = Math.min(720 / Math.max(1, cargo.lengthCm), 240 / Math.max(1, cargo.widthCm));
   return (
-    <svg viewBox="0 0 780 300" className="w-full rounded-xl border border-slate-800 bg-slate-950/60">
+    <svg viewBox="0 0 780 300" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)]">
       <g transform={`translate(20,20)`}>
         <rect x={0} y={0} width={cargo.lengthCm * scale} height={cargo.widthCm * scale} fill="none" stroke="#475569" strokeDasharray="6 4" />
         {placed.map((i, idx) => (
@@ -363,10 +363,10 @@ export default function CaricoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="flex items-center text-2xl font-bold text-slate-100">
+        <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
           <Boxes className="mr-2.5 h-6 w-6 text-indigo-400" /> Piano di carico
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-[var(--text-label)]">
           Colli, metri lineari, peso sugli assi e vista 3D. Calcola prima di partire, stampa per il magazzino.
         </p>
       </div>
@@ -376,18 +376,18 @@ export default function CaricoPage() {
 
       <div className="grid gap-5 xl:grid-cols-[1.15fr_.85fr]">
         <div className="space-y-5">
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
             <div className="flex flex-wrap items-end gap-3">
-              <label className="min-w-[220px] flex-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <label className="min-w-[220px] flex-1 text-xs font-semibold   text-[var(--text-label)]">
                 Nome piano
-                <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+                <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               </label>
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <label className="text-xs font-semibold   text-[var(--text-label)]">
                 Tipo mezzo
                 <select
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
-                  className="mt-1 block rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  className="mt-1 block rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                 >
                   <option value="FURGONE">Furgone</option>
                   <option value="MOTRICE">Motrice</option>
@@ -397,12 +397,12 @@ export default function CaricoPage() {
                 </select>
               </label>
               {vehicleType === "CONTAINER" ? (
-                <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="text-xs font-semibold   text-[var(--text-label)]">
                   Container
                   <select
                     value={containerType}
                     onChange={(e) => setContainerType(e.target.value)}
-                    className="mt-1 block rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    className="mt-1 block rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                   >
                     {Object.keys(CONTAINER_SPECS).map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -410,12 +410,12 @@ export default function CaricoPage() {
                   </select>
                 </label>
               ) : (
-                <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="text-xs font-semibold   text-[var(--text-label)]">
                   Mezzo in flotta
                   <select
                     value={vehicleId}
                     onChange={(e) => setVehicleId(e.target.value)}
-                    className="mt-1 block rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    className="mt-1 block rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
                   >
                     <option value="">— dimensioni standard —</option>
                     {vehicles.map((v) => (
@@ -427,7 +427,7 @@ export default function CaricoPage() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500"
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500"
               >
                 {ocrLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                 Leggi packing list
@@ -443,31 +443,31 @@ export default function CaricoPage() {
                 }}
               />
             </div>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-[var(--text-label-soft)]">
               {cargo.lengthCm} × {cargo.widthCm} × {cargo.heightCm} cm · portata {cargo.payloadKg.toLocaleString("it-IT")} kg
             </p>
           </section>
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold text-slate-100">Colli</h2>
+              <h2 className="font-semibold text-[var(--text)]">Colli</h2>
               <button
                 type="button"
                 onClick={() => setItems((p) => [...p, emptyItem()])}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-indigo-500"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] hover:border-indigo-500"
               >
                 <Plus className="h-3.5 w-3.5" /> Aggiungi collo
               </button>
             </div>
             <div className="space-y-3">
               {items.map((item, idx) => (
-                <div key={item.id} className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <div key={item.id} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Collo {idx + 1}</span>
+                    <span className="text-xs font-semibold   text-[var(--text-label-soft)]">Collo {idx + 1}</span>
                     <button
                       type="button"
                       onClick={() => setItems((p) => (p.length > 1 ? p.filter((i) => i.id !== item.id) : p))}
-                      className="text-slate-500 hover:text-red-400"
+                      className="text-[var(--text-label-soft)] hover:text-red-400"
                       aria-label="Rimuovi collo"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -478,7 +478,7 @@ export default function CaricoPage() {
                       placeholder="Descrizione"
                       value={item.descrizione}
                       onChange={(e) => setItem(item.id, { descrizione: e.target.value })}
-                      className="col-span-2 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="col-span-2 rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
                     <input
                       type="number"
@@ -486,7 +486,7 @@ export default function CaricoPage() {
                       placeholder="Q.tà"
                       value={item.quantita}
                       onChange={(e) => setItem(item.id, { quantita: Number(e.target.value) })}
-                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
                     <input
                       type="number"
@@ -494,7 +494,7 @@ export default function CaricoPage() {
                       placeholder="Peso kg"
                       value={item.pesoKg}
                       onChange={(e) => setItem(item.id, { pesoKg: Number(e.target.value) })}
-                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
                     <input
                       type="number"
@@ -502,7 +502,7 @@ export default function CaricoPage() {
                       placeholder="L cm"
                       value={item.lunghezzaCm}
                       onChange={(e) => setItem(item.id, { lunghezzaCm: Number(e.target.value) })}
-                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
                     <input
                       type="number"
@@ -510,7 +510,7 @@ export default function CaricoPage() {
                       placeholder="P cm"
                       value={item.larghezzaCm}
                       onChange={(e) => setItem(item.id, { larghezzaCm: Number(e.target.value) })}
-                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
                     <input
                       type="number"
@@ -518,9 +518,9 @@ export default function CaricoPage() {
                       placeholder="H cm"
                       value={item.altezzaCm}
                       onChange={(e) => setItem(item.id, { altezzaCm: Number(e.target.value) })}
-                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm text-slate-100"
+                      className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] px-2.5 py-2 text-sm text-[var(--text)]"
                     />
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 text-xs text-[var(--text-label)]">
                       <label className="inline-flex items-center gap-1">
                         <input type="checkbox" checked={item.impilabile} onChange={(e) => setItem(item.id, { impilabile: e.target.checked })} /> impilabile
                       </label>
@@ -536,28 +536,28 @@ export default function CaricoPage() {
         </div>
 
         <div className="space-y-5">
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]">
               <Calculator className="mr-2 h-4 w-4 text-emerald-400" /> Risultato
             </h2>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Metri lineari</p>
-                <p className="mt-1 text-xl font-bold text-slate-100">{result.usedLength} m</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Metri lineari</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">{result.usedLength} m</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Peso</p>
-                <p className={`mt-1 text-xl font-bold ${result.totalWeight > cargo.payloadKg ? "text-red-400" : "text-slate-100"}`}>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Peso</p>
+                <p className={`mt-1 text-xl font-semibold ${result.totalWeight > cargo.payloadKg ? "text-red-400" : "text-[var(--text)]"}`}>
                   {result.totalWeight.toLocaleString("it-IT")} kg
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Volume</p>
-                <p className="mt-1 text-xl font-bold text-slate-100">{result.totalVolume} m³</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Volume</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">{result.totalVolume} m³</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Baricentro</p>
-                <p className="mt-1 text-xl font-bold text-slate-100">{result.baricenter} m</p>
+              <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+                <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Baricentro</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">{result.baricenter} m</p>
               </div>
             </div>
             <div className={`mt-3 flex items-start gap-2 rounded-xl border p-3 text-sm ${result.fits ? "border-emerald-800/60 bg-emerald-950/30 text-emerald-200" : "border-amber-800/60 bg-amber-950/30 text-amber-200"}`}>
@@ -584,15 +584,15 @@ export default function CaricoPage() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500"
               >
                 <Upload className="h-4 w-4" /> Stampa
               </button>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100">
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]">
               <Truck className="mr-2 h-4 w-4 text-sky-400" /> Vista 2D / 3D
             </h2>
             <TopView placed={result.placed} cargo={cargo} />
@@ -601,22 +601,22 @@ export default function CaricoPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 font-semibold text-slate-100">Piani salvati</h2>
+          <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 font-semibold text-[var(--text)]">Piani salvati</h2>
             {plans.length === 0 ? (
-              <p className="text-sm text-slate-500">Nessun piano salvato.</p>
+              <p className="text-sm text-[var(--text-label-soft)]">Nessun piano salvato.</p>
             ) : (
               <div className="space-y-2">
                 {plans.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                  <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-100">{p.name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-sm font-semibold text-[var(--text)]">{p.name}</p>
+                      <p className="text-xs text-[var(--text-label-soft)]">
                         {p.vehicleType}{p.containerType ? ` · ${p.containerType}` : ""} ·{" "}
                         {Number(p.totals?.usedLengthM ?? 0)} m · {Number(p.totals?.totalWeightKg ?? 0).toLocaleString("it-IT")} kg
                       </p>
                     </div>
-                    <button type="button" onClick={() => removePlan(p.id)} className="text-slate-500 hover:text-red-400" aria-label="Elimina piano">
+                    <button type="button" onClick={() => removePlan(p.id)} className="text-[var(--text-label-soft)] hover:text-red-400" aria-label="Elimina piano">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

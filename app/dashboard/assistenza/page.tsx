@@ -96,7 +96,7 @@ export default async function AssistenzaPage() {
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
             <p className="ops-label">Video</p>
-            <h2 className="font-display mt-1 text-xl font-bold" style={{ color: "var(--text)" }}>
+            <h2 className="font-display mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>
               Guide per pagina
             </h2>
           </div>
@@ -110,7 +110,7 @@ export default async function AssistenzaPage() {
       <section id="faq" className="scroll-mt-24 space-y-3">
         <div>
           <p className="ops-label">FAQ</p>
-          <h2 className="font-display mt-1 text-xl font-bold" style={{ color: "var(--text)" }}>
+          <h2 className="font-display mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>
             Domande frequenti
           </h2>
           <p className="mt-1 max-w-2xl text-[13px]" style={{ color: "var(--text-soft)" }}>
@@ -157,7 +157,7 @@ export default async function AssistenzaPage() {
 
       <section className="ops-card flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+          <p className="font-display text-[14px] font-semibold" style={{ color: "var(--text)" }}>
             Non hai trovato la risposta?
           </p>
           <p className="mt-1 text-[12px]" style={{ color: "var(--text-soft)" }}>

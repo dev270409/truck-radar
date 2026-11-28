@@ -270,7 +270,7 @@ export default async function DashboardPage() {
           </span>
           <div className="min-w-0">
             <p className="ops-label">Prossima azione</p>
-            <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+            <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
               {nextAction.title}
             </p>
             <p className="mt-0.5 text-[12px]" style={{ color: "var(--text-label)" }}>
@@ -290,7 +290,7 @@ export default async function DashboardPage() {
         >
           <div>
             <p className="ops-label">Stima 12 mesi · rendiconti viaggi</p>
-            <p className="font-display mt-1 text-[22px] font-bold" style={{ color: "var(--text)" }}>
+            <p className="font-display mt-1 text-[22px] font-semibold" style={{ color: "var(--text)" }}>
               € {Math.round(earningsForecast.projected12m).toLocaleString("it-IT")}
             </p>
             <p className="mt-0.5 max-w-2xl text-[11px]" style={{ color: "var(--text-label)" }}>

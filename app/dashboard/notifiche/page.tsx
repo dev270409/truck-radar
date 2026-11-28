@@ -58,43 +58,43 @@ export default function NotifichePage() {
   const info = notifiche.filter((n) => n.gravita === "media");
 
   const renderCard = (n: Notifica) => {
-    const meta = tipoIcon[n.tipo] ?? { icon: Bell, cls: "text-slate-400" };
+    const meta = tipoIcon[n.tipo] ?? { icon: Bell, cls: "text-[var(--text-label)]" };
     const Icon = meta.icon;
     return (
       <Link
         key={n.id}
         href={n.link}
-        className={`block p-4 rounded-2xl border transition hover:bg-slate-900 ${
+        className={`block p-4 rounded-xl border transition hover:bg-[var(--surface-soft)] ${
           n.gravita === "alta"
             ? "bg-red-950/40 border-red-800/60"
-            : "bg-slate-900 border-slate-800"
+            : "bg-[var(--surface)] border-[var(--surface-border)]"
         }`}
       >
         <div className="flex items-start space-x-3">
-          <div className={`p-2 rounded-xl bg-slate-950 ${meta.cls}`}>
+          <div className={`p-2 rounded-xl bg-[var(--surface-soft)] ${meta.cls}`}>
             <Icon className="w-4 h-4" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-bold text-slate-100">{n.titolo}</p>
+              <p className="text-sm font-semibold text-[var(--text)]">{n.titolo}</p>
               <span
-                className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                className={`text-[11px] font-semibold  px-2 py-0.5 rounded ${
                   n.gravita === "alta"
                     ? "bg-red-500/20 text-red-300"
-                    : "bg-slate-800 text-slate-400"
+                    : "bg-[var(--surface-strong)] text-[var(--text-label)]"
                 }`}
               >
                 {n.gravita}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">{n.dettaglio}</p>
+            <p className="text-xs text-[var(--text-label)] mt-1">{n.dettaglio}</p>
             {n.data && (
-              <p className="text-[11px] font-mono text-slate-500 mt-1.5">
+              <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-1.5">
                 {new Date(n.data).toLocaleString("it-IT")}
               </p>
             )}
           </div>
-          <ArrowRight className="w-4 h-4 text-slate-600 mt-1 shrink-0" />
+          <ArrowRight className="w-4 h-4 text-[var(--text-label-soft)] mt-1 shrink-0" />
         </div>
       </Link>
     );
@@ -102,7 +102,7 @@ export default function NotifichePage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+      <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         <span>Caricamento notifiche...</span>
       </div>
@@ -112,25 +112,25 @@ export default function NotifichePage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+        <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
           <Bell className="w-6 h-6 mr-2.5 text-blue-400" /> Notifiche
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-label)] mt-1">
           Alert attivi in tempo reale su documenti, viaggi, KYC ed economia.
         </p>
       </div>
 
       {notifiche.length === 0 ? (
-        <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+        <div className="p-8 text-center bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
           <Bell className="w-8 h-8 mx-auto text-emerald-400 mb-3" />
-          <p className="text-slate-300 font-semibold">Nessuna notifica attiva.</p>
-          <p className="text-sm text-slate-500 mt-1">Tutto è sotto controllo.</p>
+          <p className="text-[var(--text-soft)] font-semibold">Nessuna notifica attiva.</p>
+          <p className="text-sm text-[var(--text-label-soft)] mt-1">Tutto è sotto controllo.</p>
         </div>
       ) : (
         <>
           {alerte.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold uppercase text-red-400 tracking-wide mb-3">
+              <h2 className="text-xs font-semibold  text-red-400  mb-3">
                 Da risolvere ({alerte.length})
               </h2>
               <div className="space-y-3">{alerte.map(renderCard)}</div>
@@ -138,7 +138,7 @@ export default function NotifichePage() {
           )}
           {info.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold uppercase text-slate-500 tracking-wide mb-3">
+              <h2 className="text-xs font-semibold  text-[var(--text-label-soft)]  mb-3">
                 In evidenza ({info.length})
               </h2>
               <div className="space-y-3">{info.map(renderCard)}</div>

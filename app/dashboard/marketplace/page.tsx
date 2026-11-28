@@ -175,7 +175,7 @@ function Original_MarketplacePage() {
 
   if (!carichi) {
     return (
-      <div className="flex items-center space-x-2 text-slate-400 text-sm p-8">
+      <div className="flex items-center space-x-2 text-[var(--text-label)] text-sm p-8">
         <Loader2 className="w-4 h-4 animate-spin" /> Caricamento borsa carichi...
       </div>
     );
@@ -185,22 +185,22 @@ function Original_MarketplacePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Borsa Carichi</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <h1 className="text-2xl font-semibold text-[var(--text)]">Borsa Carichi</h1>
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Carichi pronti o in ricerca vettore, in rete con le aziende verificate.
           </p>
         </div>
         {mioAccount?.verified ? (
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-slate-100 font-semibold px-4 py-2 rounded-xl text-sm"
+            className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-[var(--text)] font-semibold px-4 py-2 rounded-xl text-sm"
           >
             <Plus className="w-4 h-4" /> <span>Pubblica carico</span>
           </button>
         ) : (
           <Link
             href="/dashboard/integrazioni"
-            className="inline-flex items-center space-x-2 bg-slate-800 border border-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-xl text-sm hover:bg-slate-700"
+            className="inline-flex items-center space-x-2 bg-[var(--surface-strong)] border border-[var(--surface-border)] text-[var(--text-soft)] font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[var(--surface-border)]"
           >
             <ShieldCheck className="w-4 h-4" /> <span>Verifica account per pubblicare</span>
           </Link>
@@ -208,7 +208,7 @@ function Original_MarketplacePage() {
       </div>
 
       {!mioAccount?.verified && (
-        <div className="flex items-start space-x-3 p-4 bg-amber-950/40 border border-amber-800/60 rounded-2xl text-sm text-amber-200">
+        <div className="flex items-start space-x-3 p-4 bg-amber-950/40 border border-amber-800/60 rounded-xl text-sm text-amber-200">
           <Lock className="w-5 h-5 shrink-0" />
           <div>
             <p className="font-semibold">Account in modalità Basic</p>
@@ -236,7 +236,7 @@ function Original_MarketplacePage() {
       {showForm && (
         <form
           onSubmit={publish}
-          className="p-5 bg-slate-900 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-3"
+          className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl grid grid-cols-1 md:grid-cols-3 gap-3"
         >
           <div className="flex space-x-2">
             <button
@@ -245,7 +245,7 @@ function Original_MarketplacePage() {
               className={`flex-1 text-sm font-semibold py-2 rounded-xl border ${
                 form.kind === "OFFRO"
                   ? "bg-blue-950 text-blue-200 border-blue-700"
-                  : "bg-slate-900 text-slate-400 border-slate-800"
+                  : "bg-[var(--surface)] text-[var(--text-label)] border-[var(--surface-border)]"
               }`}
             >
               OFFRO CARICO
@@ -256,68 +256,68 @@ function Original_MarketplacePage() {
               className={`flex-1 text-sm font-semibold py-2 rounded-xl border ${
                 form.kind === "CERCO"
                   ? "bg-amber-950 text-amber-200 border-amber-700"
-                  : "bg-slate-900 text-slate-400 border-slate-800"
+                  : "bg-[var(--surface)] text-[var(--text-label)] border-[var(--surface-border)]"
               }`}
             >
               CERCO VETTORE
             </button>
           </div>
           <input
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Luogo ritiro *"
             value={form.luogoRitiro}
             onChange={(e) => setForm((f) => ({ ...f, luogoRitiro: e.target.value }))}
             required
           />
           <input
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Luogo consegna *"
             value={form.luogoConsegna}
             onChange={(e) => setForm((f) => ({ ...f, luogoConsegna: e.target.value }))}
             required
           />
-          <label className="text-xs text-slate-400 flex flex-col">
+          <label className="text-xs text-[var(--text-label)] flex flex-col">
             Data ritiro *
             <input
               type="date"
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 mt-1"
+              className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)] mt-1"
               value={form.dataRitiro}
               onChange={(e) => setForm((f) => ({ ...f, dataRitiro: e.target.value }))}
               required
             />
           </label>
-          <label className="text-xs text-slate-400 flex flex-col">
+          <label className="text-xs text-[var(--text-label)] flex flex-col">
             Data consegna *
             <input
               type="date"
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 mt-1"
+              className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)] mt-1"
               value={form.dataConsegna}
               onChange={(e) => setForm((f) => ({ ...f, dataConsegna: e.target.value }))}
               required
             />
           </label>
           <input
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Tipo merce (es. Ortofrutta)"
             value={form.tipoMerce}
             onChange={(e) => setForm((f) => ({ ...f, tipoMerce: e.target.value }))}
           />
           <input
             type="number"
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Peso kg"
             value={form.pesoKg}
             onChange={(e) => setForm((f) => ({ ...f, pesoKg: e.target.value }))}
           />
           <input
             type="number"
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Volume m³"
             value={form.volumeM3}
             onChange={(e) => setForm((f) => ({ ...f, volumeM3: e.target.value }))}
           />
           <select
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             value={form.vehicleCategory}
             onChange={(e) => setForm((f) => ({ ...f, vehicleCategory: e.target.value }))}
           >
@@ -330,13 +330,13 @@ function Original_MarketplacePage() {
           </select>
           <input
             type="number"
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)]"
             placeholder="Prezzo offerta €"
             value={form.prezzo}
             onChange={(e) => setForm((f) => ({ ...f, prezzo: e.target.value }))}
           />
           <input
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 md:col-span-2"
+            className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2 text-sm text-[var(--text)] md:col-span-2"
             placeholder="Note (Mc tradizionale, adr, gdo...)"
             value={form.note}
             onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
@@ -344,14 +344,14 @@ function Original_MarketplacePage() {
           <div className="flex items-end space-x-2">
             <button
               disabled={busy}
-              className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-slate-100 font-semibold px-4 py-2 rounded-xl text-sm"
+              className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-[var(--text)] font-semibold px-4 py-2 rounded-xl text-sm"
             >
               {busy ? "Pubblico..." : "Pubblica"}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 rounded-xl text-sm text-slate-400 border border-slate-800"
+              className="px-4 py-2 rounded-xl text-sm text-[var(--text-label)] border border-[var(--surface-border)]"
             >
               Annulla
             </button>
@@ -369,10 +369,10 @@ function Original_MarketplacePage() {
           <button
             key={f.k}
             onClick={() => setFilterKind(f.k)}
-            className={`text-xs font-bold px-3 py-1.5 rounded-full border ${
+            className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${
               filterKind === f.k
                 ? "bg-blue-950 text-blue-200 border-blue-700"
-                : "text-slate-400 border-slate-800"
+                : "text-[var(--text-label)] border-[var(--surface-border)]"
             }`}
           >
             {f.l}
@@ -386,18 +386,18 @@ function Original_MarketplacePage() {
                 onClick={() => setFilterStatus(mineCount ? (filterStatus === "ATTIVO" ? "" : "ATTIVO") : "ATTIVO")}
                 className={`text-xs px-3 py-1.5 rounded-full border ${
                   filterStatus === "ATTIVO"
-                    ? "bg-slate-900 text-emerald-300 border-emerald-800"
-                    : "text-slate-400 border-slate-800"
+                    ? "bg-[var(--surface)] text-emerald-300 border-emerald-800"
+                    : "text-[var(--text-label)] border-[var(--surface-border)]"
                 }`}
               >
                 {filterStatus === "ATTIVO" ? "Solo attivi" : "Tutti gli stati"}
               </button>
             );
           })()}
-          <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5">
-            <Search className="w-4 h-4 text-slate-500 mr-2" />
+          <div className="flex items-center bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-1.5">
+            <Search className="w-4 h-4 text-[var(--text-label-soft)] mr-2" />
             <input
-              className="bg-transparent text-sm text-slate-100 outline-none w-40"
+              className="bg-transparent text-sm text-[var(--text)] outline-none w-40"
               placeholder="Cerca..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -407,18 +407,18 @@ function Original_MarketplacePage() {
       </div>
 
       {carichi.length === 0 && (
-        <div className="p-10 bg-slate-900 border border-slate-800 rounded-2xl text-center text-slate-400">
-          <PackageSearch className="w-8 h-8 mx-auto mb-3 text-slate-600" />
+        <div className="p-10 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl text-center text-[var(--text-label)]">
+          <PackageSearch className="w-8 h-8 mx-auto mb-3 text-[var(--text-label-soft)]" />
           <p className="text-sm">Nessun carico pubblico in rete. Pubblica il primo!</p>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {carichi.map((c) => (
-          <div key={c.id} className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
+          <div key={c.id} className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
             <div className="flex items-center justify-between mb-3">
               <span
-                className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                className={`text-[11px] font-semibold  px-2 py-0.5 rounded ${
                   c.kind === "OFFRO"
                     ? "bg-blue-950 text-blue-300"
                     : "bg-amber-950 text-amber-300"
@@ -427,33 +427,33 @@ function Original_MarketplacePage() {
                 {c.kind === "OFFRO" ? "OFFRO CARICO" : "CERCO VETTORE"}
               </span>
               <span
-                className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                  c.isMine ? "bg-slate-800 text-slate-300" : "bg-emerald-950 text-emerald-300"
+                className={`text-[11px] font-semibold  px-2 py-0.5 rounded ${
+                  c.isMine ? "bg-[var(--surface-strong)] text-[var(--text-soft)]" : "bg-emerald-950 text-emerald-300"
                 }`}
               >
                 {c.isMine ? "MIO" : c.companyVerified ? "NETWORK ✓" : "NETWORK"}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-100">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
               <span>{c.luogoRitiro}</span>
-              <ArrowRightLeft className="w-4 h-4 text-slate-500" />
+              <ArrowRightLeft className="w-4 h-4 text-[var(--text-label-soft)]" />
               <span>{c.luogoConsegna}</span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">{fmtDate(c.dataRitiro)} → {fmtDate(c.dataConsegna)}</p>
+            <p className="text-xs text-[var(--text-label)] mt-1">{fmtDate(c.dataRitiro)} → {fmtDate(c.dataConsegna)}</p>
 
-            <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-slate-300">
+            <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-[var(--text-soft)]">
               {c.tipoMerce && (
-                <span className="bg-slate-800 px-2 py-0.5 rounded">{c.tipoMerce}</span>
+                <span className="bg-[var(--surface-strong)] px-2 py-0.5 rounded">{c.tipoMerce}</span>
               )}
               {c.pesoKg && (
-                <span className="bg-slate-800 px-2 py-0.5 rounded">{c.pesoKg.toLocaleString("it-IT")} kg</span>
+                <span className="bg-[var(--surface-strong)] px-2 py-0.5 rounded">{c.pesoKg.toLocaleString("it-IT")} kg</span>
               )}
               {c.volumeM3 && (
-                <span className="bg-slate-800 px-2 py-0.5 rounded">{c.volumeM3} m³</span>
+                <span className="bg-[var(--surface-strong)] px-2 py-0.5 rounded">{c.volumeM3} m³</span>
               )}
               {c.vehicleCategory && (
-                <span className="bg-slate-800 px-2 py-0.5 rounded">{c.vehicleCategory}</span>
+                <span className="bg-[var(--surface-strong)] px-2 py-0.5 rounded">{c.vehicleCategory}</span>
               )}
               {c.prezzo && (
                 <span className="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded font-semibold">
@@ -462,8 +462,8 @@ function Original_MarketplacePage() {
               )}
             </div>
 
-            {c.note && <p className="mt-2 text-[11px] text-slate-500 italic">{c.note}</p>}
-            <p className="mt-2 text-[11px] text-slate-500">
+            {c.note && <p className="mt-2 text-[11px] text-[var(--text-label-soft)] italic">{c.note}</p>}
+            <p className="mt-2 text-[11px] text-[var(--text-label-soft)]">
               {c.isMine ? "Print-to-order" : c.companyVerified ? c.companyName : "Azienda del network"}
             </p>
 
@@ -471,7 +471,7 @@ function Original_MarketplacePage() {
               <button
                 onClick={() => runMatch(c)}
                 disabled={matching === c.id}
-                className="flex-1 inline-flex items-center justify-center space-x-1.5 text-xs font-semibold bg-slate-950 border border-slate-700 text-slate-200 px-3 py-2 rounded-lg hover:bg-slate-800 disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center space-x-1.5 text-xs font-semibold bg-[var(--surface-soft)] border border-[var(--surface-border)] text-[var(--text)] px-3 py-2 rounded-lg hover:bg-[var(--surface-soft)] disabled:opacity-50"
               >
                 {matching === c.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Route className="w-3.5 h-3.5" />}
                 <span>Match carico vuoto</span>
@@ -502,34 +502,34 @@ function Original_MarketplacePage() {
 
       {/* Matcher */}
       {matches && (
-        <div className="p-5 bg-slate-900 border border-blue-900/50 rounded-2xl">
-          <h3 className="text-sm font-bold text-slate-100 flex items-center mb-1">
+        <div className="p-5 bg-[var(--surface)] border border-blue-900/50 rounded-xl">
+          <h3 className="text-sm font-semibold text-[var(--text)] flex items-center mb-1">
             <Boxes className="w-5 h-5 mr-2 text-blue-400" />
             Carichi inversi per {matches.forLoad?.luogoRitiro} → {matches.forLoad?.luogoConsegna}
           </h3>
-          <p className="text-xs text-slate-400 mb-4">
+          <p className="text-xs text-[var(--text-label)] mb-4">
             Match deterministico V1: carichi CERCO con percorso inverso (smart return).
           </p>
           {matches.items.length === 0 ? (
-            <p className="text-sm text-slate-500">Nessun carico inverso trovato al momento.</p>
+            <p className="text-sm text-[var(--text-label-soft)]">Nessun carico inverso trovato al momento.</p>
           ) : (
             <div className="space-y-2.5">
               {matches.items.map((m) => (
                 <div
                   key={m.id}
-                  className="flex items-center justify-between flex-wrap gap-2 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3"
+                  className="flex items-center justify-between flex-wrap gap-2 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-4 py-3"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-slate-100">
-                      {m.luogoRitiro} <ArrowRightLeft className="w-3.5 h-3.5 inline text-slate-500" /> {m.luogoConsegna}
+                    <p className="text-sm font-semibold text-[var(--text)]">
+                      {m.luogoRitiro} <ArrowRightLeft className="w-3.5 h-3.5 inline text-[var(--text-label-soft)]" /> {m.luogoConsegna}
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[11px] text-[var(--text-label)] mt-0.5">
                       {m.companyName} {m.companyVerified && <span className="text-emerald-400">(verificata)</span>} · {fmtDate(m.dataRitiro)} · score {m.score}
                       {m.pesoKg ? ` · ${m.pesoKg.toLocaleString("it-IT")} kg` : ""}
                     </p>
                   </div>
                   {m.prezzo && (
-                    <span className="text-sm font-bold text-emerald-300">€ {m.prezzo.toLocaleString("it-IT")}</span>
+                    <span className="text-sm font-semibold text-emerald-300">€ {m.prezzo.toLocaleString("it-IT")}</span>
                   )}
                 </div>
               ))}

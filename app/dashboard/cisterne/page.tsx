@@ -151,12 +151,12 @@ export default function CisternePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <Fuel className="mr-2.5 h-6 w-6 text-amber-400" /> Cisterne e accise
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Litri in cisterna, movimenti contalitri e prospetto accise trimestrale.</p>
+          <p className="mt-1 text-sm text-[var(--text-label)]">Litri in cisterna, movimenti contalitri e prospetto accise trimestrale.</p>
         </div>
-        <span className="rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">
+        <span className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-soft)]">
           <Droplets className="mr-1 inline h-4 w-4 text-sky-400" /> {num(totalLiters)} litri stimati
         </span>
       </div>
@@ -165,38 +165,38 @@ export default function CisternePage() {
       {success && <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/40 p-3 text-sm text-emerald-200">{success}</div>}
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <form onSubmit={addTank} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-emerald-400" /> Nuova cisterna</h2>
+        <form onSubmit={addTank} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+          <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-emerald-400" /> Nuova cisterna</h2>
           <div className="space-y-2">
-            <input required placeholder="Nome cisterna *" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input required placeholder="Nome cisterna *" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             <div className="grid grid-cols-2 gap-2">
-              <input type="number" placeholder="Capacità litri" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-              <input placeholder="N. contalitri" value={contalitri} onChange={(e) => setContalitri(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input type="number" placeholder="Capacità litri" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+              <input placeholder="N. contalitri" value={contalitri} onChange={(e) => setContalitri(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             </div>
-            <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             <button type="submit" disabled={saving || !name} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Crea cisterna
             </button>
           </div>
         </form>
 
-        <form onSubmit={addMovement} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Droplets className="mr-2 h-4 w-4 text-sky-400" /> Movimento</h2>
+        <form onSubmit={addMovement} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+          <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Droplets className="mr-2 h-4 w-4 text-sky-400" /> Movimento</h2>
           <div className="space-y-2">
-            <select required value={tankId} onChange={(e) => setTankId(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+            <select required value={tankId} onChange={(e) => setTankId(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
               <option value="">Cisterna *</option>
               {tanks.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
             <div className="grid grid-cols-2 gap-2">
-              <select value={movTipo} onChange={(e) => setMovTipo(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+              <select value={movTipo} onChange={(e) => setMovTipo(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                 <option value="CARICO">Carico</option>
                 <option value="SCARICO">Scarico</option>
                 <option value="RETTIFICA">Rettifica</option>
               </select>
-              <input required type="number" placeholder="Litri *" value={movLitri} onChange={(e) => setMovLitri(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input required type="number" placeholder="Litri *" value={movLitri} onChange={(e) => setMovLitri(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             </div>
-            <input type="number" placeholder="Contalitri" value={movContalitri} onChange={(e) => setMovContalitri(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Note" value={movNote} onChange={(e) => setMovNote(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input type="number" placeholder="Contalitri" value={movContalitri} onChange={(e) => setMovContalitri(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Note" value={movNote} onChange={(e) => setMovNote(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             <button type="submit" disabled={saving || !tankId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Registra movimento
             </button>
@@ -204,30 +204,30 @@ export default function CisternePage() {
         </form>
       </div>
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-        <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Fuel className="mr-2 h-4 w-4 text-amber-400" /> Cisterne</h2>
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+        <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Fuel className="mr-2 h-4 w-4 text-amber-400" /> Cisterne</h2>
         {loading ? (
-          <div className="flex items-center text-slate-400"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Caricamento...</div>
+          <div className="flex items-center text-[var(--text-label)]"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Caricamento...</div>
         ) : tanks.length === 0 ? (
-          <p className="text-sm text-slate-500">Nessuna cisterna. Creane una per tracciare i litri.</p>
+          <p className="text-sm text-[var(--text-label-soft)]">Nessuna cisterna. Creane una per tracciare i litri.</p>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {tanks.map((t) => {
               const pct = t.capacitaLitri > 0 ? Math.min(100, Math.max(0, (Number(t.litriCorrenti) / t.capacitaLitri) * 100)) : 0;
               return (
-                <div key={t.id} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                <div key={t.id} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="font-semibold text-slate-100">{t.name}</p>
-                      <p className="text-xs text-slate-500">Capacità {num(t.capacitaLitri)} l{t.contalitri ? ` · contalitri ${t.contalitri}` : ""}</p>
+                      <p className="font-semibold text-[var(--text)]">{t.name}</p>
+                      <p className="text-xs text-[var(--text-label-soft)]">Capacità {num(t.capacitaLitri)} l{t.contalitri ? ` · contalitri ${t.contalitri}` : ""}</p>
                     </div>
-                    <button type="button" onClick={() => removeTank(t.id)} className="text-slate-500 hover:text-red-400" aria-label="Elimina cisterna"><Trash2 className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => removeTank(t.id)} className="text-[var(--text-label-soft)] hover:text-red-400" aria-label="Elimina cisterna"><Trash2 className="h-4 w-4" /></button>
                   </div>
-                  <p className="mt-3 text-2xl font-bold text-sky-300">{num(Number(t.litriCorrenti))} l</p>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
+                  <p className="mt-3 text-2xl font-semibold text-sky-300">{num(Number(t.litriCorrenti))} l</p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-strong)]">
                     <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-500">{pct.toFixed(0)}% · ultimo contalitri {t.ultimoContalitri ?? "—"}</p>
+                  <p className="mt-1 text-[11px] text-[var(--text-label-soft)]">{pct.toFixed(0)}% · ultimo contalitri {t.ultimoContalitri ?? "—"}</p>
                 </div>
               );
             })}
@@ -235,25 +235,25 @@ export default function CisternePage() {
         )}
       </section>
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center font-semibold text-slate-100"><Download className="mr-2 h-4 w-4 text-indigo-400" /> Prospetto accise</h2>
+          <h2 className="flex items-center font-semibold text-[var(--text)]"><Download className="mr-2 h-4 w-4 text-indigo-400" /> Prospetto accise</h2>
           <div className="flex items-center gap-2">
-            <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-24 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-100" />
-            <button type="button" onClick={exportAccise} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-200 hover:border-indigo-500"><Download className="h-3.5 w-3.5" /> Esporta</button>
+            <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-24 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-sm text-[var(--text)]" />
+            <button type="button" onClick={exportAccise} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text)] hover:border-indigo-500"><Download className="h-3.5 w-3.5" /> Esporta</button>
           </div>
         </div>
         <div className="space-y-2 md:hidden">
           {quarters.map((q) => (
-            <div key={q.trimestre} className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+            <div key={q.trimestre} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-100">{q.trimestre} {year}</p>
-                <span className="text-[11px] text-slate-500">{q.rifornimenti} rifornimenti</span>
+                <p className="text-sm font-semibold text-[var(--text)]">{q.trimestre} {year}</p>
+                <span className="text-[11px] text-[var(--text-label-soft)]">{q.rifornimenti} rifornimenti</span>
               </div>
               <div className="mt-2 grid grid-cols-3 gap-2">
-                <div><p className="text-[9px] text-slate-500">Litri</p><p className="text-sm font-semibold text-slate-200">{num(q.litri)}</p></div>
-                <div><p className="text-[9px] text-slate-500">Costo</p><p className="text-sm font-semibold text-slate-200">{eur(q.costo)}</p></div>
-                <div><p className="text-[9px] text-slate-500">€/l</p><p className="text-sm font-semibold text-slate-200">{q.prezzoMedio != null ? eur(q.prezzoMedio) : "—"}</p></div>
+                <div><p className="text-[9px] text-[var(--text-label-soft)]">Litri</p><p className="text-sm font-semibold text-[var(--text)]">{num(q.litri)}</p></div>
+                <div><p className="text-[9px] text-[var(--text-label-soft)]">Costo</p><p className="text-sm font-semibold text-[var(--text)]">{eur(q.costo)}</p></div>
+                <div><p className="text-[9px] text-[var(--text-label-soft)]">€/l</p><p className="text-sm font-semibold text-[var(--text)]">{q.prezzoMedio != null ? eur(q.prezzoMedio) : "—"}</p></div>
               </div>
             </div>
           ))}
@@ -261,7 +261,7 @@ export default function CisternePage() {
 
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-[var(--surface-border)] text-[11px]   text-[var(--text-label-soft)]">
               <tr>
                 <th className="py-2">Trimestre</th>
                 <th className="px-3 py-2 text-right">Litri</th>
@@ -272,31 +272,31 @@ export default function CisternePage() {
             </thead>
             <tbody>
               {quarters.map((q) => (
-                <tr key={q.trimestre} className="border-b border-slate-800/60 last:border-0">
-                  <td className="py-2 font-semibold text-slate-100">{q.trimestre} {year}</td>
-                  <td className="px-3 py-2 text-right text-slate-300">{num(q.litri)}</td>
-                  <td className="px-3 py-2 text-right text-slate-300">{eur(q.costo)}</td>
-                  <td className="px-3 py-2 text-right text-slate-400">{q.prezzoMedio != null ? eur(q.prezzoMedio) : "—"}</td>
-                  <td className="px-3 py-2 text-right text-slate-400">{q.rifornimenti}</td>
+                <tr key={q.trimestre} className="border-b border-[var(--surface-border)] last:border-0">
+                  <td className="py-2 font-semibold text-[var(--text)]">{q.trimestre} {year}</td>
+                  <td className="px-3 py-2 text-right text-[var(--text-soft)]">{num(q.litri)}</td>
+                  <td className="px-3 py-2 text-right text-[var(--text-soft)]">{eur(q.costo)}</td>
+                  <td className="px-3 py-2 text-right text-[var(--text-label)]">{q.prezzoMedio != null ? eur(q.prezzoMedio) : "—"}</td>
+                  <td className="px-3 py-2 text-right text-[var(--text-label)]">{q.rifornimenti}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-xs text-slate-500">Il prospetto usa i rifornimenti registrati in Carburante. Verifica sempre con il commercialista prima della richiesta di rimborso.</p>
+        <p className="mt-2 text-xs text-[var(--text-label-soft)]">Il prospetto usa i rifornimenti registrati in Carburante. Verifica sempre con il commercialista prima della richiesta di rimborso.</p>
       </section>
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-        <h2 className="mb-3 font-semibold text-slate-100">Ultimi movimenti</h2>
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+        <h2 className="mb-3 font-semibold text-[var(--text)]">Ultimi movimenti</h2>
         {movements.length === 0 ? (
-          <p className="text-sm text-slate-500">Nessun movimento.</p>
+          <p className="text-sm text-[var(--text-label-soft)]">Nessun movimento.</p>
         ) : (
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
             {movements.map((m) => (
-              <div key={m.id} className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-sm">
+              <div key={m.id} className="flex items-center justify-between rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3 text-sm">
                 <div>
-                  <p className="font-semibold text-slate-100">{tankName(m.tankId)} · {m.tipo}</p>
-                  <p className="text-xs text-slate-500">{new Date(m.createdAt).toLocaleString("it-IT")}{m.note ? ` · ${m.note}` : ""}</p>
+                  <p className="font-semibold text-[var(--text)]">{tankName(m.tankId)} · {m.tipo}</p>
+                  <p className="text-xs text-[var(--text-label-soft)]">{new Date(m.createdAt).toLocaleString("it-IT")}{m.note ? ` · ${m.note}` : ""}</p>
                 </div>
                 <span className={`font-semibold ${m.tipo === "SCARICO" ? "text-red-300" : "text-emerald-300"}`}>{m.tipo === "SCARICO" ? "-" : "+"}{num(m.litri)} l</span>
               </div>

@@ -198,22 +198,22 @@ export default function FleetMap({ vehicles, onSelect }: FleetMapProps) {
 
   return (
     <div className="relative">
-      <div ref={containerRef} className="h-[420px] w-full rounded-xl border border-slate-800 bg-slate-900 z-0" />
-      <div className="absolute top-2 right-2 z-[500] bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-slate-300 pointer-events-none">
+      <div ref={containerRef} className="h-[420px] w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] z-0" />
+      <div className="absolute top-2 right-2 z-[500] bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg px-2 py-1 text-[11px] text-[var(--text-soft)] pointer-events-none">
         {withPosCount(vehicles)}/{vehicles.length} mezzi con posizione
       </div>
       {(playingId !== null || playingError) && (
-        <div className="absolute top-2 left-2 z-[500] bg-slate-900/95 border border-amber-700 rounded-xl px-3 py-2 text-xs text-slate-200 shadow-xl">
+        <div className="absolute top-2 left-2 z-[500] bg-[var(--surface)] border border-amber-700 rounded-xl px-3 py-2 text-xs text-[var(--text)] ">
           {playingError ? (
             <div className="flex items-center space-x-2 text-red-300">
               <span>{playingError}</span>
-              <button onClick={clearReplay} className="text-slate-300 underline">chiudi</button>
+              <button onClick={clearReplay} className="text-[var(--text-soft)] underline">chiudi</button>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               <span>Riproduzione percorso in corso...</span>
-              <button onClick={clearReplay} className="text-slate-300 underline">ferma</button>
+              <button onClick={clearReplay} className="text-[var(--text-soft)] underline">ferma</button>
             </div>
           )}
         </div>

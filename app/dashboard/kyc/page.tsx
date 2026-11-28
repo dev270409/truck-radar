@@ -104,15 +104,15 @@ export default function KycReviewPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <ShieldCheck className="w-6 h-6 mr-2.5 text-blue-400" /> Verifica Documenti KYC
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Livello 1 (SaaS Interno) attiva il gestionale flotta. Livello 2 (Borsa Carichi) abilita il Marketplace.
           </p>
         </div>
         {documents.length > 0 && (
-          <div className="text-sm text-slate-300 space-x-2">
+          <div className="text-sm text-[var(--text-soft)] space-x-2">
             <span className="bg-emerald-950 text-emerald-300 border border-emerald-800/60 px-2.5 py-1 rounded-lg font-semibold">
               {level1Verified} L1 Verificati
             </span>
@@ -130,7 +130,7 @@ export default function KycReviewPage() {
       </div>
 
       {level1Complete && (
-        <div className="p-4 rounded-2xl border border-emerald-800/60 bg-emerald-950/60 flex items-center space-x-3">
+        <div className="p-4 rounded-xl border border-emerald-800/60 bg-emerald-950/60 flex items-center space-x-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-300" />
           <p className="text-sm text-emerald-200 font-semibold">
             Livello 1 (SaaS Interno) completato! Puoi ora accedere al gestionale flotta.
@@ -139,7 +139,7 @@ export default function KycReviewPage() {
       )}
 
       {!level1Complete && (
-        <div className="p-4 rounded-2xl border border-amber-800/60 bg-amber-950/60 flex items-center space-x-3">
+        <div className="p-4 rounded-xl border border-amber-800/60 bg-amber-950/60 flex items-center space-x-3">
           <ShieldAlert className="w-5 h-5 text-amber-400" />
           <p className="text-sm text-amber-200">
             Completa il Livello 1 (2 documenti) per attivare il gestionale flotta.
@@ -147,28 +147,28 @@ export default function KycReviewPage() {
         </div>
       )}
 
-      <div className="p-4 rounded-2xl border border-violet-800/60 bg-violet-950/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 rounded-xl border border-violet-800/60 bg-violet-950/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
           <ShieldCheck className="w-5 h-5 text-violet-400" />
           <div>
-            <p className="font-bold text-violet-200">Livello 2: Borsa Carichi / Marketplace</p>
+            <p className="font-semibold text-violet-200">Livello 2: Borsa Carichi / Marketplace</p>
             <p className="text-xs text-violet-400">
               6 documenti: Licenza Conto Terzi, Albo Trasportatori, Licenza REN, Polizza CMR, DURC, Delega Firma
             </p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
             level2Complete ? "bg-emerald-950 text-emerald-300 border-emerald-800/60" :
             level2Pending > 0 ? "bg-amber-950 text-amber-300 border-amber-800/60" :
-            "bg-slate-700 text-slate-400 border-slate-800/60"
+            "bg-[var(--surface-strong)] text-[var(--text-label)] border-[var(--surface-border)]"
           }`}>
             {level2Complete ? "Completo" : level2Pending > 0 ? "In Attesa" : "Da Caricare"}
           </span>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sky-800/60 bg-sky-950/30 p-4 text-xs text-sky-100">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-800/60 bg-sky-950/30 p-4 text-xs text-sky-100">
         <span>La verifica identità e azienda è gestita dal provider KYC. I pulsanti manuali sono disattivati.</span>
         <a href="/onboarding/verifica" className="font-semibold text-sky-300 hover:text-sky-200">
           Apri verifica
@@ -181,18 +181,18 @@ export default function KycReviewPage() {
 
       {/* KYB Zero-Form: estrazione automatica */}
       {kyb && (
-        <div className="rounded-2xl border border-indigo-800/60 bg-indigo-950/30 p-5">
+        <div className="rounded-xl border border-indigo-800/60 bg-indigo-950/30 p-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-800/80 flex items-center justify-center text-indigo-300 flex-shrink-0">
                 <ScanText className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                <p className="text-sm font-semibold text-[var(--text)] flex items-center space-x-2">
                   <Sparkles className="w-4 h-4 text-indigo-400" />
                   <span>Compilazione automatica KYB (Zero-Form)</span>
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[var(--text-label)] mt-0.5">
                   Estrazione del {new Date(kyb.createdAt).toLocaleDateString("it-IT")} · provider{" "}
                   <span className="font-mono text-indigo-300">{kyb.provider}</span> · modalità{" "}
                   <span className="font-mono text-indigo-300">{kyb.mode}</span>
@@ -200,11 +200,11 @@ export default function KycReviewPage() {
               </div>
             </div>
             {kyb.verification?.status && (
-              <span className={`text-xs font-bold rounded-full px-3 py-1 border ${
+              <span className={`text-xs font-semibold rounded-full px-3 py-1 border ${
                 kyb.verification.status === "ATTIVA"
                   ? "bg-emerald-950 text-emerald-300 border-emerald-800/60"
                   : kyb.verification.status === "NON_CONFIGURATO"
-                  ? "bg-slate-800 text-slate-300 border-slate-700"
+                  ? "bg-[var(--surface-strong)] text-[var(--text-soft)] border-[var(--surface-border)]"
                   : "bg-amber-950 text-amber-300 border-amber-800/60"
               }`}>
                 {kyb.verification.status === "ATTIVA" ? "✓ Azienda ATTIVA" : kyb.verification.status === "NON_CONFIGURATO" ? "Verifica demo" : "Da confermare"}
@@ -213,25 +213,25 @@ export default function KycReviewPage() {
           </div>
 
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Ragione Sociale</p>
-              <p className="font-semibold text-slate-100 mt-1 truncate">{kyb.extraction?.ragione_sociale ?? "—"}</p>
+            <div className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl p-3">
+              <p className="text-[var(--text-label-soft)]   text-[11px]">Ragione Sociale</p>
+              <p className="font-semibold text-[var(--text)] mt-1 truncate">{kyb.extraction?.ragione_sociale ?? "—"}</p>
             </div>
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Partita IVA</p>
-              <p className="font-mono font-semibold text-slate-100 mt-1 truncate">{kyb.extraction?.partita_iva ?? "—"}</p>
+            <div className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl p-3">
+              <p className="text-[var(--text-label-soft)]   text-[11px]">Partita IVA</p>
+              <p className="font-mono font-semibold text-[var(--text)] mt-1 truncate">{kyb.extraction?.partita_iva ?? "—"}</p>
             </div>
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Legale Rappresentante</p>
-              <p className="font-semibold text-slate-100 mt-1 truncate">
+            <div className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl p-3">
+              <p className="text-[var(--text-label-soft)]   text-[11px]">Legale Rappresentante</p>
+              <p className="font-semibold text-[var(--text)] mt-1 truncate">
                 {kyb.extraction?.legale_rappresentante?.nome || kyb.extraction?.legale_rappresentante?.cognome
                   ? `${kyb.extraction.legale_rappresentante.nome ?? ""} ${kyb.extraction.legale_rappresentante.cognome ?? ""}`.trim()
                   : "—"}
               </p>
             </div>
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-              <p className="text-slate-500 uppercase tracking-wider text-[10px]">Documenti rilevati</p>
-              <p className="font-semibold text-slate-100 mt-1 truncate">
+            <div className="bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl p-3">
+              <p className="text-[var(--text-label-soft)]   text-[11px]">Documenti rilevati</p>
+              <p className="font-semibold text-[var(--text)] mt-1 truncate">
                 {(kyb.extraction?.documenti_rilevati ?? []).map(String).join(", ") || "—"}
               </p>
             </div>
@@ -249,90 +249,90 @@ export default function KycReviewPage() {
         </div>
       )}
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden ">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+          <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
             <Loader2 className="w-5 h-5 animate-spin" />
             <span>Caricamento documenti KYC...</span>
           </div>
         ) : documents.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-12 text-center text-[var(--text-label-soft)]">
             Nessun documento KYC caricato. La documentazione verrà richiesta in fase di registrazione.
           </div>
         ) : (
-          <div className="divide-y divide-slate-800/80">
+          <div className="divide-y divide-[var(--surface-border)]">
             {/* Level 1 Section */}
-            <div className="p-4 bg-slate-950/50 border-b border-slate-800/60">
-              <h3 className="font-bold text-slate-200 flex items-center space-x-2">
+            <div className="p-4 bg-[var(--surface-soft)] border-b border-[var(--surface-border)]">
+              <h3 className="font-semibold text-[var(--text)] flex items-center space-x-2">
                 <ShieldCheck className="w-5 h-5 text-blue-400" />
                 <span>Livello 1: SaaS Interno (Gestionale Flotta)</span>
-                <span className={`text-xs font-bold px-2 py-1 rounded ${level1Complete ? "bg-emerald-950 text-emerald-300" : "bg-amber-950 text-amber-300"}`}>
+                <span className={`text-xs font-semibold px-2 py-1 rounded ${level1Complete ? "bg-emerald-950 text-emerald-300" : "bg-amber-950 text-amber-300"}`}>
                   {level1Complete ? "Completo" : "In Corso"}
                 </span>
               </h3>
             </div>
             {level1Docs.map((doc) => (
-              <div key={doc.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-800/40 transition">
+              <div key={doc.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[var(--surface-soft)] transition">
                 <div className="flex items-start space-x-4 min-w-0">
                   <div className="w-10 h-10 bg-blue-950/80 border border-blue-800/60 rounded-xl flex items-center justify-center text-blue-400 flex-shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="font-semibold text-[var(--text)]">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
+                    <p className="text-xs font-mono text-[var(--text-label)] mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
+                    <p className="text-[11px] text-[var(--text-label-soft)] mt-0.5">
                       Caricato il {new Date(doc.createdAt).toLocaleDateString("it-IT")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 flex-shrink-0">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
                   <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 p-2 rounded-lg transition" title="Apri documento"><ExternalLink className="w-4 h-4" /></a>
                   {doc.status === "IN_ATTESA" && (
-                    <span className="text-[10px] font-semibold text-slate-500">In verifica</span>
+                    <span className="text-[11px] font-semibold text-[var(--text-label-soft)]">In verifica</span>
                   )}
                 </div>
               </div>
             ))}
 
             {/* Level 2 Section */}
-            <div className="p-4 bg-violet-950/30 border-b border-slate-800/60">
-              <h3 className="font-bold text-violet-200 flex items-center space-x-2">
+            <div className="p-4 bg-violet-950/30 border-b border-[var(--surface-border)]">
+              <h3 className="font-semibold text-violet-200 flex items-center space-x-2">
                 <ShieldCheck className="w-5 h-5 text-violet-400" />
                 <span>Livello 2: Borsa Carichi / Marketplace</span>
-                <span className={`text-xs font-bold px-2 py-1 rounded ${level2Complete ? "bg-emerald-950 text-emerald-300" : level2Pending > 0 ? "bg-amber-950 text-amber-300" : "bg-slate-700 text-slate-400"}`}>
+                <span className={`text-xs font-semibold px-2 py-1 rounded ${level2Complete ? "bg-emerald-950 text-emerald-300" : level2Pending > 0 ? "bg-amber-950 text-amber-300" : "bg-[var(--surface-strong)] text-[var(--text-label)]"}`}>
                   {level2Complete ? "Completo" : level2Pending > 0 ? "In Attesa" : "Da Caricare"}
                 </span>
               </h3>
             </div>
             {level2Docs.map((doc) => (
-              <div key={doc.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-800/40 transition">
+              <div key={doc.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[var(--surface-soft)] transition">
                 <div className="flex items-start space-x-4 min-w-0">
                   <div className="w-10 h-10 bg-violet-950/80 border border-violet-800/60 rounded-xl flex items-center justify-center text-violet-400 flex-shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-100">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="font-semibold text-[var(--text)]">{TIPO_LABELS[doc.tipo] || label(doc.tipo)}</p>
+                    <p className="text-xs font-mono text-[var(--text-label)] mt-0.5 truncate max-w-sm">{fileNameLabel(doc.fileName)}</p>
+                    <p className="text-[11px] text-[var(--text-label-soft)] mt-0.5">
                       Caricato il {new Date(doc.createdAt).toLocaleDateString("it-IT")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 flex-shrink-0">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${STATUS_STYLES[doc.status]}`}>{label(doc.status)}</span>
                   <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-blue-300 hover:text-blue-200 bg-blue-950/40 border border-blue-800/60 p-2 rounded-lg transition" title="Apri documento"><ExternalLink className="w-4 h-4" /></a>
                   {doc.status === "IN_ATTESA" && (
-                    <span className="text-[10px] font-semibold text-slate-500">In verifica</span>
+                    <span className="text-[11px] font-semibold text-[var(--text-label-soft)]">In verifica</span>
                   )}
                 </div>
               </div>
             ))}
 
             {level2Docs.length === 0 && (
-              <div className="p-12 text-center text-slate-500">
+              <div className="p-12 text-center text-[var(--text-label-soft)]">
                 <p>Nessun documento Livello 2 caricato.</p>
-                <p className="text-xs text-slate-400 mt-2">Carica i 6 documenti richiesti per abilitare la Borsa Carichi.</p>
+                <p className="text-xs text-[var(--text-label)] mt-2">Carica i 6 documenti richiesti per abilitare la Borsa Carichi.</p>
               </div>
             )}
           </div>
@@ -342,7 +342,7 @@ export default function KycReviewPage() {
       <div className="flex justify-end">
         <button
           onClick={fetchDocs}
-          className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition"
+          className="flex items-center space-x-1.5 text-xs text-[var(--text-label)] hover:text-white transition"
         >
           <RefreshCcw className="w-3.5 h-3.5" />
           <span>Aggiorna</span>

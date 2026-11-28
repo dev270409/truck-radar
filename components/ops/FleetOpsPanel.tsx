@@ -20,7 +20,7 @@ export default function FleetOpsPanel({ rows }: { rows: FleetVehicleRow[] }) {
     <div className="ops-card p-4 md:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+          <h2 className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
             Operativo flotta
           </h2>
           <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -61,7 +61,7 @@ export default function FleetOpsPanel({ rows }: { rows: FleetVehicleRow[] }) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-display text-[13px] font-bold" style={{ color: "var(--text)" }}>{r.targa}</span>
+                    <span className="font-display text-[13px] font-semibold" style={{ color: "var(--text)" }}>{r.targa}</span>
                     <span className="text-[11px]" style={{ color: "var(--text-label)" }}>{r.categoria}</span>
                   </div>
                   {(r.luogoRitiro || r.luogoConsegna) ? (
@@ -87,7 +87,7 @@ export default function FleetOpsPanel({ rows }: { rows: FleetVehicleRow[] }) {
         </ul>
       )}
 
-      <p className="mt-3 flex items-center gap-1.5 text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+      <p className="mt-3 flex items-center gap-1.5 text-[11px]" style={{ color: "var(--text-label-soft)" }}>
         <Navigation className="h-3 w-3" /> Posizioni dal tracking dei viaggi (integrazione GPS/telematica).
       </p>
     </div>

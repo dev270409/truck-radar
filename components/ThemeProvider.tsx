@@ -88,10 +88,10 @@ function ThemePrompt() {
   const { setTheme, dismissChoice } = useTheme();
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={dismissChoice} aria-hidden />
+      <div className="absolute inset-0 bg-black/30 " onClick={dismissChoice} aria-hidden />
       <div className="glass-strong relative w-full max-w-sm rounded-[var(--radius-card)] p-6 enter-up">
         <p className="ops-label">Preferenza di visualizzazione</p>
-        <h2 className="font-display mt-2 text-lg font-bold" style={{ color: "var(--text)" }}>
+        <h2 className="font-display mt-2 text-lg font-semibold" style={{ color: "var(--text)" }}>
           Come preferisci usare Truck Radar?
         </h2>
         <p className="mt-1.5 text-[13px]" style={{ color: "var(--text-soft)" }}>
@@ -118,7 +118,7 @@ function ThemePrompt() {
         <button
           type="button"
           onClick={dismissChoice}
-          className="mt-4 w-full text-center text-[11px] font-semibold uppercase tracking-wide"
+          className="mt-4 w-full text-center text-[11px] font-semibold  "
           style={{ color: "var(--text-label-soft)" }}
         >
           Usa il tema del sistema

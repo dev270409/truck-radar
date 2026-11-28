@@ -161,7 +161,7 @@ export type DateTickerAnimation = "roll" | "static";
 
 /** Default pill surface. Override any part with `className` (tailwind-merge). */
 export const DATE_TICKER_PILL_CLASS =
-  "overflow-hidden rounded-full bg-zinc-900 px-4 py-1 text-white shadow-lg dark:bg-zinc-100 dark:text-zinc-900";
+  "overflow-hidden rounded-full bg-zinc-900 px-4 py-1 text-white  dark:bg-zinc-100 dark:text-zinc-900";
 
 /**
  * `"solid"` — dark capsule (light in dark mode).

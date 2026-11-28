@@ -106,7 +106,7 @@ export default function ImpostazioniClient({
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <p className="ops-label">Account</p>
-        <h1 className="font-display mt-1 text-2xl font-bold" style={{ color: "var(--text)" }}>
+        <h1 className="font-display mt-1 text-2xl font-semibold" style={{ color: "var(--text)" }}>
           Impostazioni
         </h1>
         <p className="mt-2 text-[13px]" style={{ color: "var(--text-soft)" }}>
@@ -117,7 +117,7 @@ export default function ImpostazioniClient({
       <section className="ops-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full font-display text-[13px] font-bold text-white" style={{ background: "var(--brand)" }}>
+            <span className="grid h-10 w-10 place-items-center rounded-full font-display text-[13px] font-semibold text-white" style={{ background: "var(--brand)" }}>
               {(user.nome[0] ?? user.email[0] ?? "U").toUpperCase()}{(user.cognome[0] ?? "").toUpperCase()}
             </span>
             <div>
@@ -134,11 +134,11 @@ export default function ImpostazioniClient({
       <section className="ops-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950/70 text-sky-300">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--surface-soft)] text-sky-300">
               <LayoutPanelLeft className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Menu laterale</h2>
+              <h2 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Menu laterale</h2>
               <p className="mt-1 text-[11px] leading-5" style={{ color: "var(--text-label)" }}>
                 Disattiva le voci che non usi. Le pagine restano raggiungibili da link diretti o dalla ricerca.
               </p>
@@ -181,7 +181,7 @@ export default function ImpostazioniClient({
         </div>
       </section>
 
-      <section className="flex items-start gap-3 rounded-2xl border p-4 text-[11px] leading-5" style={{ borderColor: "var(--surface-border)", background: "var(--surface-soft)", color: "var(--text-label)" }}>
+      <section className="flex items-start gap-3 rounded-xl border p-4 text-[11px] leading-5" style={{ borderColor: "var(--surface-border)", background: "var(--surface-soft)", color: "var(--text-label)" }}>
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--success)" }} />
         <p>
           La personalizzazione del menu è locale al browser. Se cambi dispositivo o browser, le voci tornano tutte visibili.

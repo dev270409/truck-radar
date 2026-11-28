@@ -31,7 +31,7 @@ interface Trip {
 }
 
 const statusStyles: Record<string, string> = {
-  DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
+  DA_ASSEGNARE: "bg-[var(--surface-soft)] text-[var(--text-soft)] border border-[var(--surface-border)]",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
   IN_CORSO: "bg-amber-950 text-amber-300 border border-amber-800/60",
   COMPLETATO: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
@@ -89,10 +89,10 @@ export default function AutistaTripsPage() {
   return (
     <div className="max-w-md mx-auto space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+        <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
           <Route className="w-6 h-6 mr-2.5 text-blue-400" /> I miei Viaggi
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-label)] mt-1">
           Viaggi assegnati a te: parti e registra la consegna.
         </p>
       </div>
@@ -104,28 +104,28 @@ export default function AutistaTripsPage() {
       )}
 
       {loading ? (
-        <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+        <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
           <Loader2 className="w-5 h-5 animate-spin" />
           <span>Caricamento viaggi...</span>
         </div>
       ) : trips.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 bg-slate-900 border border-slate-800 rounded-2xl">
+        <div className="p-12 text-center text-[var(--text-label-soft)] bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
           Nessun viaggio assegnato a te al momento.
         </div>
       ) : (
         trips.map((t) => (
           <div
             key={t.id}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl"
+            className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-4 "
           >
             <div className="flex items-center justify-between">
               <span
-                className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}
+                className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyles[t.status] ?? statusStyles.DA_ASSEGNARE}`}
               >
                 {label(t.status)}
               </span>
               {t.vehicle && (
-                <span className="text-xs font-mono text-slate-400 flex items-center">
+                <span className="text-xs font-mono text-[var(--text-label)] flex items-center">
                   <Truck className="w-3.5 h-3.5 mr-1 text-emerald-400" />
                   {t.vehicle.targa}
                 </span>
@@ -135,21 +135,21 @@ export default function AutistaTripsPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold flex items-center">
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold flex items-center">
                     <MapPin className="w-3 h-3 mr-1 text-emerald-400" /> Ritiro
                   </p>
-                  <p className="text-sm font-semibold text-slate-100 capitalize">{t.luogoRitiro}</p>
+                  <p className="text-sm font-semibold text-[var(--text)] capitalize">{t.luogoRitiro}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-500" />
+                <ArrowRight className="w-5 h-5 text-[var(--text-label-soft)]" />
                 <div className="text-right">
-                  <p className="text-[11px] uppercase text-slate-500 font-semibold flex items-center justify-end">
+                  <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold flex items-center justify-end">
                     Consegna <MapPin className="w-3 h-3 ml-1 text-rose-400" />
                   </p>
-                  <p className="text-sm font-semibold text-slate-100 capitalize">{t.luogoConsegna}</p>
+                  <p className="text-sm font-semibold text-[var(--text)] capitalize">{t.luogoConsegna}</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between text-xs text-[var(--text-label)] pt-2 border-t border-[var(--surface-border)]">
                 <span className="flex items-center">
                   <CalendarDays className="w-3.5 h-3.5 mr-1.5" />
                   {new Date(t.dataRitiro).toLocaleDateString("it-IT")}
@@ -160,7 +160,7 @@ export default function AutistaTripsPage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400">
+              <div className="flex items-center justify-between text-xs text-[var(--text-label)]">
                 <span className="flex items-center">
                   <Package className="w-3.5 h-3.5 mr-1.5" />
                   {t.tipoMerce}
@@ -169,13 +169,13 @@ export default function AutistaTripsPage() {
               </div>
 
               {t.cliente && (
-                <p className="text-xs text-slate-500">
-                  Cliente: <span className="text-slate-300">{t.cliente}</span>
+                <p className="text-xs text-[var(--text-label-soft)]">
+                  Cliente: <span className="text-[var(--text-soft)]">{t.cliente}</span>
                 </p>
               )}
             </div>
 
-            <div className="flex items-center space-x-2 pt-2 border-t border-slate-800">
+            <div className="flex items-center space-x-2 pt-2 border-t border-[var(--surface-border)]">
               {t.status === "ASSEGNATO" && (
                 <button
                   onClick={() => handleStatus(t, "IN_CORSO")}
@@ -206,7 +206,7 @@ export default function AutistaTripsPage() {
               )}
               <Link
                 href={`/dashboard/autista/${t.id}`}
-                className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition text-center"
+                className="px-4 py-3 bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text-soft)] text-sm font-medium rounded-xl transition text-center"
               >
                 Dettaglio
               </Link>

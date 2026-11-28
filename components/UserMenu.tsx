@@ -34,7 +34,7 @@ export default function UserMenu({
         aria-label="Apri profilo e impostazioni"
         aria-expanded={open}
         title={`${user.nome} ${user.cognome}`}
-        className="grid h-9 w-9 place-items-center rounded-full font-display text-[12px] font-bold text-white shadow-sm"
+        className="grid h-9 w-9 place-items-center rounded-full font-display text-[12px] font-semibold text-white shadow-sm"
         style={{ background: "var(--brand)" }}
       >
         {initials}

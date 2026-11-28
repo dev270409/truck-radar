@@ -90,20 +90,24 @@ export default async function HomePage() {
 
             {/* Camion che si carica */}
             <div
-              className="ops-card relative overflow-hidden p-5 md:p-7"
+              className="ops-card relative min-w-0 overflow-hidden p-5 md:p-7"
               style={{ background: "var(--surface)" }}
             >
-              <p className="ops-label mb-5">Piano di carico · esempio animato</p>
-              <TruckCargoVisual />
-              <div
-                className="mt-5 flex items-center justify-between border-t pt-4 text-xs"
-                style={{ borderColor: "var(--surface-border)", color: "var(--text-label)" }}
-              >
-                <span>Misura i colli prima di partire, non dopo</span>
-                <span style={{ color: "var(--brand)" }} className="font-semibold">
-                  Apri il piano di carico →
+              <div className="flex items-center justify-between gap-3">
+                <p className="ops-label">Piano di carico</p>
+                <span className="font-mono text-[11px]" style={{ color: "var(--text-label-soft)" }}>
+                  esempio · nessun dato reale
                 </span>
               </div>
+              <div className="mt-4">
+                <TruckCargoVisual />
+              </div>
+              <p
+                className="mt-5 border-t pt-4 text-xs"
+                style={{ borderColor: "var(--surface-border)", color: "var(--text-label)" }}
+              >
+                Misura i colli prima di partire, non dopo.
+              </p>
             </div>
           </div>
         </section>

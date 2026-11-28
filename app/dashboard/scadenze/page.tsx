@@ -97,7 +97,7 @@ function daysLeft(value: string) {
 function urgencyClass(days: number) {
   if (days < 0) return "border-red-800 bg-red-950/60 text-red-200";
   if (days <= 30) return "border-amber-800 bg-amber-950/50 text-amber-200";
-  return "border-slate-800 bg-slate-950/60 text-slate-200";
+  return "border-[var(--surface-border)] bg-[var(--surface-soft)] text-[var(--text)]";
 }
 
 function deadlineLabel(tipo: string) {
@@ -385,14 +385,14 @@ export default function ScadenzePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <CalendarDays className="mr-2.5 h-6 w-6 text-amber-400" /> Scadenze e divieti
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-[var(--text-label)]">
             Mezzi, autisti, azienda e calendario divieti con catalogo, rinnovi e stato degli avvisi.
           </p>
         </div>
-        <a href="/api/export?type=vehicles" className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500">
+        <a href="/api/export?type=vehicles" className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500">
           <Download className="h-4 w-4" /> Esporta mezzi
         </a>
       </div>
@@ -421,16 +421,16 @@ export default function ScadenzePage() {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-red-800/60 bg-red-950/30 p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-red-300">Scadute</p>
-          <p className="mt-1 text-xl font-bold text-red-200">{summary.expired}</p>
+          <p className="text-[11px] font-semibold   text-red-300">Scadute</p>
+          <p className="mt-1 text-xl font-semibold text-red-200">{summary.expired}</p>
         </div>
         <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-amber-300">Entro 30 giorni</p>
-          <p className="mt-1 text-xl font-bold text-amber-200">{summary.soon}</p>
+          <p className="text-[11px] font-semibold   text-amber-300">Entro 30 giorni</p>
+          <p className="mt-1 text-xl font-semibold text-amber-200">{summary.soon}</p>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Divieti futuri</p>
-          <p className="mt-1 text-xl font-bold text-slate-100">{summary.bans}</p>
+        <div className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
+          <p className="text-[11px] font-semibold   text-[var(--text-label-soft)]">Divieti futuri</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--text)]">{summary.bans}</p>
         </div>
       </div>
 
@@ -447,7 +447,7 @@ export default function ScadenzePage() {
               key={item.id}
               type="button"
               onClick={() => setTab(item.id as typeof tab)}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${tab === item.id ? "border-indigo-500 bg-indigo-950/50 text-indigo-200" : "border-slate-700 text-slate-300 hover:border-slate-500"}`}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${tab === item.id ? "border-indigo-500 bg-indigo-950/50 text-indigo-200" : "border-[var(--surface-border)] text-[var(--text-soft)] hover:border-[var(--text-label)]"}`}
             >
               <Icon className="h-4 w-4" /> {item.label}
             </button>
@@ -456,33 +456,33 @@ export default function ScadenzePage() {
         <button
           type="button"
           onClick={() => setSettingsOpen((value) => !value)}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:border-slate-500"
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text-soft)] hover:border-[var(--text-label)]"
         >
           <Settings2 className="h-4 w-4" /> Configurazione avvisi
         </button>
       </div>
 
       {settingsOpen && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="flex items-center font-semibold text-slate-100"><Settings2 className="mr-2 h-4 w-4 text-indigo-300" /> Catalogo e avvisi email</h2>
-              <p className="mt-1 text-xs text-slate-400">Le voci spuntate compaiono nelle scadenze. Gli avvisi partono solo con destinatari e provider configurati.</p>
+              <h2 className="flex items-center font-semibold text-[var(--text)]"><Settings2 className="mr-2 h-4 w-4 text-indigo-300" /> Catalogo e avvisi email</h2>
+              <p className="mt-1 text-xs text-[var(--text-label)]">Le voci spuntate compaiono nelle scadenze. Gli avvisi partono solo con destinatari e provider configurati.</p>
             </div>
-            <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase ${alertStatus?.senzaDestinatari ? "border-amber-700 text-amber-200" : "border-emerald-700 text-emerald-200"}`}>
+            <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold  ${alertStatus?.senzaDestinatari ? "border-amber-700 text-amber-200" : "border-emerald-700 text-emerald-200"}`}>
               {alertStatus?.senzaDestinatari ? "Da configurare" : "Attivo"}
             </span>
           </div>
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase text-slate-400">Email destinatari</label>
-              <input value={alertEmails} onChange={(e) => setAlertEmails(e.target.value)} placeholder="ufficio@azienda.it, titolare@azienda.it" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <label className="block text-xs font-semibold  text-[var(--text-label)]">Email destinatari</label>
+              <input value={alertEmails} onChange={(e) => setAlertEmails(e.target.value)} placeholder="ufficio@azienda.it, titolare@azienda.it" className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold uppercase text-slate-400">Giorni preavviso</label>
-                  <input value={alertDays} onChange={(e) => setAlertDays(e.target.value)} placeholder="30, 7, 1" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+                  <label className="block text-xs font-semibold  text-[var(--text-label)]">Giorni preavviso</label>
+                  <input value={alertDays} onChange={(e) => setAlertDays(e.target.value)} placeholder="30, 7, 1" className="mt-1 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
                 </div>
-                <label className="mt-5 flex items-center gap-2 text-sm text-slate-200">
+                <label className="mt-5 flex items-center gap-2 text-sm text-[var(--text)]">
                   <input type="checkbox" checked={alertsEnabled} onChange={(e) => setAlertsEnabled(e.target.checked)} />
                   Avvisi attivi
                 </label>
@@ -490,13 +490,13 @@ export default function ScadenzePage() {
               <button type="button" onClick={saveSettings} disabled={saving || !alertStatus?.canEdit} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Salva configurazione
               </button>
-              {!alertStatus?.canEdit && <p className="text-[11px] text-slate-500">Solo l&apos;amministratore può modificare la configurazione.</p>}
+              {!alertStatus?.canEdit && <p className="text-[11px] text-[var(--text-label-soft)]">Solo l&apos;amministratore può modificare la configurazione.</p>}
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase text-slate-400">Voci attive</p>
+              <p className="text-xs font-semibold  text-[var(--text-label)]">Voci attive</p>
               <div className="mt-2 grid max-h-[260px] gap-1 overflow-y-auto pr-1 sm:grid-cols-2">
                 {DEADLINE_TYPES.map((item) => (
-                  <label key={item.id} className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-2 py-1.5 text-[11px] text-slate-200">
+                  <label key={item.id} className="flex items-center gap-2 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2 py-1.5 text-[11px] text-[var(--text)]">
                     <input type="checkbox" checked={activeTypes[item.id] !== false} onChange={(e) => setActiveTypes((current) => ({ ...current, [item.id]: e.target.checked }))} />
                     {item.label}
                   </label>
@@ -508,30 +508,30 @@ export default function ScadenzePage() {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
+        <div className="flex items-center justify-center p-10 text-[var(--text-label)]"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
       ) : tab === "driver" ? (
         <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-          <form onSubmit={addDriverDoc} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza autista</h2>
+          <form onSubmit={addDriverDoc} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza autista</h2>
             <div className="space-y-2">
-              <select required value={userId} onChange={(e) => setUserId(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+              <select required value={userId} onChange={(e) => setUserId(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                 <option value="">Autista *</option>
                 {users.map((u) => <option key={u.id} value={u.id}>{u.nome} {u.cognome}</option>)}
               </select>
               <div className="grid grid-cols-2 gap-2">
-                <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                   {DRIVER_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
                 </select>
-                <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+                <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               </div>
-              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               <button type="submit" disabled={saving || !userId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva
               </button>
             </div>
           </form>
           <div className="space-y-2">
-            {drivers.length === 0 ? <p className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-sm text-slate-500">Nessuna scadenza autista.</p> : drivers.map((item) => {
+            {drivers.length === 0 ? <p className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5 text-sm text-[var(--text-label-soft)]">Nessuna scadenza autista.</p> : drivers.map((item) => {
               const days = daysLeft(item.dataScadenza);
               return (
                 <div key={item.id} className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${urgencyClass(days)}`}>
@@ -540,8 +540,8 @@ export default function ScadenzePage() {
                     <p className="text-xs opacity-80">{fmtDate(item.dataScadenza)} · {days < 0 ? `scaduta da ${Math.abs(days)} gg` : `tra ${days} gg`}{item.note ? ` · ${item.note}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <a href={`https://wa.me/?text=${encodeURIComponent(`Scadenza ${deadlineLabel(item.tipo)} di ${item.nome ?? ""} ${item.cognome ?? ""}: ${fmtDate(item.dataScadenza)}`)}`} target="_blank" rel="noreferrer" className="rounded-lg border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:border-emerald-500">WhatsApp</a>
-                    <button type="button" onClick={() => remove("driver", item.id)} className="text-slate-400 hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
+                    <a href={`https://wa.me/?text=${encodeURIComponent(`Scadenza ${deadlineLabel(item.tipo)} di ${item.nome ?? ""} ${item.cognome ?? ""}: ${fmtDate(item.dataScadenza)}`)}`} target="_blank" rel="noreferrer" className="rounded-lg border border-[var(--surface-border)] px-2 py-1 text-xs font-semibold text-[var(--text)] hover:border-emerald-500">WhatsApp</a>
+                    <button type="button" onClick={() => remove("driver", item.id)} className="text-[var(--text-label)] hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </div>
               );
@@ -550,27 +550,27 @@ export default function ScadenzePage() {
         </div>
       ) : tab === "vehicle" ? (
         <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-          <form onSubmit={addVehicleDoc} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza mezzo</h2>
+          <form onSubmit={addVehicleDoc} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza mezzo</h2>
             <div className="space-y-2">
-              <select required value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+              <select required value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                 <option value="">Mezzo *</option>
                 {vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.targa} · {vehicle.categoria}</option>)}
               </select>
               <div className="grid grid-cols-2 gap-2">
-                <select value={effectiveVehicleTipo} onChange={(e) => setVehicleTipo(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                <select value={effectiveVehicleTipo} onChange={(e) => setVehicleTipo(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                   {visibleVehicleTypes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
                 </select>
-                <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+                <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               </div>
-              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               <button type="submit" disabled={saving || !vehicleId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva
               </button>
             </div>
           </form>
           <div className="space-y-2">
-            {vehicleItems.length === 0 ? <p className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-sm text-slate-500">Nessuna scadenza mezzo.</p> : vehicleItems.map((item) => {
+            {vehicleItems.length === 0 ? <p className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5 text-sm text-[var(--text-label-soft)]">Nessuna scadenza mezzo.</p> : vehicleItems.map((item) => {
               const days = daysLeft(item.dataScadenza);
               return (
                 <div key={`${item.sourceTable}-${item.id}`} className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${urgencyClass(days)}`}>
@@ -579,9 +579,9 @@ export default function ScadenzePage() {
                     <p className="text-xs opacity-80">{fmtDate(item.dataScadenza)} · {days < 0 ? `scaduta da ${Math.abs(days)} gg` : `tra ${days} gg`}{item.note ? ` · ${item.note}` : ""}</p>
                   </div>
                   {item.sourceTable === "VehicleDeadline" ? (
-                    <button type="button" onClick={() => remove("vehicle", item.id)} className="text-slate-400 hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => remove("vehicle", item.id)} className="text-[var(--text-label)] hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
                   ) : (
-                    <a href="/dashboard/vehicles" className="rounded-lg border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:border-indigo-500">Apri mezzo</a>
+                    <a href="/dashboard/vehicles" className="rounded-lg border border-[var(--surface-border)] px-2 py-1 text-xs font-semibold text-[var(--text)] hover:border-indigo-500">Apri mezzo</a>
                   )}
                 </div>
               );
@@ -590,21 +590,21 @@ export default function ScadenzePage() {
         </div>
       ) : tab === "company" ? (
         <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-          <form onSubmit={addCompanyDoc} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza aziendale</h2>
+          <form onSubmit={addCompanyDoc} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Scadenza aziendale</h2>
             <div className="space-y-2">
-              <select value={companyTipo} onChange={(e) => setCompanyTipo(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+              <select value={companyTipo} onChange={(e) => setCompanyTipo(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                 {COMPANY_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
-              <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input required type="date" value={dataScadenza} onChange={(e) => setDataScadenza(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+              <input placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               <button type="submit" disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva
               </button>
             </div>
           </form>
           <div className="space-y-2">
-            {company.length === 0 ? <p className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-sm text-slate-500">Nessuna scadenza aziendale.</p> : company.map((item) => {
+            {company.length === 0 ? <p className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5 text-sm text-[var(--text-label-soft)]">Nessuna scadenza aziendale.</p> : company.map((item) => {
               const days = daysLeft(item.dataScadenza);
               return (
                 <div key={item.id} className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${urgencyClass(days)}`}>
@@ -612,7 +612,7 @@ export default function ScadenzePage() {
                     <p className="text-sm font-semibold">{deadlineLabel(item.tipo)}</p>
                     <p className="text-xs opacity-80">{fmtDate(item.dataScadenza)} · {days < 0 ? `scaduta da ${Math.abs(days)} gg` : `tra ${days} gg`}{item.note ? ` · ${item.note}` : ""}</p>
                   </div>
-                  <button type="button" onClick={() => remove("company", item.id)} className="text-slate-400 hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => remove("company", item.id)} className="text-[var(--text-label)] hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
                 </div>
               );
             })}
@@ -620,22 +620,22 @@ export default function ScadenzePage() {
         </div>
       ) : (
         <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-          <form onSubmit={addBan} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Nuovo divieto</h2>
+          <form onSubmit={addBan} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-amber-400" /> Nuovo divieto</h2>
             <div className="space-y-2">
-              <input required type="date" value={banData} onChange={(e) => setBanData(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-              <input placeholder="Regione" value={banRegione} onChange={(e) => setBanRegione(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-              <input placeholder="Descrizione (es. divieto domenicale)" value={banDescrizione} onChange={(e) => setBanDescrizione(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input required type="date" value={banData} onChange={(e) => setBanData(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+              <input placeholder="Regione" value={banRegione} onChange={(e) => setBanRegione(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+              <input placeholder="Descrizione (es. divieto domenicale)" value={banDescrizione} onChange={(e) => setBanDescrizione(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
               <button type="submit" disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva
               </button>
-              <button type="button" onClick={generateSundays} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-amber-500 disabled:opacity-50">
+              <button type="button" onClick={generateSundays} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-amber-500 disabled:opacity-50">
                 <CalendarDays className="h-4 w-4" /> Genera 12 domeniche
               </button>
             </div>
           </form>
           <div className="space-y-2">
-            {bans.length === 0 ? <p className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-sm text-slate-500">Nessun divieto inserito.</p> : bans.map((item) => {
+            {bans.length === 0 ? <p className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5 text-sm text-[var(--text-label-soft)]">Nessun divieto inserito.</p> : bans.map((item) => {
               const days = daysLeft(item.data);
               return (
                 <div key={item.id} className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${urgencyClass(days)}`}>
@@ -644,8 +644,8 @@ export default function ScadenzePage() {
                     <p className="text-xs opacity-80">{item.descrizione || "Divieto mezzi pesanti"}{days >= 0 ? ` · tra ${days} gg` : ""}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <a href={`https://wa.me/?text=${encodeURIComponent(`Divieto mezzi pesanti ${fmtDate(item.data)} ${item.regione ?? ""}: ${item.descrizione ?? ""}`)}`} target="_blank" rel="noreferrer" className="rounded-lg border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:border-emerald-500">WhatsApp</a>
-                    <button type="button" onClick={() => removeBan(item.id)} className="text-slate-400 hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
+                    <a href={`https://wa.me/?text=${encodeURIComponent(`Divieto mezzi pesanti ${fmtDate(item.data)} ${item.regione ?? ""}: ${item.descrizione ?? ""}`)}`} target="_blank" rel="noreferrer" className="rounded-lg border border-[var(--surface-border)] px-2 py-1 text-xs font-semibold text-[var(--text)] hover:border-emerald-500">WhatsApp</a>
+                    <button type="button" onClick={() => removeBan(item.id)} className="text-[var(--text-label)] hover:text-red-300" aria-label="Elimina"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </div>
               );

@@ -75,7 +75,7 @@ export interface ChartTooltipProps {
   datePillVelocity?: boolean | DatePillVelocityConfig;
   /**
    * Classes merged (tailwind-merge) over the default pill surface
-   * (`rounded-full bg-zinc-900 px-4 py-1 text-white shadow-lg …`).
+   * (`rounded-full bg-zinc-900 px-4 py-1 text-white  …`).
    */
   datePillClassName?: string;
   /** Inline styles for the pill surface (e.g. `background`, `color`). */

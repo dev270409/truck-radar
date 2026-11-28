@@ -230,7 +230,7 @@ export default function BenchmarkPage() {
           <section>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="ops-label">Benchmark per categoria</h2>
-              <span className="text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+              <span className="text-[11px]" style={{ color: "var(--text-label-soft)" }}>
                 {benchmark.from} → {benchmark.to}
               </span>
             </div>
@@ -243,7 +243,7 @@ export default function BenchmarkPage() {
                 {benchmark.categories.map((category, index) => (
                   <div key={category.categoria} className="ops-card p-4">
                     <div className="flex items-center justify-between">
-                      <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+                      <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
                         {label(category.categoria)}
                       </p>
                       {index === 0 ? (
@@ -264,7 +264,7 @@ export default function BenchmarkPage() {
                       <Metric label="Km" value={kmValue(category.km)} />
                       <Metric label="Mezzi" value={String(category.vehicles)} />
                     </div>
-                    <div className="mt-3 flex items-center justify-between border-t pt-2 text-[10px]" style={{ borderColor: "var(--surface-border)" }}>
+                    <div className="mt-3 flex items-center justify-between border-t pt-2 text-[11px]" style={{ borderColor: "var(--surface-border)" }}>
                       <span style={{ color: "var(--text-label)" }}>
                         {category.paidTrips}/{category.geotabTrips} viaggi collegati
                       </span>
@@ -284,7 +284,7 @@ export default function BenchmarkPage() {
           <section className="ops-card overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
               <div>
-                <h2 className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+                <h2 className="font-display text-[14px] font-semibold" style={{ color: "var(--text)" }}>
                   Dettaglio per mezzo
                 </h2>
                 <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -314,7 +314,7 @@ export default function BenchmarkPage() {
                         <p className="font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>
                           {vehicle.targa}
                         </p>
-                        <p className="text-[10px]" style={{ color: "var(--text-label)" }}>{label(vehicle.categoria)}</p>
+                        <p className="text-[11px]" style={{ color: "var(--text-label)" }}>{label(vehicle.categoria)}</p>
                       </td>
                       <td className="text-right text-[12px]" style={{ color: "var(--text-soft)" }}>{kmValue(vehicle.km)}</td>
                       <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>
@@ -380,7 +380,7 @@ function Kpi({ label: title, value, tone }: { label: string; value: string; tone
         <span className="h-2 w-2 rounded-full" style={{ background: tone }} />
         <p className="ops-label">{title}</p>
       </div>
-      <p className="font-display mt-2 text-[17px] font-bold" style={{ color: "var(--text)" }}>{value}</p>
+      <p className="font-display mt-2 text-[17px] font-semibold" style={{ color: "var(--text)" }}>{value}</p>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import type { FleetVehicleRow } from "@/lib/fleet";
 const FleetMapInner = dynamic(() => import("@/components/FleetMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[420px] flex items-center justify-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400 space-x-2">
+    <div className="h-[420px] flex items-center justify-center bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl text-[var(--text-label)] space-x-2">
       <Loader2 className="w-5 h-5 animate-spin" />
       <span>Caricamento mappa...</span>
     </div>

@@ -45,7 +45,7 @@ export default function VerificationCard() {
   if (loading) {
     return (
       <div className="glass p-6 enter-up">
-        <div className="flex items-center space-x-2 text-slate-400 text-sm">
+        <div className="flex items-center space-x-2 text-[var(--text-label)] text-sm">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>Verifica account...</span>
         </div>
@@ -59,21 +59,21 @@ export default function VerificationCard() {
   return (
     <div className="glass p-6 enter-up">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-slate-100 flex items-center">
+        <h3 className="text-base font-semibold text-[var(--text)] flex items-center">
           <ShieldCheck className="w-5 h-5 mr-2 text-blue-400" /> Verified Account
         </h3>
         <span
-          className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
+          className={`text-xs font-semibold  px-3 py-1 rounded-full ${
             data.verified
               ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
-              : "bg-slate-800 text-slate-400"
+              : "bg-[var(--surface-strong)] text-[var(--text-label)]"
           }`}
         >
           {data.verified ? "Account verificato" : "Account basic"}
         </span>
       </div>
 
-      <p className="text-xs text-slate-400 mb-4">
+      <p className="text-xs text-[var(--text-label)] mb-4">
         L'account verificato accede al network: borsa carichi, subappalti e smart return.
       </p>
 
@@ -86,21 +86,21 @@ export default function VerificationCard() {
               <XCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-slate-100">
+              <p className="text-sm font-semibold text-[var(--text)]">
                 {c.label}
                 {c.beneficio && (
-                  <span className="ml-2 text-[10px] uppercase font-bold text-slate-500">beneficio</span>
+                  <span className="ml-2 text-[11px]  font-semibold text-[var(--text-label-soft)]">beneficio</span>
                 )}
               </p>
-              <p className="text-xs text-slate-400">{c.detail}</p>
+              <p className="text-xs text-[var(--text-label)]">{c.detail}</p>
             </div>
           </li>
         ))}
       </ul>
 
       {nextCriterio && (
-        <div className="mt-4 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-400">
-          Prossimo requisito: <span className="font-semibold text-slate-200">{nextCriterio.label}</span>.
+        <div className="mt-4 p-3 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl text-xs text-[var(--text-label)]">
+          Prossimo requisito: <span className="font-semibold text-[var(--text)]">{nextCriterio.label}</span>.
           {nextCriterio.key === "api" && (
             <Link
               href="/dashboard/integrazioni"

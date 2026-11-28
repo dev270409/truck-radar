@@ -212,13 +212,13 @@ export default function CostiMezziPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <Wrench className="mr-2.5 h-6 w-6 text-emerald-400" /> Costi mezzi e TCO
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Libretto, gomme, officina, assicurazione e costo reale al chilometro.</p>
+          <p className="mt-1 text-sm text-[var(--text-label)]">Libretto, gomme, officina, assicurazione e costo reale al chilometro.</p>
         </div>
         <div className="flex gap-2">
-          <a href="/api/export?type=costs" className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500">
+          <a href="/api/export?type=costs" className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500">
             <Download className="h-4 w-4" /> Esporta CSV
           </a>
           <button type="button" onClick={() => fileRef.current?.click()} disabled={ocrLoading} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
@@ -241,55 +241,55 @@ export default function CostiMezziPage() {
       {success && <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/40 p-3 text-sm text-emerald-200">{success}</div>}
 
       {libretto && (
-        <section className="rounded-2xl border border-indigo-800/60 bg-indigo-950/30 p-5">
+        <section className="rounded-xl border border-indigo-800/60 bg-indigo-950/30 p-5">
           <h2 className="mb-3 flex items-center font-semibold text-indigo-100"><Camera className="mr-2 h-4 w-4" /> Dati letti dal libretto</h2>
           <div className="grid gap-2 text-sm md:grid-cols-4">
-            <p><span className="text-slate-400">Targa:</span> <b className="text-slate-100">{libretto.targa ?? "—"}</b></p>
-            <p><span className="text-slate-400">Marca:</span> <b className="text-slate-100">{libretto.marca ?? "—"}</b></p>
-            <p><span className="text-slate-400">Modello:</span> <b className="text-slate-100">{libretto.modello ?? "—"}</b></p>
-            <p><span className="text-slate-400">Categoria:</span> <b className="text-slate-100">{libretto.categoria ?? "—"}</b></p>
-            <p><span className="text-slate-400">Portata:</span> <b className="text-slate-100">{libretto.portataMaxKg?.toLocaleString("it-IT") ?? "—"} kg</b></p>
-            <p><span className="text-slate-400">Volume:</span> <b className="text-slate-100">{libretto.volumeMaxM3 ?? "—"} m³</b></p>
-            <p><span className="text-slate-400">Euro:</span> <b className="text-slate-100">{libretto.classeEuro ?? "—"}</b></p>
-            <p><span className="text-slate-400">Revisione:</span> <b className="text-slate-100">{libretto.dataRevisione ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Targa:</span> <b className="text-[var(--text)]">{libretto.targa ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Marca:</span> <b className="text-[var(--text)]">{libretto.marca ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Modello:</span> <b className="text-[var(--text)]">{libretto.modello ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Categoria:</span> <b className="text-[var(--text)]">{libretto.categoria ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Portata:</span> <b className="text-[var(--text)]">{libretto.portataMaxKg?.toLocaleString("it-IT") ?? "—"} kg</b></p>
+            <p><span className="text-[var(--text-label)]">Volume:</span> <b className="text-[var(--text)]">{libretto.volumeMaxM3 ?? "—"} m³</b></p>
+            <p><span className="text-[var(--text-label)]">Euro:</span> <b className="text-[var(--text)]">{libretto.classeEuro ?? "—"}</b></p>
+            <p><span className="text-[var(--text-label)]">Revisione:</span> <b className="text-[var(--text)]">{libretto.dataRevisione ?? "—"}</b></p>
           </div>
           <p className="mt-2 text-xs text-amber-300">Controlla sempre i dati estratti: l&apos;OCR può sbagliare. {matchId ? "Targa già in flotta: aggiorno il mezzo esistente." : "Targa nuova: creo un nuovo mezzo."}</p>
           <div className="mt-3 flex gap-2">
             <button type="button" onClick={saveLibretto} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} {matchId ? "Aggiorna mezzo" : "Crea mezzo"}
             </button>
-            <button type="button" onClick={() => { setLibretto(null); setMatchId(null); }} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300">Annulla</button>
+            <button type="button" onClick={() => { setLibretto(null); setMatchId(null); }} className="rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm text-[var(--text-soft)]">Annulla</button>
           </div>
         </section>
       )}
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-        <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Car className="mr-2 h-4 w-4 text-sky-400" /> Costo reale per mezzo</h2>
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+        <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Car className="mr-2 h-4 w-4 text-sky-400" /> Costo reale per mezzo</h2>
         {loading ? (
-          <div className="flex items-center text-slate-400"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calcolo...</div>
+          <div className="flex items-center text-[var(--text-label)]"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calcolo...</div>
         ) : (
           <>
           <div className="space-y-3 md:hidden">
             {loading ? (
-              <div className="ops-card flex items-center p-6 text-slate-400"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calcolo...</div>
+              <div className="ops-card flex items-center p-6 text-[var(--text-label)]"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calcolo...</div>
             ) : tco.length === 0 ? (
-              <div className="ops-card p-6 text-sm text-slate-500">Nessun mezzo in flotta.</div>
+              <div className="ops-card p-6 text-sm text-[var(--text-label-soft)]">Nessun mezzo in flotta.</div>
             ) : (
               tco.map((t) => (
                 <div key={t.vehicle.id} className="ops-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-slate-100">{t.vehicle.targa}</p>
-                      <p className="text-[11px] text-slate-500">{label(t.vehicle.categoria)} · {t.km.toLocaleString("it-IT")} km</p>
+                      <p className="text-sm font-semibold text-[var(--text)]">{t.vehicle.targa}</p>
+                      <p className="text-[11px] text-[var(--text-label-soft)]">{label(t.vehicle.categoria)} · {t.km.toLocaleString("it-IT")} km</p>
                     </div>
-                    <p className={`text-sm font-bold ${t.costPerKm != null ? "text-emerald-300" : "text-slate-500"}`}>
+                    <p className={`text-sm font-semibold ${t.costPerKm != null ? "text-emerald-300" : "text-[var(--text-label-soft)]"}`}>
                       {t.costPerKm != null ? `${t.costPerKm.toFixed(2)} €/km` : "—"}
                     </p>
                   </div>
                   <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
-                    <div><p className="text-[9px] text-slate-500">Totale</p><p className="text-xs font-semibold text-slate-100">{eur(t.total)}</p></div>
-                    <div><p className="text-[9px] text-slate-500">Gasolio</p><p className="text-xs font-semibold text-slate-100">{eur(t.fuel)}</p></div>
-                    <div><p className="text-[9px] text-slate-500">km/l</p><p className="text-xs font-semibold text-slate-100">{t.kmPerLitro != null ? t.kmPerLitro.toFixed(2) : "—"}</p></div>
+                    <div><p className="text-[9px] text-[var(--text-label-soft)]">Totale</p><p className="text-xs font-semibold text-[var(--text)]">{eur(t.total)}</p></div>
+                    <div><p className="text-[9px] text-[var(--text-label-soft)]">Gasolio</p><p className="text-xs font-semibold text-[var(--text)]">{eur(t.fuel)}</p></div>
+                    <div><p className="text-[9px] text-[var(--text-label-soft)]">km/l</p><p className="text-xs font-semibold text-[var(--text)]">{t.kmPerLitro != null ? t.kmPerLitro.toFixed(2) : "—"}</p></div>
                   </div>
                 </div>
               ))
@@ -298,7 +298,7 @@ export default function CostiMezziPage() {
 
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-[var(--surface-border)] text-[11px]   text-[var(--text-label-soft)]">
                 <tr>
                   <th className="py-2 pr-3">Mezzo</th>
                   <th className="px-3 py-2 text-right">Gasolio</th>
@@ -311,14 +311,14 @@ export default function CostiMezziPage() {
               </thead>
               <tbody>
                 {tco.map((t) => (
-                  <tr key={t.vehicle.id} className="border-b border-slate-800/60 last:border-0">
-                    <td className="py-2 pr-3 font-semibold text-slate-100">{t.vehicle.targa}<span className="ml-1 text-xs font-normal text-slate-500">{label(t.vehicle.categoria)}</span></td>
-                    <td className="px-3 py-2 text-right text-slate-300">{eur(t.fuel)}</td>
-                    <td className="px-3 py-2 text-right text-slate-300">{eur(t.other)}</td>
-                    <td className="px-3 py-2 text-right font-semibold text-slate-100">{eur(t.total)}</td>
-                    <td className="px-3 py-2 text-right text-slate-400">{t.km.toLocaleString("it-IT")}</td>
-                    <td className={`px-3 py-2 text-right font-semibold ${t.costPerKm != null ? "text-emerald-300" : "text-slate-500"}`}>{t.costPerKm != null ? `${t.costPerKm.toFixed(2)} €` : "—"}</td>
-                    <td className="px-3 py-2 text-right text-slate-400">{t.kmPerLitro != null ? t.kmPerLitro.toFixed(2) : "—"}</td>
+                  <tr key={t.vehicle.id} className="border-b border-[var(--surface-border)] last:border-0">
+                    <td className="py-2 pr-3 font-semibold text-[var(--text)]">{t.vehicle.targa}<span className="ml-1 text-xs font-normal text-[var(--text-label-soft)]">{label(t.vehicle.categoria)}</span></td>
+                    <td className="px-3 py-2 text-right text-[var(--text-soft)]">{eur(t.fuel)}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-soft)]">{eur(t.other)}</td>
+                    <td className="px-3 py-2 text-right font-semibold text-[var(--text)]">{eur(t.total)}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-label)]">{t.km.toLocaleString("it-IT")}</td>
+                    <td className={`px-3 py-2 text-right font-semibold ${t.costPerKm != null ? "text-emerald-300" : "text-[var(--text-label-soft)]"}`}>{t.costPerKm != null ? `${t.costPerKm.toFixed(2)} €` : "—"}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-label)]">{t.kmPerLitro != null ? t.kmPerLitro.toFixed(2) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -329,48 +329,48 @@ export default function CostiMezziPage() {
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
-        <form onSubmit={addCost} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Plus className="mr-2 h-4 w-4 text-emerald-400" /> Nuovo costo</h2>
+        <form onSubmit={addCost} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+          <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Plus className="mr-2 h-4 w-4 text-emerald-400" /> Nuovo costo</h2>
           <div className="space-y-2">
-            <select required value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+            <select required value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
               <option value="">Mezzo *</option>
               {vehicles.map((v) => <option key={v.id} value={v.id}>{v.targa}</option>)}
             </select>
             <div className="grid grid-cols-2 gap-2">
-              <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+              <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                 {COST_CATEGORIES.filter((category) => category.ambito === "mezzo" || category.code === "ALTRO").map((category) => (
                   <option key={category.code} value={category.code}>{category.label}</option>
                 ))}
               </select>
-              <input required type="number" placeholder="Importo € *" value={importo} onChange={(e) => setImporto(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input required type="number" placeholder="Importo € *" value={importo} onChange={(e) => setImporto(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             </div>
-            <input placeholder="Descrizione" value={descrizione} onChange={(e) => setDescrizione(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <input placeholder="Descrizione" value={descrizione} onChange={(e) => setDescrizione(e.target.value)} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             <div className="grid grid-cols-2 gap-2">
-              <input type="date" value={data} onChange={(e) => setData(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-              <input placeholder="Fornitore" value={fornitore} onChange={(e) => setFornitore(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+              <input type="date" value={data} onChange={(e) => setData(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+              <input placeholder="Fornitore" value={fornitore} onChange={(e) => setFornitore(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             </div>
-            <textarea placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
+            <textarea placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
             <button type="submit" disabled={saving || !vehicleId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva costo
             </button>
           </div>
         </form>
 
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-          <h2 className="mb-3 flex items-center font-semibold text-slate-100"><Fuel className="mr-2 h-4 w-4 text-amber-400" /> Costi registrati</h2>
+        <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
+          <h2 className="mb-3 flex items-center font-semibold text-[var(--text)]"><Fuel className="mr-2 h-4 w-4 text-amber-400" /> Costi registrati</h2>
           {costs.length === 0 ? (
-            <p className="text-sm text-slate-500">Nessun costo registrato.</p>
+            <p className="text-sm text-[var(--text-label-soft)]">Nessun costo registrato.</p>
           ) : (
             <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
               {costs.map((c) => (
-                <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-100">{targaOf(c.vehicleId)} · {costCategoryLabel(c.tipo)}</p>
-                    <p className="truncate text-xs text-slate-500">{new Date(c.data).toLocaleDateString("it-IT")} · {c.descrizione || c.fornitore || "—"}</p>
+                    <p className="truncate text-sm font-semibold text-[var(--text)]">{targaOf(c.vehicleId)} · {costCategoryLabel(c.tipo)}</p>
+                    <p className="truncate text-xs text-[var(--text-label-soft)]">{new Date(c.data).toLocaleDateString("it-IT")} · {c.descrizione || c.fornitore || "—"}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-slate-100">{eur(c.importo)}</span>
-                    <button type="button" onClick={() => removeCost(c.id)} className="text-slate-500 hover:text-red-400" aria-label="Elimina costo">
+                    <span className="text-sm font-semibold text-[var(--text)]">{eur(c.importo)}</span>
+                    <button type="button" onClick={() => removeCost(c.id)} className="text-[var(--text-label-soft)] hover:text-red-400" aria-label="Elimina costo">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

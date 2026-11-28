@@ -346,7 +346,7 @@ export default function SpesePage() {
               <ReceiptText className="h-6 w-6" />
             </span>
             <div>
-              <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+              <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
                 Nessuna spesa nel periodo
               </p>
               <p className="mt-1 text-[12px]" style={{ color: "var(--text-label)" }}>
@@ -382,7 +382,7 @@ export default function SpesePage() {
                       <td>
                         <span className="chip chip-brand" style={{ fontSize: 9 }}>{expenseCategoryLabel(item.category)}</span>
                         {item.paymentMethod ? (
-                          <p className="mt-1 text-[10px]" style={{ color: "var(--text-label)" }}>{expensePaymentLabel(item.paymentMethod)}</p>
+                          <p className="mt-1 text-[11px]" style={{ color: "var(--text-label)" }}>{expensePaymentLabel(item.paymentMethod)}</p>
                         ) : null}
                       </td>
                       <td>
@@ -392,7 +392,7 @@ export default function SpesePage() {
                       <td className="text-right font-mono text-[12px]" style={{ color: "var(--text-soft)" }}>{eur(Number(item.netAmount))}</td>
                       <td className="text-right font-mono text-[12px]" style={{ color: "var(--text-label)" }}>
                         {eur(Number(item.vatAmount))}
-                        <span className="block text-[10px]">{Number(item.vatRate)}%</span>
+                        <span className="block text-[11px]">{Number(item.vatRate)}%</span>
                       </td>
                       <td className="text-right font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>{eur(Number(item.amount))}</td>
                       <td>
@@ -439,7 +439,7 @@ export default function SpesePage() {
                     <td colSpan={3} className="text-right text-[11px] font-semibold" style={{ color: "var(--text-label)" }}>Totale periodo</td>
                     <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>{eur(totals.net)}</td>
                     <td className="text-right font-mono text-[12px]" style={{ color: "var(--text)" }}>{eur(totals.vat)}</td>
-                    <td className="text-right font-mono text-[12px] font-bold" style={{ color: "var(--text)" }}>{eur(totals.total)}</td>
+                    <td className="text-right font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>{eur(totals.total)}</td>
                     <td colSpan={2} />
                   </tr>
                 </tfoot>
@@ -456,7 +456,7 @@ export default function SpesePage() {
                         {new Date(item.date).toLocaleDateString("it-IT")} · {expenseCategoryLabel(item.category)}
                       </p>
                     </div>
-                    <p className="shrink-0 font-mono text-[13px] font-bold" style={{ color: "var(--text)" }}>{eur(Number(item.amount))}</p>
+                    <p className="shrink-0 font-mono text-[13px] font-semibold" style={{ color: "var(--text)" }}>{eur(Number(item.amount))}</p>
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <p className="truncate text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -599,7 +599,7 @@ export default function SpesePage() {
                     endpoint="expenseReceipt"
                     appearance={{
                       button: "ops-btn ops-btn--secondary ops-btn--sm",
-                      allowedContent: "text-[10px]",
+                      allowedContent: "text-[11px]",
                     }}
                     onClientUploadComplete={(res) => {
                       const file = res[0];
@@ -666,7 +666,7 @@ function Metric({ label, value, tone }: { label: string; value: string; tone: st
         <span className="h-2 w-2 rounded-full" style={{ background: tone }} />
         <p className="ops-label">{label}</p>
       </div>
-      <p className="font-display mt-2 text-xl font-bold" style={{ color: "var(--text)" }}>{value}</p>
+      <p className="font-display mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{value}</p>
     </div>
   );
 }

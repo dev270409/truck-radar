@@ -54,7 +54,7 @@ function Stars({ value }: { value: number }) {
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={`w-4 h-4 ${i <= Math.round(value) ? "text-amber-400 fill-amber-400" : "text-slate-600"}`}
+          className={`w-4 h-4 ${i <= Math.round(value) ? "text-amber-400 fill-amber-400" : "text-[var(--text-label-soft)]"}`}
         />
       ))}
     </div>
@@ -127,11 +127,11 @@ function Original_ParkingPage() {
 
   const amenity = (ok: boolean, Icon: any, label: string) => (
     <span
-      className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center ${
-        ok ? "bg-emerald-950 text-emerald-300 border border-emerald-800/60" : "bg-slate-800 text-slate-500"
+      className={`text-[11px] font-semibold  px-2 py-0.5 rounded inline-flex items-center ${
+        ok ? "bg-emerald-950 text-emerald-300 border border-emerald-800/60" : "bg-[var(--surface-strong)] text-[var(--text-label-soft)]"
       }`}
     >
-      <Icon className={`w-3 h-3 mr-1 ${ok ? "text-emerald-400" : "text-slate-600"}`} />
+      <Icon className={`w-3 h-3 mr-1 ${ok ? "text-emerald-400" : "text-[var(--text-label-soft)]"}`} />
       {label}
     </span>
   );
@@ -140,10 +140,10 @@ function Original_ParkingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <MapPin className="w-6 h-6 mr-2.5 text-emerald-400" /> Aree di Sosta
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Community (§47): parcheggi segnalati dalle aziende con sicurezza, servizi e feedback degli autisti.
           </p>
         </div>
@@ -158,26 +158,26 @@ function Original_ParkingPage() {
       {msg && <p className="text-sm text-rose-300">{msg}</p>}
 
       {showForm && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-5 bg-slate-900 border border-slate-700 rounded-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
           <input
-            className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 text-sm"
+            className="px-3 py-2 rounded-xl bg-[var(--surface-strong)] border border-[var(--surface-border)] text-[var(--text)] text-sm"
             placeholder="Nome (es. Sosta Monte Bianco)"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <input
-            className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 text-sm"
+            className="px-3 py-2 rounded-xl bg-[var(--surface-strong)] border border-[var(--surface-border)] text-[var(--text)] text-sm"
             placeholder="Indirizzo"
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
           />
           <input
-            className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 text-sm"
+            className="px-3 py-2 rounded-xl bg-[var(--surface-strong)] border border-[var(--surface-border)] text-[var(--text)] text-sm"
             placeholder="Città (opzionale)"
             value={form.city ?? ""}
             onChange={(e) => setForm({ ...form, city: e.target.value || null })}
           />
-          <div className="flex items-center justify-between text-xs text-slate-300">
+          <div className="flex items-center justify-between text-xs text-[var(--text-soft)]">
             <label className="flex items-center space-x-2">
               <input type="checkbox" checked={form.security} onChange={(e) => setForm({ ...form, security: e.target.checked })} />
               <span>Sicurezza</span>
@@ -205,7 +205,7 @@ function Original_ParkingPage() {
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="text-sm text-slate-400 hover:text-slate-200 px-3"
+              className="text-sm text-[var(--text-label)] hover:text-[var(--text)] px-3"
             >
               Annulla
             </button>
@@ -214,25 +214,25 @@ function Original_ParkingPage() {
       )}
 
       {!areas ? (
-        <div className="flex items-center space-x-2 text-slate-400 text-sm p-8">
+        <div className="flex items-center space-x-2 text-[var(--text-label)] text-sm p-8">
           <Loader2 className="w-4 h-4 animate-spin" /> Caricamento aree...
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {areas.map((a) => (
-            <div key={a.id} className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
+            <div key={a.id} className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-slate-100">{a.name}</h3>
+                <h3 className="text-base font-semibold text-[var(--text)]">{a.name}</h3>
                 <button onClick={() => remove(a.id)} title="Rimuovi (solo se l'hai creata tu)">
-                  <Trash2 className="w-4 h-4 text-slate-600 hover:text-rose-400" />
+                  <Trash2 className="w-4 h-4 text-[var(--text-label-soft)] hover:text-rose-400" />
                 </button>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">{a.address}</p>
-              {a.city && <p className="text-xs text-slate-500 flex items-center"><CloudSun className="w-3 h-3 mr-1" />{a.city}</p>}
+              <p className="text-xs text-[var(--text-label-soft)] mt-0.5">{a.address}</p>
+              {a.city && <p className="text-xs text-[var(--text-label-soft)] flex items-center"><CloudSun className="w-3 h-3 mr-1" />{a.city}</p>}
 
-              <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+              <div className="mt-3 flex items-center justify-between text-xs text-[var(--text-label)]">
                 <Stars value={a.ratingAvg} />
-                <span className="text-slate-500">{a.feedbackCount} feedback</span>
+                <span className="text-[var(--text-label-soft)]">{a.feedbackCount} feedback</span>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -249,7 +249,7 @@ function Original_ParkingPage() {
                 </p>
               ) : (
                 <div className="mt-3 flex items-center space-x-1">
-                  <span className="text-[11px] text-slate-500 mr-1">Valuta:</span>
+                  <span className="text-[11px] text-[var(--text-label-soft)] mr-1">Valuta:</span>
                   {[1, 2, 3, 4, 5].map((i) => (
                     <button
                       key={i}
@@ -257,7 +257,7 @@ function Original_ParkingPage() {
                       onMouseEnter={() => setRatings((m) => ({ ...m, [a.id]: i }))}
                     >
                       <Star
-                        className={`w-4 h-4 ${i <= (ratings[a.id] ?? 0) ? "text-amber-400 fill-amber-400" : "text-slate-600"}`}
+                        className={`w-4 h-4 ${i <= (ratings[a.id] ?? 0) ? "text-amber-400 fill-amber-400" : "text-[var(--text-label-soft)]"}`}
                       />
                     </button>
                   ))}

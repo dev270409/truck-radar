@@ -38,7 +38,7 @@ export default function NotificationsBadge() {
       <Bell className="h-[18px] w-[18px]" />
       {totale > 0 && (
         <span
-          className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
+          className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-semibold text-white"
           style={{ background: "var(--danger)" }}
         >
           {totale > 99 ? "99+" : totale}

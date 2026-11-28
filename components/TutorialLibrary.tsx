@@ -20,7 +20,7 @@ export default function TutorialLibrary({ tutorials }: { tutorials: Tutorial[] }
             className="ops-card group overflow-hidden text-left transition-colors hover:border-[var(--brand)]"
             aria-label={`Guarda: ${tutorial.title} (${tutorial.durationLabel})`}
           >
-            <span className="relative block aspect-video overflow-hidden bg-slate-950">
+            <span className="relative block aspect-video overflow-hidden bg-[var(--surface-soft)]">
               <Image
                 src={tutorial.poster}
                 alt=""

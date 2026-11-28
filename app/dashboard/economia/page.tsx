@@ -148,17 +148,17 @@ export default function EconomiaPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Wallet className="w-6 h-6 mr-2.5 text-emerald-400" /> Gestione Economica & Pool
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Incassi Escrow dai viaggi completati, commissioni piattaforma e prelievi.
           </p>
         </div>
         <button
           onClick={reconcile}
           disabled={syncing}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center space-x-2 transition disabled:opacity-50"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl   flex items-center space-x-2 transition disabled:opacity-50"
         >
           {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
           <span>Sincronizza Pool</span>
@@ -174,30 +174,30 @@ export default function EconomiaPage() {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Saldo Disponibile</p>
-          <h3 className="text-2xl font-bold text-emerald-300 mt-1">
+        <div className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <p className="text-xs font-semibold text-[var(--text-label)]  ">Saldo Disponibile</p>
+          <h3 className="text-2xl font-semibold text-emerald-300 mt-1">
             {data ? eur(data.saldo) : "—"}
           </h3>
-          <p className="text-xs text-slate-500 mt-1">Importo prelevabile dal pool</p>
+          <p className="text-xs text-[var(--text-label-soft)] mt-1">Importo prelevabile dal pool</p>
         </div>
-        <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Incassato da Viaggi</p>
-          <h3 className="text-2xl font-bold text-slate-100 mt-1">{data ? eur(data.incassato) : "—"}</h3>
-          <p className="text-xs text-slate-500 mt-1">Escrow dei viaggi completati</p>
+        <div className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <p className="text-xs font-semibold text-[var(--text-label)]  ">Incassato da Viaggi</p>
+          <h3 className="text-2xl font-semibold text-[var(--text)] mt-1">{data ? eur(data.incassato) : "—"}</h3>
+          <p className="text-xs text-[var(--text-label-soft)] mt-1">Escrow dei viaggi completati</p>
         </div>
-        <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Commissioni Piattaforma</p>
-          <h3 className="text-2xl font-bold text-indigo-300 mt-1 flex items-center space-x-1.5">
+        <div className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <p className="text-xs font-semibold text-[var(--text-label)]  ">Commissioni Piattaforma</p>
+          <h3 className="text-2xl font-semibold text-indigo-300 mt-1 flex items-center space-x-1.5">
             <span>{data ? eur(data.commissioni) : "—"}</span>
             {data && <span className="text-xs bg-indigo-950/60 border border-indigo-800/60 px-2 py-0.5 rounded">{data.rate}%</span>}
           </h3>
-          <p className="text-xs text-slate-500 mt-1">Fee versata a Truck Radar</p>
+          <p className="text-xs text-[var(--text-label-soft)] mt-1">Fee versata a Truck Radar</p>
         </div>
-        <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prelievi In Elaborazione</p>
-          <h3 className="text-2xl font-bold text-amber-300 mt-1">{data ? eur(data.inElaborazione) : "—"}</h3>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="p-5 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <p className="text-xs font-semibold text-[var(--text-label)]  ">Prelievi In Elaborazione</p>
+          <h3 className="text-2xl font-semibold text-amber-300 mt-1">{data ? eur(data.inElaborazione) : "—"}</h3>
+          <p className="text-xs text-[var(--text-label-soft)] mt-1">
             Richiesti {data ? eur(data.prelevato) : ""} già completati
           </p>
         </div>
@@ -207,18 +207,18 @@ export default function EconomiaPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Transactions */}
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+        <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
             <Truck className="w-5 h-5 mr-2 text-emerald-400" /> Movimenti del Pool
           </h3>
 
           {!data ? (
-            <div className="p-8 text-center text-slate-400 flex items-center justify-center space-x-2">
+            <div className="p-8 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>Caricamento...</span>
             </div>
           ) : data.transactions.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-[var(--text-label-soft)]">
               Nessun movimento contabile. Completa un viaggio e usa &quot;Sincronizza Pool&quot; per alimentare economia.
             </p>
           ) : (
@@ -228,33 +228,33 @@ export default function EconomiaPage() {
                 return (
                   <div
                     key={tx.id}
-                    className="p-3.5 bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3"
+                    className="p-3.5 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl flex items-center justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${meta.cls}`}>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${meta.cls}`}>
                         {meta.label}
                       </span>
                       {tx.trip && (
-                        <p className="text-xs text-slate-400 mt-1.5 truncate">
+                        <p className="text-xs text-[var(--text-label)] mt-1.5 truncate">
                           {tx.trip.luogoRitiro} → {tx.trip.luogoConsegna}
                         </p>
                       )}
-                      <p className="text-[10px] font-mono text-slate-600 mt-0.5">
+                      <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                         {new Date(tx.createdAt).toLocaleString("it-IT")}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p
-                        className={`font-bold text-sm ${
+                        className={`font-semibold text-sm ${
                           tx.type === "COMMISSION" || tx.type === "PAYOUT"
-                            ? "text-slate-400"
+                            ? "text-[var(--text-label)]"
                             : "text-emerald-300"
                         }`}
                       >
                         {tx.type === "COMMISSION" || tx.type === "PAYOUT" ? "−" : "+"}
                         {eur(tx.amount)}
                       </p>
-                      <p className="text-[10px] text-slate-500 uppercase">{label(tx.status)}</p>
+                      <p className="text-[11px] text-[var(--text-label-soft)] ">{label(tx.status)}</p>
                     </div>
                   </div>
                 );
@@ -264,14 +264,14 @@ export default function EconomiaPage() {
         </div>
 
         {/* Payouts */}
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+        <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
             <ArrowUpFromLine className="w-5 h-5 mr-2 text-amber-400" /> Richiedi Prelievo
           </h3>
 
           <form onSubmit={requestPayout} className="flex items-end space-x-3 mb-5">
             <div className="flex-1">
-              <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+              <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                 Importo (max {data ? eur(data.saldo) : "—"})
               </label>
               <input
@@ -282,7 +282,7 @@ export default function EconomiaPage() {
                 value={payoutAmount}
                 onChange={(e) => setPayoutAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none"
+                className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-amber-500 rounded-xl px-4 py-2.5 text-[var(--text)] outline-none"
               />
             </div>
             <button
@@ -295,29 +295,29 @@ export default function EconomiaPage() {
             </button>
           </form>
 
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Storico Prelievi</h4>
+          <h4 className="text-xs font-semibold text-[var(--text-label)]   mb-2">Storico Prelievi</h4>
           {!data ? (
-            <div className="p-6 text-center text-slate-400 flex items-center justify-center space-x-2">
+            <div className="p-6 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Caricamento...</span>
             </div>
           ) : data.payoutRequests.length === 0 ? (
-            <p className="text-sm text-slate-500">Nessun prelievo richiesto finora.</p>
+            <p className="text-sm text-[var(--text-label-soft)]">Nessun prelievo richiesto finora.</p>
           ) : (
             <div className="space-y-2">
               {data.payoutRequests.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3.5 bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3"
+                  className="p-3.5 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl flex items-center justify-between gap-3"
                 >
                   <div>
-                    <p className="font-bold text-slate-100">{eur(p.amount)}</p>
-                    <p className="text-[10px] font-mono text-slate-500 mt-0.5">
+                    <p className="font-semibold text-[var(--text)]">{eur(p.amount)}</p>
+                    <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                       {new Date(p.createdAt).toLocaleDateString("it-IT")}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${PAYOUT_BADGES[p.status]}`}>
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${PAYOUT_BADGES[p.status]}`}>
                       {label(p.status)}
                     </span>
                     <div className="flex items-center space-x-1.5">
@@ -326,14 +326,14 @@ export default function EconomiaPage() {
                           <button
                             onClick={() => updatePayout(p, "PROCESSING")}
                             disabled={busyId === p.id}
-                            className="bg-blue-950/60 hover:bg-blue-900/60 border border-blue-800/60 text-blue-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
+                            className="bg-blue-950/60 hover:bg-blue-900/60 border border-blue-800/60 text-blue-200 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
                           >
                             In Elaborazione
                           </button>
                           <button
                             onClick={() => updatePayout(p, "FAILED")}
                             disabled={busyId === p.id}
-                            className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
+                            className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
                           >
                             <XCircle className="w-3 h-3" />
                           </button>
@@ -344,20 +344,20 @@ export default function EconomiaPage() {
                           <button
                             onClick={() => updatePayout(p, "COMPLETED")}
                             disabled={busyId === p.id}
-                            className="bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/60 text-emerald-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
+                            className="bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/60 text-emerald-200 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
                           >
                             <CheckCircle2 className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => updatePayout(p, "FAILED")}
                             disabled={busyId === p.id}
-                            className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
+                            className="bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-200 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50"
                           >
                             <XCircle className="w-3 h-3" />
                           </button>
                         </>
                       )}
-                      {busyId === p.id && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />}
+                      {busyId === p.id && <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--text-label)]" />}
                     </div>
                   </div>
                 </div>

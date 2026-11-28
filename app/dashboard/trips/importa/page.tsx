@@ -310,7 +310,7 @@ export default function ImportaRendicontoPage() {
         <section className="ops-card flex flex-wrap items-center justify-between gap-3 p-4">
           <div>
             <p className="ops-label">Stima 12 mesi · si aggiorna a ogni rendiconto</p>
-            <p className="font-display mt-1 text-2xl font-bold" style={{ color: "var(--text)" }}>
+            <p className="font-display mt-1 text-2xl font-semibold" style={{ color: "var(--text)" }}>
               {eur(forecast.projected12m)}
             </p>
             <p className="mt-1 max-w-2xl text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -326,7 +326,7 @@ export default function ImportaRendicontoPage() {
       <section className="ops-card overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
           <div>
-            <p className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+            <p className="font-display text-[14px] font-semibold" style={{ color: "var(--text)" }}>
               Rendiconti importati
             </p>
             <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -438,7 +438,7 @@ export default function ImportaRendicontoPage() {
         <section className="space-y-3">
           <div>
             <p className="ops-label">Analisi</p>
-            <h2 className="font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>
+            <h2 className="font-display text-[16px] font-semibold" style={{ color: "var(--text)" }}>
               Ricavi e km reali
             </h2>
             <p className="text-[12px]" style={{ color: "var(--text-label)" }}>
@@ -465,7 +465,7 @@ export default function ImportaRendicontoPage() {
           <div className="grid gap-3 lg:grid-cols-3">
             <div className="ops-card p-4">
               <p className="ops-label">Km Geotab nel periodo</p>
-              <p className="font-display mt-1 text-xl font-bold" style={{ color: "var(--text)" }}>
+              <p className="font-display mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>
                 {km(analytics.geotab.totalKm)}
               </p>
               <div className="mt-3 space-y-1.5 text-[11px]">
@@ -498,7 +498,7 @@ export default function ImportaRendicontoPage() {
                   Nessun tracciato Geotab nel periodo: sincronizza Geotab per calcolare km e viaggi a vuoto.
                 </p>
               )}
-              <p className="mt-3 text-[10px]" style={{ color: "var(--text-label-soft)" }}>
+              <p className="mt-3 text-[11px]" style={{ color: "var(--text-label-soft)" }}>
                 Spostamenti = micro-tragitti sotto 3 km o 8 minuti. I km a vuoto sono i tracciati
                 oltre 3 km o 8 minuti non collegati a un viaggio pagato: la stima diminuisce man
                 mano che colleghi i viaggi.
@@ -584,7 +584,7 @@ export default function ImportaRendicontoPage() {
               <Upload className="h-7 w-7" />
             </span>
             <div>
-              <p className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+              <p className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
                 Carica il rendiconto in PDF
               </p>
               <p className="mt-1 text-[12px]" style={{ color: "var(--text-label)" }}>
@@ -596,7 +596,7 @@ export default function ImportaRendicontoPage() {
               endpoint="tripStatement"
               appearance={{
                 button: "ops-btn ops-btn--primary",
-                allowedContent: "text-[10px]",
+                allowedContent: "text-[11px]",
               }}
               onClientUploadComplete={(res) => {
                 const file = res[0];
@@ -656,7 +656,7 @@ export default function ImportaRendicontoPage() {
           <section className="ops-card overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b p-4" style={{ borderColor: "var(--surface-border)" }}>
               <div>
-                <p className="font-display text-[14px] font-bold" style={{ color: "var(--text)" }}>
+                <p className="font-display text-[14px] font-semibold" style={{ color: "var(--text)" }}>
                   Anteprima viaggi
                 </p>
                 <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
@@ -706,7 +706,7 @@ export default function ImportaRendicontoPage() {
                         <td className="font-mono text-[12px]" style={{ color: "var(--text)" }}>{line.code}</td>
                         <td className="whitespace-nowrap text-[12px]" style={{ color: "var(--text-soft)" }}>
                           {prettyDate(line.date)}
-                          <span className="block text-[10px]" style={{ color: "var(--text-label)" }}>{line.pickupTime}</span>
+                          <span className="block text-[11px]" style={{ color: "var(--text-label)" }}>{line.pickupTime}</span>
                         </td>
                         <td className="text-[12px]" style={{ color: "var(--text-soft)" }}>
                           {line.description}
@@ -746,7 +746,7 @@ export default function ImportaRendicontoPage() {
                         <span className="font-mono text-[12px] font-semibold" style={{ color: "var(--text)" }}>{eur(line.amount)}</span>
                       </span>
                       <span className="mt-1 block text-[11px]" style={{ color: "var(--text-soft)" }}>{line.description}</span>
-                      <span className="mt-1 block text-[10px]" style={{ color: "var(--text-label)" }}>
+                      <span className="mt-1 block text-[11px]" style={{ color: "var(--text-label)" }}>
                         {prettyDate(line.date)} · {line.customer || "—"}
                       </span>
                     </span>
@@ -760,7 +760,7 @@ export default function ImportaRendicontoPage() {
                 <p className="text-[11px]" style={{ color: "var(--text-label)" }}>
                   {selected.size} viaggi selezionati
                 </p>
-                <p className="font-display text-[16px] font-bold" style={{ color: "var(--text)" }}>
+                <p className="font-display text-[16px] font-semibold" style={{ color: "var(--text)" }}>
                   {eur(selectedTotal)}
                 </p>
               </div>
@@ -785,7 +785,7 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="ops-card p-4">
       <p className="ops-label">{label}</p>
-      <p className="font-display mt-1 text-[16px] font-bold" style={{ color: "var(--text)" }}>{value}</p>
+      <p className="font-display mt-1 text-[16px] font-semibold" style={{ color: "var(--text)" }}>{value}</p>
     </div>
   );
 }

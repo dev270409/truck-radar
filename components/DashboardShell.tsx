@@ -66,7 +66,7 @@ export default function DashboardShell({
         {/* Backdrop mobile */}
         {open && (
           <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-black/40  md:hidden"
             onClick={() => setOpen(false)}
             aria-hidden
           />
@@ -103,12 +103,12 @@ export default function DashboardShell({
           ) : (
             <div className="ops-card mx-auto mt-10 max-w-xl p-6 text-center">
               <div
-                className="mx-auto grid h-12 w-12 place-items-center rounded-2xl"
+                className="mx-auto grid h-12 w-12 place-items-center rounded-xl"
                 style={{ background: "var(--surface-soft)", color: "var(--brand)" }}
               >
                 <Lock className="h-5 w-5" />
               </div>
-              <h1 className="font-display mt-4 text-xl font-bold" style={{ color: "var(--text)" }}>
+              <h1 className="font-display mt-4 text-xl font-semibold" style={{ color: "var(--text)" }}>
                 Permesso non attivo
               </h1>
               <p className="mt-2 text-[13px]" style={{ color: "var(--text-soft)" }}>

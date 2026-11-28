@@ -19,7 +19,7 @@ export default function BarChart({
   return (
     <div className="ops-card p-4 md:p-5">
       <div className="mb-4">
-        <h2 className="font-display text-[15px] font-bold" style={{ color: "var(--text)" }}>
+        <h2 className="font-display text-[15px] font-semibold" style={{ color: "var(--text)" }}>
           {title}
         </h2>
         {subtitle && (

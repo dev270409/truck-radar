@@ -497,6 +497,11 @@ body {
   color: var(--text);
 }
 
+/* Le icone nei titoli di pagina non competono con stato e azioni. */
+.dashboard-dark h1 svg {
+  color: var(--text-label);
+}
+
 .register-dark {
   color: var(--text);
 }
@@ -561,6 +566,14 @@ details[open] > summary .faq-chevron {
   to   { opacity: 1; transform: translateY(0); }
 }
 .enter-up { animation: enter-up 0.45s ease both; }
+
+/* Entrata hero CSS-first: visibile anche senza JS, nessun mismatch SSR. */
+.hero-rise {
+  animation: enter-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise { animation: none; }
+}
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }

@@ -79,7 +79,7 @@ interface TrackEvent {
 }
 
 const statusStyles: Record<string, string> = {
-  DA_ASSEGNARE: "bg-slate-950 text-slate-300 border border-slate-700",
+  DA_ASSEGNARE: "bg-[var(--surface-soft)] text-[var(--text-soft)] border border-[var(--surface-border)]",
   ASSEGNATO: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
   IN_CORSO: "bg-amber-950 text-amber-300 border border-amber-800/60",
   COMPLETATO: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
@@ -364,7 +364,7 @@ export default function AutistaTripDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+      <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         <span>Caricamento viaggio...</span>
       </div>
@@ -373,7 +373,7 @@ export default function AutistaTripDetailPage() {
 
   if (!trip) {
     return (
-      <div className="p-12 text-center text-slate-500 bg-slate-900 border border-slate-800 rounded-2xl max-w-md mx-auto">
+      <div className="p-12 text-center text-[var(--text-label-soft)] bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl max-w-md mx-auto">
         Viaggio non trovato o non assegnato a te.
       </div>
     );
@@ -388,16 +388,16 @@ export default function AutistaTripDetailPage() {
       <div>
         <Link
           href="/dashboard/autista"
-          className="inline-flex items-center text-xs text-slate-400 hover:text-slate-200 mb-2 transition"
+          className="inline-flex items-center text-xs text-[var(--text-label)] hover:text-[var(--text)] mb-2 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Torna ai miei viaggi
         </Link>
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Route className="w-6 h-6 mr-2.5 text-blue-400" />
             {trip.luogoRitiro} → {trip.luogoConsegna}
           </h1>
-          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusStyles[trip.status]}`}>
+          <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${statusStyles[trip.status]}`}>
             {label(trip.status)}
           </span>
         </div>
@@ -414,8 +414,8 @@ export default function AutistaTripDetailPage() {
 
       {/* Azione principale */}
       {actionable ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-          <h3 className="text-sm font-bold text-slate-100">
+        <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-[var(--text)]">
             {isAssigned ? "Pronto a partire?" : "Merce consegnata?"}
           </h3>
           <input
@@ -423,7 +423,7 @@ export default function AutistaTripDetailPage() {
             value={eventNote}
             onChange={(e) => setEventNote(e.target.value)}
             placeholder="Nota per l'aggiornamento (opzionale)"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+            className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
           />
           {isAssigned ? (
             <button
@@ -446,82 +446,82 @@ export default function AutistaTripDetailPage() {
           )}
         </div>
       ) : (
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm text-slate-400">
+        <div className="p-4 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl text-sm text-[var(--text-label)]">
           Nessuna azione disponibile per questo viaggio.
         </div>
       )}
 
       {/* Dettagli */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] uppercase text-slate-500 font-semibold flex items-center">
+            <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold flex items-center">
               <MapPin className="w-3 h-3 mr-1 text-emerald-400" /> Ritiro
             </p>
-            <p className="text-sm font-semibold text-slate-100 capitalize">{trip.luogoRitiro}</p>
-            <p className="text-xs font-mono text-slate-400">
+            <p className="text-sm font-semibold text-[var(--text)] capitalize">{trip.luogoRitiro}</p>
+            <p className="text-xs font-mono text-[var(--text-label)]">
               {new Date(trip.dataRitiro).toLocaleString("it-IT")}
             </p>
           </div>
-          <ArrowRight className="w-5 h-5 text-slate-500" />
+          <ArrowRight className="w-5 h-5 text-[var(--text-label-soft)]" />
           <div className="text-right">
-            <p className="text-[11px] uppercase text-slate-500 font-semibold flex items-center justify-end">
+            <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold flex items-center justify-end">
               Consegna <MapPin className="w-3 h-3 ml-1 text-rose-400" />
             </p>
-            <p className="text-sm font-semibold text-slate-100 capitalize">{trip.luogoConsegna}</p>
-            <p className="text-xs font-mono text-slate-400">
+            <p className="text-sm font-semibold text-[var(--text)] capitalize">{trip.luogoConsegna}</p>
+            <p className="text-xs font-mono text-[var(--text-label)]">
               {new Date(trip.dataConsegna).toLocaleString("it-IT")}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800 text-sm">
+        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[var(--surface-border)] text-sm">
           <div className="flex items-start space-x-2">
-            <Package className="w-4 h-4 text-slate-400 mt-0.5" />
+            <Package className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
             <div>
-              <p className="text-[11px] uppercase text-slate-500 font-semibold">Merce</p>
-              <p className="text-slate-200">{trip.tipoMerce}</p>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Merce</p>
+              <p className="text-[var(--text)]">{trip.tipoMerce}</p>
+              <p className="text-xs text-[var(--text-label)]">
                 {trip.pesoKg} kg · {trip.volumeM3} m³
               </p>
             </div>
           </div>
           <div className="flex items-start space-x-2">
-            <Truck className="w-4 h-4 text-slate-400 mt-0.5" />
+            <Truck className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
             <div>
-              <p className="text-[11px] uppercase text-slate-500 font-semibold">Mezzo</p>
+              <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Mezzo</p>
               {trip.vehicle ? (
                 <>
-                  <p className="text-slate-200 font-mono text-xs">{trip.vehicle.targa}</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-[var(--text)] font-mono text-xs">{trip.vehicle.targa}</p>
+                  <p className="text-xs text-[var(--text-label)]">
                     {label(trip.vehicle.categoria)} · {trip.vehicle.portataMaxKg} kg max
                   </p>
                 </>
               ) : (
-                <p className="text-slate-400">—</p>
+                <p className="text-[var(--text-label)]">—</p>
               )}
             </div>
           </div>
           <div className="flex items-start space-x-2">
-            <CalendarDays className="w-4 h-4 text-slate-400 mt-0.5" />
+            <CalendarDays className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
             <div>
-              <p className="text-[11px] uppercase text-slate-500 font-semibold">Cliente</p>
-              <p className="text-slate-200">{trip.cliente || "—"}</p>
+              <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Cliente</p>
+              <p className="text-[var(--text)]">{trip.cliente || "—"}</p>
             </div>
           </div>
           <div className="flex items-start space-x-2">
-            <StickyNote className="w-4 h-4 text-slate-400 mt-0.5" />
+            <StickyNote className="w-4 h-4 text-[var(--text-label)] mt-0.5" />
             <div>
-              <p className="text-[11px] uppercase text-slate-500 font-semibold">Note</p>
-              <p className="text-slate-300">{trip.note || "—"}</p>
+              <p className="text-[11px]  text-[var(--text-label-soft)] font-semibold">Note</p>
+              <p className="text-[var(--text-soft)]">{trip.note || "—"}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* DDT digitale */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-base font-bold text-slate-100 flex items-center">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-4">
+        <h3 className="text-base font-semibold text-[var(--text)] flex items-center">
           <FileText className="w-5 h-5 mr-2 text-emerald-400" /> DDT Digitale
         </h3>
 
@@ -536,7 +536,7 @@ export default function AutistaTripDetailPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                     ddtTipo === t
                       ? "bg-emerald-600 text-white"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      : "bg-[var(--surface-strong)] text-[var(--text-soft)] hover:bg-[var(--surface-border)]"
                   }`}
                 >
                   {t === "FOTO" ? "Foto" : t === "FIRMA" ? "Firma" : "Documento"}
@@ -567,7 +567,7 @@ export default function AutistaTripDetailPage() {
               value={ddtNote}
               onChange={(e) => setDdtNote(e.target.value)}
               placeholder="Nota (opzionale)"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+              className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
             />
             <button
               onClick={handleDdtUpload}
@@ -581,7 +581,7 @@ export default function AutistaTripDetailPage() {
         )}
 
         {documents.length === 0 ? (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-[var(--text-label-soft)]">
             Nessun documento DDT per questo viaggio.
           </p>
         ) : (
@@ -589,17 +589,17 @@ export default function AutistaTripDetailPage() {
             {documents.map((doc) => (
               <li
                 key={doc.id}
-                className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5"
+                className="flex items-center justify-between bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2.5"
               >
                 <div className="flex items-center space-x-3 min-w-0">
                   <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-100 capitalize">{label(doc.tipo)}</p>
-                    {doc.note && <p className="text-xs text-slate-400 truncate">{doc.note}</p>}
+                    <p className="text-sm font-semibold text-[var(--text)] capitalize">{label(doc.tipo)}</p>
+                    {doc.note && <p className="text-xs text-[var(--text-label)] truncate">{doc.note}</p>}
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 shrink-0">
-                  <span className="text-[11px] font-mono text-slate-500">
+                  <span className="text-[11px] font-mono text-[var(--text-label-soft)]">
                     {new Date(doc.createdAt).toLocaleDateString("it-IT")}
                   </span>
                   <a
@@ -618,8 +618,8 @@ export default function AutistaTripDetailPage() {
       </div>
 
       {/* Navigazione e POD */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-base font-bold text-slate-100 flex items-center">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-4">
+        <h3 className="text-base font-semibold text-[var(--text)] flex items-center">
           <Navigation className="w-5 h-5 mr-2 text-sky-400" /> Navigazione e prova di consegna
         </h3>
 
@@ -637,7 +637,7 @@ export default function AutistaTripDetailPage() {
             href={`https://waze.com/ul?q=${encodeURIComponent(trip.luogoConsegna)}&navigate=yes`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-100 text-sm font-semibold py-3 rounded-xl transition"
+            className="flex items-center justify-center space-x-2 bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text)] text-sm font-semibold py-3 rounded-xl transition"
           >
             <Navigation className="w-4 h-4" />
             <span>Waze</span>
@@ -651,7 +651,7 @@ export default function AutistaTripDetailPage() {
               type="button"
               onClick={() => setPodTipo(t)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                podTipo === t ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                podTipo === t ? "bg-sky-600 text-white" : "bg-[var(--surface-strong)] text-[var(--text-soft)] hover:bg-[var(--surface-border)]"
               }`}
             >
               {t === "FIRMA" ? "Firma destinatario" : "Foto consegna"}
@@ -669,7 +669,7 @@ export default function AutistaTripDetailPage() {
               onPointerMove={moveSignature}
               onPointerUp={endSignature}
               onPointerLeave={endSignature}
-              className="w-full touch-none rounded-xl border border-slate-700 bg-white"
+              className="w-full touch-none rounded-xl border border-[var(--surface-border)] bg-white"
             />
             <div className="flex gap-2">
               <button
@@ -681,7 +681,7 @@ export default function AutistaTripDetailPage() {
                 {podSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <PenLine className="w-4 h-4" />}
                 <span>Salva firma</span>
               </button>
-              <button type="button" onClick={clearSignature} className="px-3 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800">
+              <button type="button" onClick={clearSignature} className="px-3 py-2.5 rounded-xl border border-[var(--surface-border)] text-[var(--text-soft)] hover:bg-[var(--surface-soft)]">
                 <Eraser className="w-4 h-4" />
               </button>
             </div>
@@ -714,22 +714,22 @@ export default function AutistaTripDetailPage() {
           value={podNote}
           onChange={(e) => setPodNote(e.target.value)}
           placeholder="Nota consegna (nome destinatario, ora, anomalia)"
-          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+          className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
         />
 
         {pods.length > 0 && (
           <ul className="space-y-2">
             {pods.map((p) => (
-              <li key={p.id} className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5">
+              <li key={p.id} className="flex items-center justify-between bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl px-3 py-2.5">
                 <div className="flex items-center space-x-3 min-w-0">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-100">{p.tipo}</p>
-                    {p.note && <p className="text-xs text-slate-400 truncate">{p.note}</p>}
+                    <p className="text-sm font-semibold text-[var(--text)]">{p.tipo}</p>
+                    {p.note && <p className="text-xs text-[var(--text-label)] truncate">{p.note}</p>}
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 shrink-0">
-                  <span className="text-[11px] font-mono text-slate-500">{new Date(p.createdAt).toLocaleDateString("it-IT")}</span>
+                  <span className="text-[11px] font-mono text-[var(--text-label-soft)]">{new Date(p.createdAt).toLocaleDateString("it-IT")}</span>
                   {(p.fileUrl || p.firmaData) && (
                     <a href={p.fileUrl || p.firmaData || "#"} target="_blank" rel="noreferrer" className="text-xs font-semibold text-sky-300 hover:underline">
                       Apri
@@ -743,8 +743,8 @@ export default function AutistaTripDetailPage() {
       </div>
 
       {/* Tracking */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-base font-bold text-slate-100 flex items-center">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5 space-y-4">
+        <h3 className="text-base font-semibold text-[var(--text)] flex items-center">
           <MapPin className="w-5 h-5 mr-2 text-blue-400" /> Tracking consegna
         </h3>
 
@@ -765,7 +765,7 @@ export default function AutistaTripDetailPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                     trackTipo === t.k
                       ? "bg-blue-600 text-white"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      : "bg-[var(--surface-strong)] text-[var(--text-soft)] hover:bg-[var(--surface-border)]"
                   }`}
                 >
                   {t.l}
@@ -777,14 +777,14 @@ export default function AutistaTripDetailPage() {
               value={trackPosizione}
               onChange={(e) => setTrackPosizione(e.target.value)}
               placeholder="Posizione (es. Milano, Autogrill — indirizzo)"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+              className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
             />
             <input
               type="text"
               value={trackNote}
               onChange={(e) => setTrackNote(e.target.value)}
               placeholder="Nota (opzionale)"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+              className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
             />
             <button
               onClick={handleTrackSend}
@@ -798,27 +798,27 @@ export default function AutistaTripDetailPage() {
         )}
 
         {(isAssigned || isInCorso) && inspectTemplate && (
-          <div className="border-t border-slate-800 pt-4 space-y-3">
+          <div className="border-t border-[var(--surface-border)] pt-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-emerald-300 flex items-center">
+              <h4 className="text-sm font-semibold text-emerald-300 flex items-center">
                 <ClipboardCheck className="w-4 h-4 mr-2" /> {inspectTemplate.name}
               </h4>
               {inspectSent && (
-                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
+                <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
                   INVIATA
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[var(--text-label)]">
               Conferma ogni voce prima della partenza. Almeno una voce non ok genera un esito critico.
             </p>
             <div className="space-y-2">
               {inspectTemplate.items.map((item) => (
                 <label
                   key={item.label}
-                  className="flex items-start justify-between gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer"
+                  className="flex items-start justify-between gap-3 p-3 bg-[var(--surface-soft)] border border-[var(--surface-border)] rounded-xl cursor-pointer"
                 >
-                  <span className="text-sm text-slate-200">{item.label}</span>
+                  <span className="text-sm text-[var(--text)]">{item.label}</span>
                   <input
                     type="checkbox"
                     checked={inspectChecks[item.label] !== false}
@@ -835,7 +835,7 @@ export default function AutistaTripDetailPage() {
               value={inspectNote}
               onChange={(e) => setInspectNote(e.target.value)}
               placeholder="Note o criticità (opzionale)"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-slate-100 outline-none text-sm"
+              className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--success)] rounded-xl px-4 py-2.5 text-[var(--text)] outline-none text-sm"
             />
             {inspectError && (
               <div className="p-3 bg-red-950/60 border border-red-800 text-red-200 text-xs rounded-xl">{inspectError}</div>
@@ -852,18 +852,18 @@ export default function AutistaTripDetailPage() {
         )}
 
         {trackEvents.length === 0 ? (
-          <p className="text-sm text-slate-500">Nessun evento di tracking.</p>
+          <p className="text-sm text-[var(--text-label-soft)]">Nessun evento di tracking.</p>
         ) : (
-          <ol className="relative border-l border-slate-800 ml-2 space-y-4">
+          <ol className="relative border-l border-[var(--surface-border)] ml-2 space-y-4">
             {trackEvents.map((ev) => (
               <li key={ev.id} className="ml-4">
                 <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-bold text-blue-300">{ev.eventType.replace("_", " ")}</span>
-                  {ev.posizione && <span className="text-xs text-slate-300">{ev.posizione}</span>}
+                  <span className="text-xs font-semibold text-blue-300">{ev.eventType.replace("_", " ")}</span>
+                  {ev.posizione && <span className="text-xs text-[var(--text-soft)]">{ev.posizione}</span>}
                 </div>
-                {ev.note && <p className="text-xs text-slate-400 mt-0.5">{ev.note}</p>}
-                <p className="text-[11px] font-mono text-slate-500 mt-0.5">
+                {ev.note && <p className="text-xs text-[var(--text-label)] mt-0.5">{ev.note}</p>}
+                <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-0.5">
                   {new Date(ev.createdAt).toLocaleString("it-IT")}
                 </p>
               </li>
@@ -873,28 +873,28 @@ export default function AutistaTripDetailPage() {
       </div>
 
       {/* Timeline */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl p-5">
+        <h3 className="text-base font-semibold text-[var(--text)] mb-4 flex items-center">
           <History className="w-5 h-5 mr-2 text-blue-400" /> Cronologia
         </h3>
         {trip.events.length === 0 ? (
-          <p className="text-sm text-slate-500">Nessun evento registrato.</p>
+          <p className="text-sm text-[var(--text-label-soft)]">Nessun evento registrato.</p>
         ) : (
-          <ol className="relative border-l border-slate-800 ml-2 space-y-5">
+          <ol className="relative border-l border-[var(--surface-border)] ml-2 space-y-5">
             {trip.events.map((ev) => (
               <li key={ev.id} className="ml-4">
                 <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <div className="flex items-center space-x-2 text-xs">
-                  <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
+                  <span className={`font-semibold px-2 py-0.5 rounded ${statusStyles[ev.fromStatus]}`}>
                       {label(ev.fromStatus)}
                   </span>
-                  <ArrowRight className="w-3 h-3 text-slate-500" />
-                  <span className={`font-bold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
+                  <ArrowRight className="w-3 h-3 text-[var(--text-label-soft)]" />
+                  <span className={`font-semibold px-2 py-0.5 rounded ${statusStyles[ev.toStatus]}`}>
                       {label(ev.toStatus)}
                   </span>
                 </div>
-                {ev.note && <p className="text-xs text-slate-400 mt-1">{ev.note}</p>}
-                <p className="text-[11px] font-mono text-slate-500 mt-1">
+                {ev.note && <p className="text-xs text-[var(--text-label)] mt-1">{ev.note}</p>}
+                <p className="text-[11px] font-mono text-[var(--text-label-soft)] mt-1">
                   {new Date(ev.createdAt).toLocaleString("it-IT")}
                 </p>
               </li>

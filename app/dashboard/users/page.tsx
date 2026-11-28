@@ -181,10 +181,10 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+          <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
             <Users className="w-6 h-6 mr-2.5 text-indigo-400" /> Gestione Team & Autisti
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-label)] mt-1">
             Crea le credenziali degli autisti, assegna il mezzo e gestisci il team.
           </p>
         </div>
@@ -193,12 +193,12 @@ export default function UsersPage() {
           <Link href="/dashboard/users/geotab" className="bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 text-sm font-semibold px-4 py-2.5 rounded-xl border border-emerald-800/60 flex items-center space-x-2 transition">
             <UserPlus className="w-4 h-4" /><span>Importa da Geotab</span>
           </Link>
-          <Link href="/dashboard/analytics?scope=autista" className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
+          <Link href="/dashboard/analytics?scope=autista" className="bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text)] text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition">
             <BarChart3 className="w-4 h-4" /><span>Analisi autisti</span>
           </Link>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl   flex items-center space-x-2 transition"
           >
             <Plus className="w-4 h-4" />
             <span>Aggiungi utente</span>
@@ -207,24 +207,24 @@ export default function UsersPage() {
       </div>
 
       {geotabSnapshotAt && (
-        <section className="overflow-hidden rounded-2xl border border-sky-800/60 bg-slate-900/80">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-5 py-4">
+        <section className="overflow-hidden rounded-xl border border-sky-800/60 bg-[var(--surface)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--surface-border)] px-5 py-4">
             <div>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">Driver presenti in Geotab · sola lettura</h2>
-              <p className="mt-1 text-[11px] text-slate-400">Non sono account Truck Radar e non possono accedere alla PWA. Crea un account locale solo dopo aver verificato il nominativo.</p>
+              <h2 className="text-sm font-semibold   text-[var(--text)]">Driver presenti in Geotab · sola lettura</h2>
+              <p className="mt-1 text-[11px] text-[var(--text-label)]">Non sono account Truck Radar e non possono accedere alla PWA. Crea un account locale solo dopo aver verificato il nominativo.</p>
             </div>
-            {geotabSnapshotAt && <span className="text-[10px] text-slate-400">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
+            {geotabSnapshotAt && <span className="text-[11px] text-[var(--text-label)]">Lettura {new Date(geotabSnapshotAt).toLocaleString("it-IT")}</span>}
           </div>
           {geotabDrivers.length === 0 ? (
-            <p className="px-5 py-6 text-sm text-slate-400">Nessun driver restituito da MyGeotab. Verifica che l&apos;utente API abbia accesso agli utenti/driver e che i profili siano marcati come driver.</p>
+            <p className="px-5 py-6 text-sm text-[var(--text-label)]">Nessun driver restituito da MyGeotab. Verifica che l&apos;utente API abbia accesso agli utenti/driver e che i profili siano marcati come driver.</p>
           ) : unmatchedGeotabDrivers.length === 0 ? (
             <p className="px-5 py-6 text-sm text-emerald-200">Tutti i driver Geotab letti sono già associati a un account locale tramite lo username/email.</p>
           ) : (
             <div className="grid gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
               {unmatchedGeotabDrivers.map((driver) => (
-                <div key={driver.geotabId} className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5">
-                  <p className="text-sm font-semibold text-slate-100">{`${driver.firstName} ${driver.lastName}`.trim() || "Nome non disponibile"}</p>
-                  <p className="mt-0.5 font-mono text-[10px] text-slate-500">ID Geotab · {driver.geotabId}</p>
+                <div key={driver.geotabId} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2.5">
+                  <p className="text-sm font-semibold text-[var(--text)]">{`${driver.firstName} ${driver.lastName}`.trim() || "Nome non disponibile"}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-[var(--text-label-soft)]">ID Geotab · {driver.geotabId}</p>
                 </div>
               ))}
             </div>
@@ -233,14 +233,14 @@ export default function UsersPage() {
       )}
 
       {/* Users Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden ">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+          <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
             <Loader2 className="w-5 h-5 animate-spin" />
             <span>Caricamento utenti in corso...</span>
           </div>
         ) : users.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-12 text-center text-[var(--text-label-soft)]">
             Nessun membro del team trovato. Clicca su &quot;Aggiungi autista&quot; per creare credenziali e accesso PWA.
           </div>
         ) : (
@@ -250,8 +250,8 @@ export default function UsersPage() {
               <div key={u.id} className="ops-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-100">{u.nome} {u.cognome}</p>
-                    <p className="truncate font-mono text-[11px] text-slate-400">{u.email}</p>
+                    <p className="truncate text-sm font-semibold text-[var(--text)]">{u.nome} {u.cognome}</p>
+                    <p className="truncate font-mono text-[11px] text-[var(--text-label)]">{u.email}</p>
                   </div>
                   <span className="chip chip-brand">{label(u.role)}</span>
                 </div>
@@ -262,7 +262,7 @@ export default function UsersPage() {
                       <button
                         type="button"
                         onClick={() => openPermissions(u)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-indigo-600 hover:text-indigo-200"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--text-soft)] hover:border-indigo-600 hover:text-indigo-200"
                       >
                         <ShieldCheck className="h-3.5 w-3.5" /> Permessi
                       </button>
@@ -271,7 +271,7 @@ export default function UsersPage() {
                       type="button"
                       onClick={() => resetPassword(u)}
                       disabled={saving}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--text-soft)] hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
                     >
                       <KeyRound className="h-3.5 w-3.5" /> Reset
                     </button>
@@ -282,8 +282,8 @@ export default function UsersPage() {
           </div>
 
           <div className="hidden overflow-x-auto md:block">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+            <table className="w-full text-left text-sm text-[var(--text-soft)]">
+              <thead className="bg-black/60 text-xs font-semibold text-[var(--text-label)]   border-b border-[var(--surface-border)]">
                 <tr>
                   <th className="px-6 py-4">Nome & Cognome</th>
                   <th className="px-6 py-4">Email</th>
@@ -293,18 +293,18 @@ export default function UsersPage() {
                   <th className="px-6 py-4 text-right">Azioni</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-[var(--surface-border)]">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-800/40 transition">
-                    <td className="px-6 py-4 font-semibold text-slate-100">
+                  <tr key={u.id} className="hover:bg-[var(--surface-soft)] transition">
+                    <td className="px-6 py-4 font-semibold text-[var(--text)]">
                       {u.nome} {u.cognome}
-                      {geotabLinkedLocalIds.has(u.id) && <span className="ml-2 rounded-full border border-sky-700/60 bg-sky-950/40 px-2 py-0.5 text-[9px] font-bold uppercase text-sky-200">Geotab collegato</span>}
+                      {geotabLinkedLocalIds.has(u.id) && <span className="ml-2 rounded-full border border-sky-700/60 bg-sky-950/40 px-2 py-0.5 text-[9px] font-semibold  text-sky-200">Geotab collegato</span>}
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-slate-300">{u.email}</td>
-                    <td className="px-6 py-4 text-xs text-slate-400">{u.telefono || "-"}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-[var(--text-soft)]">{u.email}</td>
+                    <td className="px-6 py-4 text-xs text-[var(--text-label)]">{u.telefono || "-"}</td>
                     <td className="px-6 py-4">
                       <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-md ${
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-md ${
                           u.role === "ADMIN"
                             ? "bg-purple-950 text-purple-300 border border-purple-800/60"
                             : u.role === "AUTISTA"
@@ -316,7 +316,7 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded text-emerald-400 bg-emerald-950/80">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded text-emerald-400 bg-emerald-950/80">
                         ATTIVO
                       </span>
                     </td>
@@ -326,7 +326,7 @@ export default function UsersPage() {
                           <button
                             type="button"
                             onClick={() => openPermissions(u)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-indigo-600 hover:text-indigo-200"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--text-soft)] hover:border-indigo-600 hover:text-indigo-200"
                             title="Gestisci permessi"
                           >
                             <ShieldCheck className="h-3.5 w-3.5" /> Permessi
@@ -336,7 +336,7 @@ export default function UsersPage() {
                           type="button"
                           onClick={() => resetPassword(u)}
                           disabled={saving}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--text-soft)] hover:border-amber-600 hover:text-amber-200 disabled:opacity-50"
                           title="Reimposta password"
                         >
                           <KeyRound className="h-3.5 w-3.5" /> Reset
@@ -358,7 +358,7 @@ export default function UsersPage() {
             Password temporanea per {resetResult.email}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <code className="rounded-lg border border-amber-800/60 bg-slate-950 px-3 py-2 font-mono text-sm text-amber-100">
+            <code className="rounded-lg border border-amber-800/60 bg-[var(--surface-soft)] px-3 py-2 font-mono text-sm text-amber-100">
               {resetResult.tempPassword}
             </code>
             <button
@@ -373,7 +373,7 @@ export default function UsersPage() {
             <button
               type="button"
               onClick={() => setResetResult(null)}
-              className="rounded-lg border border-slate-700 px-2.5 py-2 text-xs font-semibold text-slate-300"
+              className="rounded-lg border border-[var(--surface-border)] px-2.5 py-2 text-xs font-semibold text-[var(--text-soft)]"
             >
               Chiudi
             </button>
@@ -386,9 +386,9 @@ export default function UsersPage() {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-slate-100 flex items-center">
+        <div className="fixed inset-0 bg-black/60  z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl w-full max-w-md p-6  space-y-4">
+            <h3 className="text-lg font-semibold text-[var(--text)] flex items-center">
               <UserCheck className="w-5 h-5 mr-2 text-indigo-400" /> Crea account del team
             </h3>
 
@@ -401,7 +401,7 @@ export default function UsersPage() {
             <form onSubmit={handleAddUser} className="space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Nome *
                   </label>
                   <input
@@ -410,12 +410,12 @@ export default function UsersPage() {
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     placeholder="Mario"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Cognome *
                   </label>
                   <input
@@ -424,13 +424,13 @@ export default function UsersPage() {
                     value={cognome}
                     onChange={(e) => setCognome(e.target.value)}
                     placeholder="Rossi"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   Email Login *
                 </label>
                 <input
@@ -439,12 +439,12 @@ export default function UsersPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="utente@azienda.it"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                   Password Iniziale *
                 </label>
                 <input
@@ -453,19 +453,19 @@ export default function UsersPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                  className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Ruolo
                   </label>
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value as "AUTISTA" | "UFFICIO")}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-slate-100 outline-none"
+                    className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-4 py-2 text-[var(--text)] outline-none"
                   >
                     <option value="AUTISTA">Autista</option>
                     <option value="UFFICIO">Ufficio</option>
@@ -473,7 +473,7 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Telefono
                   </label>
                   <input
@@ -481,20 +481,20 @@ export default function UsersPage() {
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
                     placeholder="+39..."
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none"
                   />
                 </div>
               </div>
 
               {role === "AUTISTA" && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                  <label className="block text-xs font-semibold text-[var(--text-soft)]  mb-1">
                     Assegna Veicolo (Opzionale)
                   </label>
                   <select
                     value={vehicleId}
                     onChange={(e) => setVehicleId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-slate-100 outline-none font-mono text-xs"
+                    className="w-full bg-[var(--surface-soft)] border border-[var(--surface-border)] focus:border-[var(--brand)] rounded-xl px-4 py-2 text-[var(--text)] outline-none font-mono text-xs"
                   >
                     <option value="">-- Nessun veicolo assegnato --</option>
                     {vehicles.map((v) => (
@@ -506,11 +506,11 @@ export default function UsersPage() {
                 </div>
               )}
 
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+              <div className="flex justify-end space-x-3 pt-3 border-t border-[var(--surface-border)]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium"
+                  className="px-4 py-2 bg-[var(--surface-strong)] hover:bg-[var(--surface-border)] text-[var(--text-soft)] rounded-xl font-medium"
                 >
                   Annulla
                 </button>
@@ -528,21 +528,21 @@ export default function UsersPage() {
       )}
 
       {permissionUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 ">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-6 ">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="flex items-center text-lg font-bold text-slate-100">
+                <h3 className="flex items-center text-lg font-semibold text-[var(--text)]">
                   <ShieldCheck className="mr-2 h-5 w-5 text-indigo-400" /> Permessi di {permissionUser.nome} {permissionUser.cognome}
                 </h3>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-[var(--text-label)]">
                   Il ruolo {label(permissionUser.role)} può accedere solo alle aree spuntate. Le API verificano gli stessi permessi.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setPermissionUser(null)}
-                className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300"
+                className="rounded-lg border border-[var(--surface-border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text-soft)]"
               >
                 Chiudi
               </button>
@@ -551,10 +551,10 @@ export default function UsersPage() {
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               {PERMISSION_GROUPS.map((group) => (
                 <section key={group.group}>
-                  <h4 className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{group.group}</h4>
+                  <h4 className="text-[11px] font-semibold   text-[var(--text-label)]">{group.group}</h4>
                   <div className="mt-2 space-y-1.5">
                     {group.items.map((item) => (
-                      <label key={item.key} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-200">
+                      <label key={item.key} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]">
                         <span>{item.label}</span>
                         <input
                           type="checkbox"
@@ -571,11 +571,11 @@ export default function UsersPage() {
               ))}
             </div>
 
-            <div className="mt-5 flex justify-end gap-3 border-t border-slate-800 pt-4">
+            <div className="mt-5 flex justify-end gap-3 border-t border-[var(--surface-border)] pt-4">
               <button
                 type="button"
                 onClick={() => setPermissionUser(null)}
-                className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300"
+                className="rounded-xl bg-[var(--surface-strong)] px-4 py-2 text-sm font-medium text-[var(--text-soft)]"
               >
                 Annulla
               </button>

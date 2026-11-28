@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { Copy, Download, ExternalLink, Loader2, PackageCheck, Plus, RefreshCw, Route } from "lucide-react";
@@ -253,16 +253,16 @@ export default function OrdiniPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center text-2xl font-bold text-slate-100">
+          <h1 className="flex items-center text-2xl font-semibold text-[var(--text)]">
             <PackageCheck className="mr-2.5 h-6 w-6 text-amber-400" /> Ordini
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Ordini e richieste dal portale cliente, con stati e conversione in viaggio.</p>
+          <p className="mt-1 text-sm text-[var(--text-label)]">Ordini e richieste dal portale cliente, con stati e conversione in viaggio.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a href="/api/export?type=orders" className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500">
+          <a href="/api/export?type=orders" className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500">
             <Download className="h-4 w-4" /> Esporta CSV
           </a>
-          <button type="button" onClick={load} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500">
+          <button type="button" onClick={load} className="inline-flex items-center gap-2 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500">
             <RefreshCw className="h-4 w-4" /> Aggiorna
           </button>
           <button type="button" onClick={() => setShowForm((v) => !v)} className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-500">
@@ -274,21 +274,21 @@ export default function OrdiniPage() {
       {error && <div className="rounded-xl border border-red-800/60 bg-red-950/40 p-3 text-sm text-red-200">{error}</div>}
       {success && <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/40 p-3 text-sm text-emerald-200">{success}</div>}
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+      <section className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-slate-100">Portale ordini cliente</h2>
-            <p className="mt-1 text-xs text-slate-500">Una pagina brandizzata dove i clienti inviano ordini e richieste di preventivo.</p>
+            <h2 className="font-semibold text-[var(--text)]">Portale ordini cliente</h2>
+            <p className="mt-1 text-xs text-[var(--text-label-soft)]">Una pagina brandizzata dove i clienti inviano ordini e richieste di preventivo.</p>
           </div>
           {portal ? (
             <div className="flex flex-wrap items-center gap-2">
-              <a href={portalUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-indigo-500">
+              <a href={portalUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-xs font-semibold text-[var(--text)] hover:border-indigo-500">
                 <ExternalLink className="h-3.5 w-3.5" /> Apri portale
               </a>
-              <button type="button" onClick={copyLink} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-indigo-500">
+              <button type="button" onClick={copyLink} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--surface-border)] px-3 py-2 text-xs font-semibold text-[var(--text)] hover:border-indigo-500">
                 <Copy className="h-3.5 w-3.5" /> Copia link
               </button>
-              <span className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${portal.enabled ? "border-emerald-800 bg-emerald-950 text-emerald-300" : "border-slate-700 bg-slate-900 text-slate-400"}`}>
+              <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${portal.enabled ? "border-emerald-800 bg-emerald-950 text-emerald-300" : "border-[var(--surface-border)] bg-[var(--surface)] text-[var(--text-label)]"}`}>
                 {portal.enabled ? "Attivo" : "Disattivato"}
               </span>
             </div>
@@ -299,24 +299,24 @@ export default function OrdiniPage() {
           )}
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-[1fr_180px_auto]">
-          <input placeholder="Nome brand (es. Trasporti Rossi)" value={brandName} onChange={(e) => setBrandName(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-          <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-2" />
-          <button type="button" onClick={updatePortal} disabled={saving || !portal} className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-indigo-500 disabled:opacity-50">
+          <input placeholder="Nome brand (es. Trasporti Rossi)" value={brandName} onChange={(e) => setBrandName(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+          <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-10 w-full rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-2" />
+          <button type="button" onClick={updatePortal} disabled={saving || !portal} className="rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm font-semibold text-[var(--text)] hover:border-indigo-500 disabled:opacity-50">
             Salva brand
           </button>
         </div>
-        {portal && <p className="mt-2 break-all text-xs text-slate-500">{portalUrl}</p>}
+        {portal && <p className="mt-2 break-all text-xs text-[var(--text-label-soft)]">{portalUrl}</p>}
       </section>
 
       {showForm && (
-        <form onSubmit={create} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <form onSubmit={create} className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] p-5">
           <div className="grid gap-3 md:grid-cols-3">
             <div className="col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
               <select
                 value={customerId}
                 onChange={(e) => selectCustomer(e.target.value)}
                 aria-label="Seleziona cliente dall'anagrafica"
-                className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                className="flex-1 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]"
               >
                 <option value="">Cliente occasionale / nuovo — compila i campi sotto</option>
                 {customers.map((c) => (
@@ -327,18 +327,18 @@ export default function OrdiniPage() {
                 Gestisci anagrafica
               </a>
             </div>
-            <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input placeholder="Merce" value={goods} onChange={(e) => setGoods(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input required placeholder="Ritiro *" value={pickup} onChange={(e) => setPickup(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input required placeholder="Consegna *" value={delivery} onChange={(e) => setDelivery(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Peso kg" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <input type="number" placeholder="Volume m³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" />
-            <textarea placeholder="Note" value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 md:col-span-1" rows={1} />
+            <input required placeholder="Cliente *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input placeholder="Merce" value={goods} onChange={(e) => setGoods(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input required placeholder="Ritiro *" value={pickup} onChange={(e) => setPickup(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input required placeholder="Consegna *" value={delivery} onChange={(e) => setDelivery(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Peso kg" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <input type="number" placeholder="Volume m³" value={volumeM3} onChange={(e) => setVolumeM3(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)]" />
+            <textarea placeholder="Note" value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)] md:col-span-1" rows={1} />
           </div>
           <div className="mt-3 flex justify-end gap-2">
-            <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300">Annulla</button>
+            <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-[var(--surface-border)] px-3 py-2 text-sm text-[var(--text-soft)]">Annulla</button>
             <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Salva ordine
             </button>
@@ -348,7 +348,7 @@ export default function OrdiniPage() {
 
       <div className="space-y-3 md:hidden">
         {loading ? (
-          <div className="ops-card flex items-center justify-center p-8 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
+          <div className="ops-card flex items-center justify-center p-8 text-[var(--text-label)]"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
           <div className="ops-card">
             <EmptyState
@@ -364,16 +364,16 @@ export default function OrdiniPage() {
             <div key={o.id} className="ops-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-100">{o.customerName}</p>
-                  <p className="text-xs text-slate-500">{o.pickup} → {o.delivery}</p>
+                  <p className="truncate text-sm font-semibold text-[var(--text)]">{o.customerName}</p>
+                  <p className="text-xs text-[var(--text-label-soft)]">{o.pickup} → {o.delivery}</p>
                 </div>
-                <p className="text-sm font-bold text-slate-100">{eur(o.price)}</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{eur(o.price)}</p>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2 border-t pt-3" style={{ borderColor: "var(--surface-border)" }}>
                 <select
                   value={o.status}
                   onChange={(e) => setStatus(o.id, e.target.value)}
-                  className={`rounded-full border px-2 py-1 text-[10px] font-bold ${statusStyle[o.status] ?? statusStyle.RICEVUTO}`}
+                  className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? statusStyle.RICEVUTO}`}
                 >
                   {statuses.map((s) => <option key={s} value={s}>{label(s)}</option>)}
                 </select>
@@ -389,9 +389,9 @@ export default function OrdiniPage() {
         )}
       </div>
 
-      <div className="hidden overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/70 md:block">
+      <div className="hidden overflow-x-auto rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] md:block">
         {loading ? (
-          <div className="flex items-center justify-center p-10 text-slate-400"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
+          <div className="flex items-center justify-center p-10 text-[var(--text-label)]"><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Caricamento...</div>
         ) : items.length === 0 ? (
           <EmptyState
             icon={PackageCheck}
@@ -402,7 +402,7 @@ export default function OrdiniPage() {
           />
         ) : (
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 text-[11px] uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-[var(--surface-border)] text-[11px]   text-[var(--text-label-soft)]">
               <tr>
                 <th className="px-4 py-3">Cliente</th>
                 <th className="px-4 py-3">Tratta</th>
@@ -413,21 +413,21 @@ export default function OrdiniPage() {
             </thead>
             <tbody>
               {items.map((o) => (
-                <tr key={o.id} className="border-b border-slate-800/60 last:border-0">
+                <tr key={o.id} className="border-b border-[var(--surface-border)] last:border-0">
                   <td className="px-4 py-3">
-                    <p className="font-semibold text-slate-100">{o.customerName}</p>
-                    <p className="text-xs text-slate-500">{o.customerEmail || "—"}</p>
+                    <p className="font-semibold text-[var(--text)]">{o.customerName}</p>
+                    <p className="text-xs text-[var(--text-label-soft)]">{o.customerEmail || "—"}</p>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">
+                  <td className="px-4 py-3 text-[var(--text-soft)]">
                     {o.pickup} → {o.delivery}
-                    <p className="text-xs text-slate-500">{o.goods || "Merce"} · {o.weightKg} kg</p>
+                    <p className="text-xs text-[var(--text-label-soft)]">{o.goods || "Merce"} · {o.weightKg} kg</p>
                   </td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-100">{eur(o.price)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[var(--text)]">{eur(o.price)}</td>
                   <td className="px-4 py-3">
                     <select
                       value={o.status}
                       onChange={(e) => setStatus(o.id, e.target.value)}
-                      className={`rounded-full border px-2 py-1 text-[11px] font-bold ${statusStyle[o.status] ?? statusStyle.RICEVUTO}`}
+                      className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? statusStyle.RICEVUTO}`}
                     >
                       {statuses.map((s) => (
                         <option key={s} value={s}>{label(s)}</option>

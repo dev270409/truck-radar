@@ -27,7 +27,7 @@ interface Connection {
 }
 
 const statusStyles: Record<string, string> = {
-  DRAFT: "bg-slate-800 text-slate-400",
+  DRAFT: "bg-[var(--surface-strong)] text-[var(--text-label)]",
   TESTED: "bg-blue-950 text-blue-300 border border-blue-800/60",
   SYNCED: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
 };
@@ -199,7 +199,7 @@ export default function IntegrazioniPage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-slate-400 flex items-center justify-center space-x-2">
+      <div className="p-12 text-center text-[var(--text-label)] flex items-center justify-center space-x-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         <span>Caricamento integrazioni...</span>
       </div>
@@ -209,10 +209,10 @@ export default function IntegrazioniPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center">
+        <h1 className="text-2xl font-semibold text-[var(--text)] flex items-center">
           <Cloud className="w-6 h-6 mr-2.5 text-blue-400" /> API & Integrazioni
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-label)] mt-1">
           Geotab usa una connessione reale in sola lettura. Gli altri connettori sono dimostrativi finché non è disponibile un adapter.
         </p>
       </div>
@@ -228,18 +228,18 @@ export default function IntegrazioniPage() {
 
       {/* Provider collegati */}
       <section>
-        <h2 className="text-xs font-bold uppercase text-slate-500 tracking-wide mb-3">
+        <h2 className="text-xs font-semibold  text-[var(--text-label-soft)]  mb-3">
           Connessioni attive ({connessioni.length})
         </h2>
         {connessioni.length === 0 ? (
-          <div className="p-6 text-center bg-slate-900 border border-slate-800 rounded-2xl">
-            <Cloud className="w-8 h-8 mx-auto text-slate-600 mb-3" />
-            <p className="text-sm text-slate-400">Nessuna integrazione collegata.</p>
+          <div className="p-6 text-center bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
+            <Cloud className="w-8 h-8 mx-auto text-[var(--text-label-soft)] mb-3" />
+            <p className="text-sm text-[var(--text-label)]">Nessuna integrazione collegata.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {connessioni.map((c) => (
-              <div key={c.id} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl">
+              <div key={c.id} className="p-4 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl">
                 {/** La lettura Geotab è reale e read-only; gli adapter non implementati non vanno presentati come sync attive. */}
                 {(() => {
                   const provider = catalogo.find((item) => item.id === c.integrationId)?.provider;
@@ -249,8 +249,8 @@ export default function IntegrazioniPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center space-x-2">
-                      <p className="text-sm font-bold text-slate-100">{c.name}</p>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusStyles[c.status]}`}>
+                      <p className="text-sm font-semibold text-[var(--text)]">{c.name}</p>
+                      <span className={`text-[11px] font-semibold  px-2 py-0.5 rounded ${statusStyles[c.status]}`}>
                               {label(c.status)}
                       </span>
                       {isGeotab ? (
@@ -260,14 +260,14 @@ export default function IntegrazioniPage() {
                       )}
                     </div>
                     {c.baseUrl && (
-                      <p className="text-xs font-mono text-slate-500 mt-0.5 truncate">{c.baseUrl}</p>
+                      <p className="text-xs font-mono text-[var(--text-label-soft)] mt-0.5 truncate">{c.baseUrl}</p>
                     )}
                     {!isGeotab && (
-                      <p className="mt-1 text-[10px] font-semibold text-amber-300">
+                      <p className="mt-1 text-[11px] font-semibold text-amber-300">
                         Connettore dimostrativo: le credenziali sono salvate ma non viene effettuata alcuna chiamata reale al provider.
                       </p>
                     )}
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-[11px] text-[var(--text-label-soft)] mt-1">
                       Credenziali: {c.hasCreds ? `configurate (${c.credsKeys})` : "mancanti"}
                       {c.lastTestedAt && ` · Test: ${new Date(c.lastTestedAt).toLocaleString("it-IT")}`}
                       {c.lastSyncAt && ` · Sync: ${new Date(c.lastSyncAt).toLocaleString("it-IT")}`}
@@ -311,16 +311,16 @@ export default function IntegrazioniPage() {
 
       {/* Catalogo provider */}
       <section>
-        <h2 className="text-xs font-bold uppercase text-slate-500 tracking-wide mb-3">
+        <h2 className="text-xs font-semibold  text-[var(--text-label-soft)]  mb-3">
           Scegli provider e metodo di autenticazione
         </h2>
-        <p className="mb-5 max-w-3xl text-xs leading-5 text-slate-400">
+        <p className="mb-5 max-w-3xl text-xs leading-5 text-[var(--text-label)]">
           Le credenziali cambiano da un fornitore all&apos;altro: Geotab usa database + utente + password; gli altri connettori richiedono la chiave o il flusso indicato dal provider. Usa un account di servizio con permessi minimi, non condividere password personali.
         </p>
         <div className="space-y-8">
           {Object.entries(catalogGroups).map(([group, providers]) => (
             <div key={group}>
-              <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wide text-slate-400">{group}</h3>
+              <h3 className="mb-3 text-[11px] font-semibold   text-[var(--text-label)]">{group}</h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {providers.map((prov) => {
                   const alreadyConnected = connessioni.some((c) => c.integrationId === prov.id);
@@ -328,14 +328,14 @@ export default function IntegrazioniPage() {
                   const guideOpen = openGuide === prov.id || openForm === prov.id;
                   const canConnect = isGeotab ? Boolean(database.trim() && username.trim() && password) : true;
                   return (
-                    <div key={prov.id} className={`rounded-2xl border p-5 ${isGeotab ? "border-blue-700/70 bg-slate-900" : "border-slate-800 bg-slate-900"}`}>
+                    <div key={prov.id} className={`rounded-xl border p-5 ${isGeotab ? "border-blue-700/70 bg-[var(--surface)]" : "border-[var(--surface-border)] bg-[var(--surface)]"}`}>
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <p className="text-sm font-bold text-slate-100">{prov.name}</p>
-                        <span className="rounded-full bg-slate-800 px-2 py-1 text-[9px] font-bold uppercase text-slate-300">
+                        <p className="text-sm font-semibold text-[var(--text)]">{prov.name}</p>
+                        <span className="rounded-full bg-[var(--surface-strong)] px-2 py-1 text-[9px] font-semibold  text-[var(--text-soft)]">
                           {isGeotab ? "Database + utente" : "API key / OAuth"}
                         </span>
                       </div>
-                      <p className="text-[11px] font-mono text-slate-500">{prov.provider} · {prov.type}</p>
+                      <p className="text-[11px] font-mono text-[var(--text-label-soft)]">{prov.provider} · {prov.type}</p>
 
                       {isGeotab && (
                         <div className="mt-3 rounded-xl border border-blue-800/60 bg-blue-950/30 p-3 text-[11px] leading-5 text-blue-100">
@@ -354,7 +354,7 @@ export default function IntegrazioniPage() {
                       </button>
 
                       {guideOpen && (
-                        <div className="mt-3 space-y-2 rounded-xl border border-slate-700 bg-slate-950/70 p-3 text-[11px] leading-5 text-slate-300">
+                        <div className="mt-3 space-y-2 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] p-3 text-[11px] leading-5 text-[var(--text-soft)]">
                           {isGeotab ? (
                             <ol className="list-decimal space-y-1 pl-4">
                               <li>Accedi a MyGeotab e usa il nome database della tua istanza (lo stesso selezionato nella schermata di accesso).</li>
@@ -385,40 +385,40 @@ export default function IntegrazioniPage() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder={isGeotab ? "Nome connessione (es. Geotab flotta)" : "Nome connessione"}
-                            className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500"
+                            className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]"
                           />
                           {isGeotab ? (
                             <>
-                              <label className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                              <label className="block text-[11px] font-semibold   text-[var(--text-label)]">
                                 Database MyGeotab
-                                <input required autoComplete="off" value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="es. nome_database" className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm normal-case text-slate-100 outline-none focus:border-blue-500" />
+                                <input required autoComplete="off" value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="es. nome_database" className="mt-1 w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm normal-case text-[var(--text)] outline-none focus:border-[var(--brand)]" />
                               </label>
-                              <label className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                              <label className="block text-[11px] font-semibold   text-[var(--text-label)]">
                                 Email / username dell&apos;utente API
-                                <input required type="email" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="truck-radar-api@azienda.it" className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm normal-case text-slate-100 outline-none focus:border-blue-500" />
+                                <input required type="email" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="truck-radar-api@azienda.it" className="mt-1 w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm normal-case text-[var(--text)] outline-none focus:border-[var(--brand)]" />
                               </label>
-                              <label className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                              <label className="block text-[11px] font-semibold   text-[var(--text-label)]">
                                 Password dell&apos;utente API
                                 <span className="relative mt-1 block">
-                                  <input required type={showPassword ? "text" : "password"} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password MyGeotab" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 pr-10 text-sm normal-case text-slate-100 outline-none focus:border-blue-500" />
-                                  <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Nascondi password" : "Mostra password"} className="absolute right-3 top-2.5 text-slate-400">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+                                  <input required type={showPassword ? "text" : "password"} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password MyGeotab" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 pr-10 text-sm normal-case text-[var(--text)] outline-none focus:border-[var(--brand)]" />
+                                  <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Nascondi password" : "Mostra password"} className="absolute right-3 top-2.5 text-[var(--text-label)]">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                                 </span>
                               </label>
-                              <div className="flex items-start gap-2 rounded-lg bg-emerald-950/30 p-2 text-[10px] leading-4 text-emerald-200">
+                              <div className="flex items-start gap-2 rounded-lg bg-emerald-950/30 p-2 text-[11px] leading-4 text-emerald-200">
                                 <ShieldCheck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
                                 Inviamo le credenziali solo al server MyGeotab via HTTPS POST; le salviamo cifrate e non le mostriamo di nuovo.
                               </div>
                             </>
                           ) : (
                             <>
-                              <input type="url" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder="Base URL HTTPS del provider" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 outline-none focus:border-blue-500" />
-                              <input type="password" autoComplete="new-password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="API key / token" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 outline-none focus:border-blue-500" />
+                              <input type="url" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder="Base URL HTTPS del provider" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
+                              <input type="password" autoComplete="new-password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="API key / token" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
                               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                <input type="text" autoComplete="off" value={clientId} onChange={(e) => setClientId(e.target.value)} placeholder="Client ID (OAuth, se richiesto)" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 outline-none focus:border-blue-500" />
-                                <input type="password" autoComplete="new-password" value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} placeholder="Client secret (OAuth)" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 outline-none focus:border-blue-500" />
+                                <input type="text" autoComplete="off" value={clientId} onChange={(e) => setClientId(e.target.value)} placeholder="Client ID (OAuth, se richiesto)" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
+                                <input type="password" autoComplete="new-password" value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} placeholder="Client secret (OAuth)" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
                               </div>
-                              <input type="text" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username (se richiesto)" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500" />
-                              <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (se richiesta)" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500" />
+                              <input type="text" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username (se richiesto)" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
+                              <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (se richiesta)" className="w-full rounded-xl border border-[var(--surface-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]" />
                             </>
                           )}
                           <div className="flex gap-2">
@@ -426,14 +426,14 @@ export default function IntegrazioniPage() {
                               {busy === prov.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plug className="h-3.5 w-3.5" />}
                               <span>Collega in modo sicuro</span>
                             </button>
-                            <button onClick={resetForm} className="rounded-xl bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-700">Annulla</button>
+                            <button onClick={resetForm} className="rounded-xl bg-[var(--surface-strong)] px-3 py-2 text-xs font-semibold text-[var(--text-soft)] transition hover:bg-[var(--surface-border)]">Annulla</button>
                           </div>
                         </div>
                       ) : (
                         <button
                           onClick={() => { setOpenForm(prov.id); setOpenGuide(prov.id); }}
                           disabled={alreadyConnected}
-                          className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[var(--surface-strong)] px-3 py-2 text-xs font-semibold text-[var(--text)] transition hover:bg-[var(--surface-border)] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <Plus className="h-3.5 w-3.5" />
                           <span>{alreadyConnected ? "Già collegato" : isGeotab ? "Configura MyGeotab" : "Configura provider"}</span>
